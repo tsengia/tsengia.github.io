@@ -20,6 +20,6 @@ permalink:           /:title
 plugins:             [jekyll-paginate, jekyll-sitemap, jekyll-feed, jekyll-seo-tag]
 
 # Customise atom feed settings (this is where Jekyll-Feed gets configuration information)
-title:		           'Tyler Sengia Blog'
+title:		           "Tyler Sengia's Blog"
 description:	       'Software engineering blog, tutorials, and examples.'
 author:              'Tyler Sengia'
