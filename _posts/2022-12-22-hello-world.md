@@ -6,7 +6,6 @@ categories: journal
 tags: [journal]
 ---
 
-# Hello World!
 This is my first post on GitHub pages!
 
 Many thanks to [Paul Le](https://github.com/LeNPaul) for providing this great Jekyll template [Legrange](https://github.com/LeNPaul/Lagrange)  that I am using for this site.
