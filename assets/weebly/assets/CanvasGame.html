@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html>
+<head>
+
+<title>
+HTML Template
+</title>
+
+<style>
+#canvas {
+border:1px solid;
+border-color:#000000;
+}
+</style>
+</head>
+
+<body>
+<canvas id='canvas' height=200 width=300 > If you can see this text your browser doesn't support canvas! </canvas>
+
+
+
+<script type='text/javascript' >
+var c = document.getElementById('canvas');
+var can = c.getContext('2d');
+var cH = c.height;
+var cW = c.width;
+var key;
+var playing = true;
+
+c.addEventListener("mousedown", getPosition, false);
+c.addEventListener("mousemove", getPosition, false);
+
+var mouseX = 0;
+var mouseY = 0;
+window.onload=start();
+
+function start() {
+
+window.setInterval("run();", 10);
+}
+
+function run() {
+	render();
+}
+
+function render() {
+clearCan();
+
+}
+
+
+
+function fillCan(color) {
+var color;
+can.fillStyle=color;
+can.fillRect(0, 0, cW, cH);
+}
+
+function clearCan() {
+can.clearRect(0, 0, cW, cH);
+}
+
+
+function writeCookie(value, name, hours)
+
+{
+
+  var expire = "";
+
+  if(hours != null)
+
+  {
+
+    expire = new Date((new Date()).getTime() + hours * 3600000);
+
+    expire = "; expires=" + expire.toGMTString();
+
+  }
+
+  document.cookie = name + "=" + escape(value) + expire;
+
+}
+
+/* Example:
+alert( readCookie("myCookie") );
+*/
+function readCookie(name)
+
+{
+
+  var cookieValue = "";
+
+  var search = name + "=";
+
+  if(document.cookie.length > 0)
+
+  { 
+
+    offset = document.cookie.indexOf(search);
+
+    if (offset != -1)
+
+    { 
+
+      offset += search.length;
+
+      end = document.cookie.indexOf(";", offset);
+
+      if (end == -1) end = document.cookie.length;
+
+      cookieValue = unescape(document.cookie.substring(offset, end))
+
+    }
+
+  }
+
+  return cookieValue;
+
+}
+
+function deleteCookie(name) {
+var name;
+writeCookie("", name, -1);
+}
+
+
+
+function setKey(e) {
+var ASCIKEY = e.keyCode;
+key = String.fromCharCode(ASCIKEY);
+}
+window.onkeypress = function(e) {
+setKey(e);
+var bK = key;
+while(key == bK ) {
+setKey(e);
+}
+key ='';
+}
+
+window.onkeyup = function(e){
+key = '';
+}
+
+
+
+function getPosition(event) {
+        var x;
+        var y;
+        if (event.x != undefined && event.y != undefined)
+        {
+          x = event.x;
+          y = event.y;
+        }
+        else // Firefox method to get the position
+        {
+          x = event.clientX + document.body.scrollLeft +
+              document.documentElement.scrollLeft;
+          y = event.clientY + document.body.scrollTop +
+              document.documentElement.scrollTop;
+        }
+
+        x -= c.offsetLeft;
+        y -= c.offsetTop;
+		x  = x - window.pageXOffset;
+		y  = y + window.pageYOffset;
+        mouseX = x;
+		mouseY = y;
+      } 
+	  
+function loadImage(name, src, height, width) {
+/* Loads images */
+var name;
+var src;
+var height;
+var width;
+loaded = false;
+eval(name+' = new Image();');
+eval(name+".src='"+src+"';");
+eval(name+".width='"+width+"';");
+eval(name+".height='"+height+"';");
+}
+
+</script>
+
+</body>
+
+</html>

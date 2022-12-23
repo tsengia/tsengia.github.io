@@ -1,0 +1,206 @@
+<html>
+<head>
+<style>
+#topBar {
+background-color:#000099;
+color:FFFFFF;
+}
+
+#input {
+color:#111199;
+}
+#output {
+background-color:#000000;
+}
+
+#inp {
+bgcolor:#660000;
+}
+</style>
+<title>
+Wandered JS
+</title>
+</head>
+<body>
+<div id='topBar' style="width:600px;height:20px;" > <img height=10 width=10 src= ' ' alt='image' /> Wandered JS </div>
+<div id='output' style="border:1px solid
+black;width:600px;height:200px; overflow:scroll; overflow-
+y:scroll;  overflow-x:hidden; " >
+
+</div>
+<br />
+<div id='inp' >
+<textarea id='input' rows=3 cols=65 ></textarea>
+<button type='button' onclick='enter();' > Enter <br /> => </button>
+</div>
+
+<script type='text/javascript' >
+var input;
+var output;
+var entered = new Array();
+
+window.onload = start();
+
+function start() {
+send('Press enter to start.', 'Grey', "System", true);
+}
+
+var key;
+window.onkeydown = function(e) {
+key = e.keyCode;
+if (key == 38) {
+lastCommand();
+}
+}
+
+window.onkeyup = function() {
+key = " ";
+}
+
+function enter() {
+input = document.getElementById('input').value;
+entered.push(input);
+/* Is it blank? */
+if (input == "" || input == " ") {
+document.getElementById('input').value= "";
+}
+else {
+/* If not then process it */
+document.getElementById('input').value= "";
+process();
+}
+}
+inArray = new Array();
+/* Is it a command? */
+function process() {
+  if(input.charAt(0) == "/" ) {
+  inArray = input.split(' ');
+  ex(inArray[0]);
+  }
+else {
+/* If not a command then say it */
+send(input, 'Blue' , "Player");
+}
+}
+
+function ex(com) {
+var com;
+/*Put commands inside the switch */
+switch (com) {
+case '/sleep':
+sleep();
+break;
+case '/help':
+help();
+break;
+case '/do':
+doSo();
+break;
+default:
+send(com + " is not a command!", "Red", "Error");
+break;
+}
+}
+
+function doSo() {
+var string = input.replace("/do" , " ");
+eval(string);
+}
+
+function sleep() {
+send("ZZZZZZZ", "Blue", "Player");
+}
+
+function help() {
+if (inArray == "/help") {
+send("::Commands:: <br /> /sleep <br /> /help <br /> Type in /help command to find out more about that command.", 'Yellow', 'Help');
+}
+if(inArray[1] == "sleep" ) {
+send('/sleep <br /> Causes the player to sleep.', 'Yellow', 'Help - Sleep');
+}
+}
+
+function popup(type, text) {
+var type;
+var text;
+switch (type) {
+case 'say':
+alert(text);
+break;
+case 'ask':
+return prompt(text);
+break;
+case 'confirm':
+return confirm(text);
+break;
+}
+}
+
+function send(text, speakerType, speakerName, scrolling) {
+/* Post the text into the game */
+var text;
+var speakerType;
+var speakerName;
+var scrolling;
+if (speakerName == "") {
+speakerName = "Console";
+}
+var color = getColor(speakerType);
+if (scrolling == true) {
+var finText = '<br /> <marquee style=" color:' + color + ';" > ' +
+speakerName + ': ' + text + '</marquee>';
+}
+else {
+var finText = '<p style=" color:' + color + ';" > ' +
+speakerName + ': ' + text + '</p>';
+}
+output  = output + finText;
+update();
+}
+
+function getColor(speaker) {
+/* What color to use... */
+var speaker;
+switch (speaker) {
+case 'Grey':
+return '#777777';
+break;
+case 'Blue':
+return '#3333FF';
+break;
+case 'Purple':
+return '#991199';
+break;
+case 'Red':
+return '#990000';
+break;
+case 'Yellow':
+return '#999900';
+break;
+case 'Green':
+return '#009900';
+break;
+default:
+return '#FFFFFF';
+break;
+}
+}
+
+
+
+function update() {
+/* Make the text show up */
+document.getElementById('output').innerHTML = output;
+var objDiv = document.getElementById('output');
+objDiv.scrollTop = objDiv.scrollHeight;
+}
+
+function lastCommand() {
+var current = entered.length;
+current--;
+document.getElementById('input').value = entered[current];
+}
+
+</script>
+</body>
+</html>

@@ -1,0 +1,355 @@
+<html>
+<head>
+<title>Canvas Template</title>
+
+<style>
+#canBorder {
+background-color:#999999;
+width:300px;
+padding:15px;
+border:5px solid;
+border-radius:10px;
+border-color:#777777;
+}
+</style>
+
+</head>
+
+<body>
+<div id='canBorder' >
+<canvas id='canvas'  height="200" width="300" onmousemove='getPosition(event);' onclick='getPosition(event);' style="border:1px solid #000000;" > If you can see this text your browser doesn't support canvas! </canvas>
+</div>
+
+<script type="text/javascript" >
+var c = document.getElementById('canvas');
+c.addEventListener("mousedown", getPosition, false);
+var cH = c.height;
+var cW = c.width;
+var can = c.getContext('2d');
+var key;
+var playing;
+var screen;
+var loaded;
+var frame = 0;
+var frames = 30;
+var loop = true;
+var speed = 300;
+Square = new Object();
+Square.x = 100;
+Square.y  = 80;
+clickedX = 0;
+clickedY = 0;
+
+window.onload=loadAll();
+//window.onload=count();
+
+function loadAll() {
+/* Load all needed data, images, sounds, ect. here.
+This function is only used once. */
+start();
+}
+
+function start() {
+/* This function is called when the program starts up, loadings, reset variables here. */
+playing=true;
+window.setInterval("run();", 20);
+}
+
+function run() {
+/* The main loop for the program */
+if(playing == true) {
+	render();
+	frame++;
+	wait(speed);
+	if (frame > frames) {
+		if(loop) {
+		frame = 0;
+		}
+		else {
+		playing = false;
+		}
+	}
+	updateObjects();
+	}
+else {
+
+}
+}
+
+function updateObjects() {
+switch(frame) {
+case 1:
+Square.x = 100;
+Square.y = 80;
+break;
+case 2:
+Square.x += 3;
+break;
+case 3:
+Square.x += 3;
+break;
+case 4:
+Square.x += 3;
+break;
+case 5:
+Square.x++;
+Square.y++;
+break;
+case 6:
+Square.x++;
+Square.y++;
+break;
+case 7:
+Square.x++;
+Square.y++;
+break;
+case 8:
+Square.x++;
+Square.y++;
+break;
+case 9:
+Square.x++;
+Square.y++;
+break;
+case 10:
+Square.x++;
+Square.y++;
+break;
+case 11:
+Square.x++;
+Square.y++;
+break;
+case 12:
+Square.x++;
+Square.y++;
+break;
+case 13:
+Square.x++;
+Square.y++;
+break;
+
+case 14:
+Square.x++;
+Square.y++;
+break;
+case 15:
+Square.x--;
+Square.y--;
+break;
+case 16:
+Square.x--;
+Square.y--;
+break;
+case 17:
+Square.x--;
+Square.y--;
+break;
+case 18:
+Square.x--;
+Square.y--;
+break;
+case 19:
+Square.x--;
+Square.y--;
+break;
+case 20:
+Square.x--;
+Square.y--;
+break;
+case 21:
+Square.x--;
+Square.y--;
+break;
+case 22:
+Square.x--;
+Square.y--;
+break;
+case 23:
+Square.x--;
+Square.y--;
+break;
+case 24:
+Square.x--;
+Square.y--;
+break;
+case 25:
+Square.x--;
+Square.y--;
+break;
+case 26:
+Square.x -= 3;
+break;
+case 27:
+Square.x -= 3;
+break;
+case 28:
+Square.x -= 3;
+break;
+case 29:
+Square.x -= 3;
+break;
+case 30:
+Square.x -= 3;
+break;
+default:
+
+break;
+}
+}
+
+function render() {
+/* Render the screen using layers. */
+clear();
+background();
+layer0();
+layer1();
+layer2();
+layer3();
+
+}
+
+function layer0() {
+can.fillStyle='#0022FF';
+can.fillRect(Square.x, Square.y, 20, 20);
+}
+
+function layer1() {
+
+}
+
+function layer2() {
+
+}
+
+function layer3() {
+
+}
+
+function background() {
+can.fillStyle='#FFFFFF';
+can.fillRect(0, 0, 300, 200);
+}
+
+function wait(mill) {
+  var start = new Date().getTime();
+  for (var i = 0; i < 1e7; i++) {
+    if ((new Date().getTime() - start) > mill){
+      break;
+    }
+  }
+}
+
+
+function getPosition(event)
+      {
+	  /* Mouse event handling */
+        var x;
+        var y;
+
+        if (event.x != undefined && event.y != undefined)
+        {
+          x = event.x;
+          y = event.y;
+        }
+        else // Firefox method to get the position
+        {
+          x = event.clientX + document.body.scrollLeft +
+              document.documentElement.scrollLeft;
+          y = event.clientY + document.body.scrollTop +
+              document.documentElement.scrollTop;
+        }
+
+        x -= c.offsetLeft;
+        y -= c.offsetTop;
+		x  = x - window.pageXOffset;
+		y  = y + window.pageYOffset;
+        clickedX = x;
+		clickedY = y;
+      }
+
+
+
+window.onkeydown = function(e) {
+/* Respond to the key press */
+	key = e.keyCode;
+	handleKey();
+}
+
+window.onkeyup = function() {
+/* Respond to the key release */
+	key = " ";
+}
+
+function handleKey() {
+/* Key handling */
+	switch (key) {
+		case 39:
+		_handleLeft();
+		break;
+		case 38:
+		_handleUp();
+		break;
+		case 37:
+		_handleRight();
+		break;
+		case 40:
+		_handleDown();
+		break;
+		case 13:
+		_handleA();
+		break;
+		case 65:
+		_handleA();
+		break;
+
+	}
+}
+
+
+
+function _handleLeft() {
+//When left arrow key pressed...
+
+}
+
+function _handleRight() {
+//When right arrow key pressed...
+
+}
+
+function _handleUp() {
+//When up arrow key pressed...
+
+}
+
+function _handleDown() {
+//When down arrow key pressed...
+
+}
+
+function _handleA() {
+//When A arrow key pressed...
+
+}
+
+function clear() {
+/* Clears the entire canvas. */
+can.clearRect(0, 0, cW, cH);
+}
+
+function loadImage(name, src, height, width) {
+/* Loads images */
+var name;
+var src;
+var height;
+var width;
+loaded = false;
+eval(name+' = new Image();');
+eval(name+".src='"+src+"';");
+eval(name+".width='"+width+"';");
+eval(name+".height='"+height+"';");
+}
+</script>
+
+</body>
+</html>

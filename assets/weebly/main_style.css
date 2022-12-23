@@ -1,0 +1,39 @@
+
+#nav {
+	background-color:#777777;
+	border-color:#555555;
+	border-radius:5px;
+	border:5px solid;
+	width:100px;
+	margin-right:9px;
+	margin-left:2px;
+	font-family:Arial;
+	
+}
+
+#nav h3 {
+margin-top:4px;
+margin-bottom:3px;
+color:#111;
+}
+
+#head {
+	background-color:#999999;
+	border-color:#222222;
+	border-radius:5px;
+	border:5px solid;
+	padding-top:4px;
+	font-family:Arial;
+	font-size:1.3em;
+}
+
+#body {
+	background-color:#444444;
+	text-color:000000;
+	margin:0px;
+}
+
+a{
+font-family:Arial;
+text-decoration:none;
+}

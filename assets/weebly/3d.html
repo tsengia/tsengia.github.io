@@ -1,0 +1,227 @@
+<div id="canBorder">
+<canvas id="canvas" height="200" width="300" onclick="clicked(event)" style="border:1px solid #000000;"> If you can see this text your browser doesn't support canvas! </canvas>
+</div>
+
+<script type="text/javascript">
+
+can = document.getElementById('canvas').getContext('2d');
+var key;
+var hit = false;
+var score = 0;
+var playing = true;
+var crossHairs = 0;
+mouse = new Object();
+mouse.clickedX = 0;
+mouse.clickedY = 0;
+//Create the player
+pl = new Object();
+pl.X = 150;
+pl.Y = 100;
+pl.Z = 1;
+pl.Rot = 0;
+
+//Define objects
+ob = new Object();
+ob.X = 10;
+ob.Y = 1;
+ob.S = 5;
+ob.renX = pl.Rot + ob.X;
+ob.renY = pl.Y + ob.Y;
+ob.renS = pl.Y - ob.X + ob.S;
+
+var yoff = 100 - pl.Z;
+
+window.scrollMaxX=300;
+window.scrollMaxY=200;
+window.onload=run();
+//window.onload=count();
+
+function run() {
+	crossHairs = Preload( 'http://i46.tinypic.com/1g4qiu.png');
+	calculate();
+	render();
+	collision();
+}
+
+function calculate() {
+	if (pl.Rot > 360 ) {
+		pl.Rot=1;
+	}
+	if (pl.Rot < 0) {
+		pl.Rot = 359;	
+	}
+	yoff = 100 - pl.Z;
+	ob.renX = pl.Rot + ob.X - 3;
+	ob.renY = pl.Y + ob.Y;
+	ob.renS = pl.Y - ob.Y + ob.S;	
+}
+function render() {
+	layer1();
+	layer2();
+	layer3();
+}
+
+function layer1() {
+	can.fillStyle='#117700';
+	can.fillRect(0, yoff, 300, 200);
+	can.fillStyle='#7777FF';
+	can.fillRect(0, 0, 300, 200 - yoff);
+}
+
+function layer2() {
+	can.fillStyle='#996600';
+	//Vanishing point
+	if (ob.renY > 50 + pl.Z ) {
+		//if object is not hidden, render
+		can.fillRect(ob.renX, ob.renY, ob.renS, ob.renS);
+	}
+}
+
+function layer3() {
+//Score
+can.font='15px Arial';
+can.fillStyle='#000000';
+can.fillText('Score: ' + score, 10, 12);
+//Cross Hairs
+can.drawImage(document.imageArray[crossHairs], 130, 80);
+//Hit?
+if (hit == true) {
+can.fillStyle='#991111';
+can.font='30px Impact';
+can.fillText('Hit!', 130, 135);
+hit = false;
+}
+}
+
+function collision() {
+
+}
+
+function clicked(event) {
+mouse.clickedX = event.clientX;
+mouse.clickedY = event.clientY;
+handleClick();
+}
+
+function handleClick() {
+	if (playing == true) {
+		if (ob.renX < 130 && ob.renX + ob.renS > 158 && ob.renY < 80 && ob.renY + ob.renS > 108) {
+		score++;
+		hit = true;
+		run();
+		}
+	}
+}
+
+
+
+window.onkeydown = function(e) {
+	key = e.keyCode;
+	handleKey();
+}
+
+window.onkeyup = function() {
+	key = " ";
+	Akey = false;
+}
+
+function handleKey() {
+	switch (key) {
+		case 39:
+		_handleLeft();
+		break;
+		case 38:
+		_handleUp();
+		break;
+		case 37:
+		_handleRight();
+		break;
+		case 40:
+		_handleDown();
+		break;
+		case 13:
+		_handleA();
+		break;
+		case 65:
+		_handleA();
+		break;
+
+	}
+}
+
+function _handleLeft() {
+//When left arrow key pressed...
+//Change where the player is looking
+pl.Rot--;
+pl.Rot--;
+pl.Rot--;
+run();
+}
+
+function _handleRight() {
+//When right arrow key pressed...
+pl.Rot++;
+pl.Rot++;
+pl.Rot++;
+run();
+}
+
+function _handleUp() {
+//When up arrow key pressed...
+pl.Y++;
+pl.Y++;
+pl.Y++;
+run();
+}
+
+function _handleDown() {
+//When down arrow key pressed...
+pl.Y--;
+pl.Y--;
+pl.Y--;
+run();
+}
+
+function _handleA() {
+//When A arrow key pressed...
+
+}
+
+/* function count() {
+	while (playing == true) {
+	setInterval(handleTick() , 1000);
+	}
+}
+
+function handleTick() {
+//Do every second...
+
+}
+*/
+
+//Preload( '01.gif', '02.gif' ); 
+
+function Preload()
+
+{ 
+
+  var args = Preload.arguments;
+
+  document.imageArray = new Array(args.length);
+
+  for(var i=0; i<args.length; i++)
+
+  {
+
+    document.imageArray[i] = new Image;
+
+    document.imageArray[i].src = args[i];
+	return i;
+  }
+
+}
+
+
+
+
+</script>
