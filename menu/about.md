@@ -5,7 +5,6 @@ permalink: /about
 tags: [about]
 ---
 
-# About Me
 👋 Hi, I'm Tyler Sengia.  
 
 I'm a software engineer that enjoys writing code for humans.  
