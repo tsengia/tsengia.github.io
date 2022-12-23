@@ -7,6 +7,7 @@
   margin-right: auto;
   width: 750px;
   padding: 0 1.5em 1em 1.5em;
+  background-color: #FFF;
 }
 
 .content-container {
@@ -60,9 +61,10 @@
 }
 
 .menu-content a {
-  color: $light-gray-color;
+  color: #79F;
   font-size: 1rem;
   padding-right: 10px;
+  text-decoration: underline;
 }
 
 .social-icons {
