@@ -1,0 +1,548 @@
+<!DOCTYPE html>
+<html><head><meta http-equiv="Content-Type" content="text/html; charset=windows-1252">
+
+<title>Evolving AI</title>
+<style>
+#konsole {
+    background-color:#000;
+    color:#FFF;
+    overflow:auto;
+    display:inline-block;
+    padding:3px;
+    font-family:monospace;
+    font-size:80%;
+    float:left;
+    height:500px;
+    min-width: 200px;
+}
+canvas {
+padding: 5px;
+border: 3px dashed #CCC;
+}
+h2 {
+border-bottom: 2px solid black;
+width: 700px;
+}
+#content {
+width: 700px;
+}
+</style>
+</head>
+<body><div>
+<canvas height="500" width="500" id="canvas"></canvas>
+<div id="konsole"><span class="log"><b><u>Console:</u></b></span><br></div>
+<script type="text/javascript">
+var c = document.getElementById('canvas');
+var cH = 500;
+var cW= 500;
+var can = c.getContext('2d');
+var popPerRound = 12;
+var objPerRound = 3;
+var living = [];
+var roundDone = false;
+var populated = false;
+var tick = 0;
+var time = 0;
+var objects = [];
+var gen = 1;
+var population = 0;
+var mult = false;
+function Konsole() {
+this.element =  document.getElementById('konsole');
+this.log = function(m) {
+var m = "<span class='log' >"+m+"</span><br />";
+this.element.innerHTML = this.element.innerHTML + m;
+}
+}
+var k = new Konsole();
+function Quib() {
+this.x = Math.floor(Math.random()*cW)+50;
+this.y = Math.floor(Math.random()*cH)+50;
+this.weights = [];
+this.health = 10;
+this.living = true;
+this.energy = 15;
+this.id='';
+this.create = function(r) {
+    this.living = true;
+    this.energy = 15;
+    this.health = 10;
+    this.id=population;
+    population++;
+    if(r) {
+    for(var i = 0; i < 40; i++) {
+        this.weights.push(Math.random());
+    }
+    }
+    this.x = Math.floor(Math.random()*cW-100)+50;
+    this.y = Math.floor(Math.random()*cH-100)+50;
+    living.push(this);
+}
+this.die = function() {
+    this.living = false;
+    population--;
+}
+this.moveUp = function(e) {
+if(mult) {
+this.y -= e*1.5;
+}
+else {
+this.y -= 1.5;
+}
+var o = eatObject(this.x, this.y);
+if(!o) { }
+else {
+    o.eat();
+    this.energy += 3;
+}
+}
+this.moveDown = function(e) {
+if(mult) {
+this.y += e*1.5;
+}
+else {
+ this.y += 1.5;   
+}
+var o = eatObject(this.x, this.y);
+if(!o) { }
+else {
+    o.eat();
+    this.energy += 3;
+}
+}
+this.moveLeft = function(e) {
+if(mult) {
+this.x -= e*1.5;
+}
+else {
+this.x -= 1.5;   
+}
+var o = eatObject(this.x, this.y);
+if(!o) { }
+else {
+    o.eat();
+    this.energy += 3;
+}
+}
+this.moveRight = function(e) {
+if(mult) {
+this.x += e*1.5;
+}
+else {
+this.x += 1.5; 
+}
+var o = eatObject(this.x, this.y);
+if(!o) { }
+else {
+    o.eat();
+    this.energy += 3;
+}
+}
+this.objectLeft = function() {
+var n = nearestObject(this.x+5, this.y-5); 
+if(n.x < Math.abs(this.x)) {
+    return 1;
+}
+else {
+  return 0;  
+}
+}
+this.objectRight = function() {
+var n = nearestObject(this.x+5, this.y-5); 
+if(n.x > Math.abs(this.x)) {
+    return 1;
+}
+else {
+  return 0;  
+}
+}
+this.objectAbove = function() {
+var n = nearestObject(this.x+5, this.y-5); 
+if(n.y < Math.abs(this.y)) {
+    return 1;
+}
+else {
+  return 0;  
+}
+}
+this.objectBelow = function() {
+var n = nearestObject(this.x+5, this.y-5); 
+if(n.y > Math.abs(this.y)) {
+    return 1;
+}
+else {
+  return 0;  
+}
+}
+this.update = function() {
+if(this.energy < 0) {
+this.die();    
+}
+else {
+if(this.y < 2) {
+this.y = cH - 21;    
+}
+if(this.y > cH - 10) {
+this.y = 3;    
+}
+if(this.x < 2) {
+this.x = cW-12; 
+}
+if(this.x > cW - 10) {
+this.x = 2;    
+}
+var o = eatObject(this.x, this.y);
+if(!o) { }
+else {
+    o.eat();
+    this.energy += 1;
+}
+this.energy -= 0.1;
+think(this);
+
+}
+
+
+}
+}
+
+function think(q) {
+var w = q.weights;
+var i1 = q.objectAbove();
+var i2 = q.objectBelow();
+var i3 = q.objectLeft();
+var i4 = q.objectRight();
+var a = (w[0] * i1) + (w[1] * i2) + (w[2] * i3) + (w[3] * i4);
+var b = (w[4] * i1) + (w[5] * i2) + (w[6] * i3) + (w[7] * i4);
+var c = (w[8] * i1) + (w[9] * i2) + (w[10] * i3) + (w[11] * i4);
+var d = (w[12] * i1) + (w[13] * i2) + (w[14] * i3) + (w[15] * i4);
+var e = (w[16] * i1) + (w[17] * i2) + (w[18] * i3) + (w[19] * i4);
+var f = (w[20] * a) + (w[21] * b) + (w[22] * c) + (w[23] * d) + (w[24] * e);
+var g = (w[25] * a) + (w[26] * b) + (w[27] * c) + (w[28] * d) + (w[29] * e);
+var h = (w[30] * a) + (w[31] * b) + (w[32] * c) + (w[33] * d) + (w[34] * e);
+var i = (w[35] * a) + (w[36] * b) + (w[37] * c) + (w[38] * d) + (w[39] * e);
+
+if(f > g) {
+    q.moveUp(f);
+}
+else if(f < g) {
+    q.moveDown(g);
+}
+
+if(h > i) {
+    q.moveLeft(h);
+}
+else if(h < i) {
+    q.moveRight(i);
+}
+}
+
+function updateLiving() {
+for(var i = 0; i < living.length; i++) {
+    if(living[i].living) {
+        living[i].update();
+    }
+    else {
+      addObject(living[i].x, living[i].y);
+      living.splice(i, 1);
+    }
+}
+}
+
+function nearestObject(x, y) {
+var a = [];
+var c =  99999999999999;
+var ci = 0;
+	for(var i = 0; i < objects.length; i++) {
+		var o = objects[i];
+		var dist = Math.pow((o.x - x), 2) + Math.pow((o.y - y), 2);
+		if(dist < c) {
+		 ci = i;
+		 c = dist;
+		}
+	}
+	return objects[ci];
+}
+
+
+function eatObject(x, y) {
+for(var i = 0; i < objects.length; i++) {
+var nO = objects[i];
+if((nO.x + 5 >= x && nO.x <= x+10) && (nO.y +5 >= y && nO.y <= y+10)) {
+//console.log("eat");
+return nO;
+}
+}
+return false;
+}
+
+function updateObjects() {
+for(var i = 0; i < objects.length; i++) {
+    if(!objects[i].here) {
+        objects.splice(i, 1);
+    }
+}
+}
+
+function AIObject() {
+this.x = 0;
+this.y = 0;
+this.here = true;
+this.eat = function() {
+  this.here = false; 
+}
+this.create = function() {
+objects.push(this);    
+}
+}
+
+function addObject(x, y) {
+    var o = new AIObject();
+    o.x = x;
+    o.y = y;
+    o.create();
+}
+
+function run() {
+updateObjects();
+updateLiving();
+draw();
+round();
+}
+
+function draw() {
+can.clearRect(0, 0, cW, cH);
+can.fillStyle='#000';
+can.fillRect(0, 0, cW, cH);
+can.fillStyle='#FFF';
+can.fillText(time, 2, 12);
+can.fillText(tick, 2, 22);
+can.fillText("Pop: "+population, 2, 32);
+can.fillText("Gen: "+gen, 2, 42);
+can.fillStyle='#F00';
+for(var i = 0; i < living.length; i++) {
+    can.fillStyle='#F00';
+    can.fillRect(living[i].x, living[i].y, 10, 10);
+    can.fillStyle='#FFF';
+    can.fillText(living[i].id, living[i].x, living[i].y+9);
+    var e = (living[i].energy / 15);
+    if(e >= 0) {
+    can.fillStyle='#909';    
+    }
+    if(e >= 0.30) {
+    can.fillStyle='#F00';    
+    }
+    if(e >= 0.50) {
+    can.fillStyle='#F55';    
+    }
+    if(e >= 0.60) {
+    can.fillStyle='#FF1';    
+    }
+    if(e >= 0.75) {
+    can.fillStyle='#0F0';    
+    }
+    if(e >= 0.90) {
+    can.fillStyle='#00F';    
+    }
+    can.fillText(living[i].id+": "+living[i].energy, 370, 353+(living[i].id*11));
+}
+can.fillStyle='#0FF';
+for(var i = 0; i < objects.length; i++) {
+    can.fillRect(objects[i].x, objects[i].y, 5, 5);
+}
+}
+var pool = [];
+function breedQuibs() {
+/* find the alpha Quib */
+pool=[];
+var ce = 0;
+var ci = 0;
+for(var i=0; i < living.length; i++) {
+if(ce <= living[i].energy) {
+    ci = i;
+    ce = living[i].energy;
+}
+}
+var a = living.splice(ci, 1);
+pool.push(a[0]);
+k.log("Alpha Quib # for gen " + gen +": " +a[0].id);
+/* Found the aphla, now remove it and add it to the breeding pool*/
+/* is there enough Quibs other than the alpah to breed? if not copy the alpha */
+while(living.length < 2) {
+living.push(a[0]);    
+}
+/* find the other Quibs in order of energy */
+var ce = 0;
+var ci = 0;
+for(var i=0; i < living.length; i++) {
+if(ce <= living[i].energy) {
+    ci = i;
+    ce = living[i].energy;
+}
+}
+var b = living.splice(ci, 1);
+var c = living.splice(0, 1);
+k.log("B Quib # for gen " + gen +": " +b[0].id);
+k.log("C Quib # for gen " + gen +": " +c[0].id);
+pool.push(b[0]);
+pool.push(c[0]);
+pool.push(MixWithRandom(a[0]));
+pool.push(MixWithRandom(b[0]));
+pool.push(MixWithRandom(c[0]));
+pool.push(MixQuibs(a[0], b[0]));
+pool.push(MixQuibs(b[0], c[0]));
+pool.push(MixQuibs(a[0], c[0]));
+pool.push(TotalQuibs([a[0], b[0], c[0]]));
+pool.push(AverageQuibs([a[0], b[0], c[0]]));
+living = [];
+for(var i=0; i < pool.length-1; i++) {
+pool[i].create(false);    
+}
+pool.push(new Quib());
+pool[pool.length-1].create(true);    
+}
+
+function AverageQuibs(q) {
+var n = new Quib();
+for(var i=0; q[0].weights.length > i; i++) {
+var t = 0;
+for(var a=0; a < q.length; a++) {
+t += q[a].weights[i];    
+}
+n.weights[i] = t/q.length;
+}
+return n;
+}
+
+function TotalQuibs(q) {
+var n = new Quib();
+for(var i=0; q[0].weights.length > i; i++) {
+var t = 0;
+for(var a=0; a < q.length; a++) {
+t += q[a].weights[i];    
+}
+n.weights[i] = t;
+}
+return n;
+}
+
+function MixWithRandom(q) {
+var n = new Quib();
+for(var i = 0; i < q.weights.length; i++) {
+if(Math.round(Math.random()) == 1) {
+    n.weights[i] = q.weights[i];    
+}
+else {
+    n.weights[i] = Math.random();
+}
+}
+return n;
+}
+
+function MixQuibs(q, Q) {
+var n = new Quib();
+for(var i = 0; i < q.weights.length; i++) {
+if(Math.round(Math.random()) == 1) {
+    n.weights[i] = q.weights[i];    
+}
+else {
+    n.weights[i] = Q.weights[i];
+}
+}
+return n;
+}
+
+function round() {
+    if(!populated) {
+    if(gen == 1) {
+        var i = 0;
+        while (i < popPerRound) {
+        var q = new Quib();
+        q.create(true);
+        i++;
+        }
+        var i = 0;
+        while (i < objPerRound) {
+        addObject(Math.floor(Math.random()*420)+20, Math.floor(Math.random()*420)+20);
+        i++;
+        }
+        }
+    else {
+        var i = 0;
+        while (i < objPerRound) {
+        addObject(Math.floor(Math.random()*420)+20, Math.floor(Math.random()*420)+20);
+        i++;
+        }
+    }
+    populated = true;
+    }
+    else {
+    if(living.length <= 3) {
+        population = 0;
+        breedQuibs();
+        gen++;
+        populated = false;
+        time = 0;
+        tick = 0;
+    }
+    else {
+    tick++; 
+    if((tick % 5) == 0) {
+    time++;    
+    }
+    if(tick >= 50) {
+    tick = 0;    
+    }
+    }
+    }
+}
+window.setInterval("run();", 200);
+</script>
+
+</div>
+
+<div id="content" >
+<h2>About</h2>
+<p>
+Evolve AI is a virtual environment that is made up of two objects:
+<ul>
+<li>"Quibs" - The red squares that wander around. They are numbered with white text.</li>
+<li>"Food" - The smaller light blue squares that stay put.</li>
+</ul>
+For each "tick" of the simulation, every Quib uses up some of its "energy". You can see the remaining amount of energy that each Quib has on the colored chart on the lower right corner of the simulation screen.<br />
+When a Quib runs out of energy, it dies and is eliminated from the simulation. When a Quib dies, it also leaves behind a Food object at the same location it died.<br /><br />
+
+The simulation continues until all the Quibs die but 3 of them. These 3 remaining Quibs are then "bred" to create the next generation of Quibs for the next round of the simulation. Sometimes, the Quibs die off at the same exact time, so when that happens, the last surviving Quib is simply cloned until there are three Quibs to be used for breeding.<br />
+When the next round starts, the new Quibs are placed at random, but the Food objects remain.<br />
+
+Each tick, every Quib is polled on where it wants to go. The Quib's decision making is powered through a simple feed-forward artificial neural network. The neural network is comprised of 4 input neurons, 5 hidden neurons, and 4 output neurons. This gives a total of 40 weights, however, no bias neurons/inputs are used. The 4 input neurons are fed either a 1 or a 0 (boolean) if the nearest food object is to the right, left, above, or below them. Each input neuron is assigned a direction (one input is for left, one is for right, etc). Each output neuron is given a direction as well (left, right, up, down). If the left output has a higher value than the right output, then the "moveLeft()" function is called (the same goes for the other directions).<br /><br />
+When a Quib goes off the screen, it is immediatly "teleported" to the opposite edge (like it wrapped around).<br />
+<br />
+<h4>Breeding</h4>
+As mentioned before, at the end of the round the 3 surviving Quibs are then "bred" to create the next generation of Quibs. This "breeding" is simply a mixing and mashing of the neural network weights.<br />For the very first round of the generation, all Quibs are created by randomly generated weights.<br />
+<br />
+I tried multiple methods of "breeding", and the name for each method is noted in square brackets [].
+<br />
+<br />
+ The top three surviving Quibs (order is made by descending remaining energy levels) are cloned and placed as Quibs #0, 1, and 2 in the next round [Cloning]. There are a few Quibs in the next generation that are not created from "breeding", but instead their weights are generated randomly [Random]. Some Quibs are created by averaging each weight from two of the surviving Quibs [Average]. Other Quibs are created by cloning one of the surviving Quibs, but randomly selecting weights to be exchanged with a random number [RandomMix]. Next there are Quibs that are generated by randomly choosing weights from two surviving Quibs and merging them together [Merge]. Finally, there is only one Quib that takes a weight from each three surviving Quibs, adds them together to use for its own weight. It repeats this summation for all 40 weights [Total].<br />
+ <br />
+Below is a list of each Quib # and how it was generated:<br />
+#0 Cloned from the "Alpha" Quib<br />
+#1 Cloned from the "Beta" Quib<br />
+#2 Cloned from the "C" Quib<br />
+#3 Random Mix of the "Alpha" Quib<br />
+#4 Random Mix of the "Beta" Quib<br />
+#5 Random Mix of the "C" Quib<br />
+#6 Merge of Alpha and Beta Quibs<br />
+#7 Merge of Beta and C Quibs<br />
+#8 Merge of Alpha and C Quibs<br />
+#9 Total of Alpha, Beta, and C Quibs<br />
+#10 Average of the Alpha, Beta, and C Quibs<br />
+<br />
+I have not run any tests/investigations on which breeding method is most effective.<br />
+All I know is that after a few minutes of observing these virtual creatures, you will start to see "intelligent" movement patterns. Quibs that "zig zag" towards a Food object seem to fare better, almost as if they home in on the Food.<br />
+There are Quibs that exhibit other movement patterns. Some are "floaters" that constantly move in one direction across the screen (which is sometimes just as effective as zig zags). Some get stuck between two or three Food objects. Some will zig zag towards a Food object to their left, but will not respond to a food object on its right!<br />
+It's almost like a safari, enjoy watching them!
+</p>
+</div>
+</body></html>
