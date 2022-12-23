@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta http-equiv="Content-Language" content="en-us">
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="stylesheet" type="text/css" href="styles/ResetCSS.css" />
+<link rel="stylesheet" type="text/css" href="styles/style.css" />
+<title>Cell Cycle Interphase | 8 Bit Bio</title>
+<style>
+.imp {
+font-family: Impact;
+font-size: 130%;
+}
+.inner {
+background-color: #4D4; 
+display: inline-block; 
+padding: 0.5%;
+color:#000;
+}
+</style>
+</head>
+<body>
+<div id='header-large' >
+<span id="header-large-title" >8 Bit Bio</span><br />
+<span id="header-large-description" ></span>
+<script type="text/javascript" >
+    var random_quote_element = document.getElementById("header-large-description");
+    var quotes = ["Better Biology",
+    "By Teens, for Teens",
+    "Interactive Learning",
+    "Under Construction!"];
+    random_quote_element.innerHTML = quotes[Math.floor(Math.random() * quotes.length)];
+</script>
+</div>
+<div id="topbar" >
+	<div class="nav-button" ><a href="index.html" >Home</a></div>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+	<div class="nav-button" ><a href="lessons.html" >Lessons</a></div>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+	<div class="nav-button" ><a href="about.html" >About</a></div>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+	<div class="nav-button" ><a href="contactinfo.html" >Contact</a></div>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+	<script type='text/javascript' >
+		//Vertically center nav-button text on load
+//And correct the font size
+//Some browsers have a funky default font size
+function positionAndSize() {
+		var topbar = document.getElementById("topbar");
+		var barHeight = parseInt(getComputedStyle(topbar).height);
+		var third = Math.round(barHeight / 3);
+		var fontSizeCorrected = third % 2 === 0 ? third : third-1;
+		topbar.style.fontSize = fontSizeCorrected + "px";
+		var elementList = document.getElementsByClassName("nav-button");
+		for(var e = 0; e < elementList.length; e++) {
+			var button = elementList[e];
+			button.style.paddingTop = third + "px";
+		}
+		var fraction = Math.round(parseInt(getComputedStyle(document.body).height) / 40);
+		var correctedFraction = fraction % 2 === 0 ? fraction : fraction - 1;
+		document.body.style.fontSize = correctedFraction + "px";
+}
+window.addEventListener("load", positionAndSize);
+//window.addEventListener("resize", positionAndSize); 
+	</script>
+</div>
+<div id="body" >
+
+	<div id="content">
+	<div id="container" >
+<h1>Interphase</h1>
+				<p class="text" >
+				&nbsp;&nbsp;In the cell cycle there are multiple stages. The first and longest stage is interphase.<br />
+				Interphase is the time when a cell is growing and preparing for cell division.
+				</p>
+				<br />
+				<div style='display: inline-block; padding:0.5%; background-color: #FF5; border: 2px solid #FF5;' >
+				<span style="font-size: 250%; font-family: Impact;" >1st</span> stage of the cell cycle<br />
+				<span style="font-size: 250%; font-family: Impact;" >Longest</span> stage of the cell cycle<br />
+				</div><!--
+				--><div style='display: inline-block; padding:0.5%; background-color: #4F3; border: 2px solid #4F3;' >
+				<ul>
+					<li>Duplicates DNA</li>
+					<li>Produces more organelles</li>
+					<li><span style="font-size: 200%; font-family: Impact;" >Growth + Preparation</span></li>
+					<span style="display: block; text-align: center;">for cell division</span>
+				</ul>
+				</div>
+<div style='display: block; padding:0.5%; background-color: #F33; border: 2px solid #F00; color:#FFF; font-size: 120%; ' >
+There are several sub-phases to Interphase:
+</div><!--
+--><div style='border-left: 3px solid #F11; padding: 1%; ' >
+
+<div style='display: inline-block; padding:0.5%; background-color: #34F; color: #FFF; font-size: 110%;' >
+<span class='imp' style='font-size:200%;' >G1</span><br />
+<span class='imp' >1st sub-phase</span><br />
+
+<span style='background-color: #4F3; text-align:center; display: inline-block; padding: 1%; color: #000;' >
+<span class='imp' >Growth</span> in size &<br />
+<span class='imp' >mRNA</span> and <span class='imp' >proteins</span><br />
+<span style="display: block; text-align:center;" >are synthesized</span>
+</span>
+
+</div>
+
+<div style='display: inline-block; padding:0.5%; background-color: #F99; color: #222; font-size: 110%;' >
+<span class='imp' style='font-size:200%;' >Switch!</span> S or G0?<br />
+There is a choice to be made:<br />
+<ul>
+<li>&nbsp;If everything is going normally, go to S.</li>
+<li>&nbsp;If something is wrong, go to G0!</li>
+</ul>
+<span class='imp' >Environmental factors</span> determine the choice.<br />
+Things like food, energy, temperature and activity cause the switch.<br />
+</span>
+</div>
+<br /><br />
+<div style='display: inline-block; padding:0.5%; background-color: #FFF; border: 2px solid #000; color:#000; font-size: 110%;' >
+<span class='imp' style='font-size:200%;' >G0</span><br />
+<span class='imp' >"Hibernation" or Death</span><br />
+
+<span style='background-color: #FFF; border: 2px solid #000; display: inline-block; padding: 1%; color: #000;' >
+The cell cycle <span class='imp' >stops</span><br />
+Sometimes this means <span class="imp" >death</span><br />
+or the cell just <span class="imp" >continues</span> functioning normally. <br />
+</span>
+
+</div>
+<br />
+<br />
+<div>
+<div style=' float:left; display: inline-block; padding:0.5%; background-color: #C2C; border: 2px solid #000; color:#000; font-size: 110%;' >
+<span class='imp' style='font-size:200%; color: #FFF;' >S</span><br />
+<span class='imp' style="color: #FFF;" >DNA Duplication</span><br />
+
+<span style='background-color: #FFF; border: 2px solid #000; display: inline-block; padding: 1%; color: #000;' >
+The cell's DNA is duplicated.<br />
+</span>
+
+</div>
+
+<div style='display: inline-block; padding:0.5%; background-color: #5C5; color:#000; font-size: 110%;' >
+<span class='imp' style='font-size:200%; color: #FFF;' >G2</span><br />
+<span class='imp' style="color: #FFF;" >Final sub-stage</span><br />
+
+<span style='background-color: #FFF; border: 2px solid #000; display: inline-block; padding: 1%; color: #000;' >
+<span class="imp" >Proteins</span> that are needed for mitosis are synthesized. <br />
+DNA damage (errors) made in sub-stage S are <br />
+attempted to be <span class='imp' >repaired</span>
+</span>
+
+</div>
+
+</div>
+</div>
+<br />
+<br />
+
+<br />
+<br />
+<br />
+<br />
+</div>
+</div>
+<div id='footer'>
+<a href="index.html" >Home</a>
+&nbsp;&#124;&nbsp;
+<a href="lessons.html" >Lessons</a>
+&nbsp;&#124;&nbsp;
+<a href="about.html" >About</a>
+</div>
+
+</div>
+</body>
+</html>

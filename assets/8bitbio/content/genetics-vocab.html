@@ -1,0 +1,248 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta http-equiv="Content-Language" content="en-us">
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+	<link rel="stylesheet" type="text/css" href="../styles/ResetCSS.css" />
+	<link rel="stylesheet" type="text/css" href="../styles/style.css" />
+<title>Genetics Vocab | 8 Bit Bio</title>
+<style type='text/css' >
+	#word {
+	font-size: 135%;
+	background-color:#FF0;
+	font-weight: bold;
+	text-decoration: underline;
+	display: inline-block;
+	width: 45%;
+	padding: 4px;
+	}
+	.answer {
+	border: 1px solid #111;
+	padding: 0.5%;
+	background-color: #5C5;
+	color: #FFF;
+	font-style: italic;
+	margin-top: 1%;
+	display: inline-block;
+	}
+	.ans-letter {
+	border: 1px solid #111;
+	padding: 0.5%;
+	background-color: #FF0;
+	color: #000;
+	font-weight: bold;
+	margin-top: 1%;
+	display: inline-block;
+	margin-right: 5px;
+	}
+	#game-area {
+		margin-left: 5%;
+		margin-top: 1%;
+	}
+	.wrong {
+	background-color: #F55;
+	border-left: 3px solid #F00;
+	color: #111;
+	font-family: monospace;
+	padding: 0.5%;
+	margin-top: 0.5%;
+	font-size: 120%;
+	}
+</style>
+</head>
+<body>
+<div id='header-large' >
+<span id="header-large-title" >8 Bit Bio</span><br />
+<span id="header-large-description" ></span>
+<script type="text/javascript" >
+    var random_quote_element = document.getElementById("header-large-description");
+    var quotes = ["Better Biology",
+    "By Teens, for Teens",
+    "Interactive Learning",
+    "Under Construction!"];
+    random_quote_element.innerHTML = quotes[Math.floor(Math.random() * quotes.length)];
+</script>
+</div>
+<div id="topbar" >
+	<div class="nav-button" ><a href="index.html" >Home</a></div>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+	<div class="nav-button" ><a href="lessons.html" >Lessons</a></div>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+	<div class="nav-button" ><a href="about.html" >About</a></div>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+	<div class="nav-button" ><a href="contactinfo.html" >Contact</a></div>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+	<script type='text/javascript' >
+		//Vertically center nav-button text on load
+//And correct the font size
+//Some browsers have a funky default font size
+function positionAndSize() {
+		var topbar = document.getElementById("topbar");
+		var barHeight = parseInt(getComputedStyle(topbar).height);
+		var third = Math.round(barHeight / 3);
+		var fontSizeCorrected = third % 2 === 0 ? third : third-1;
+		topbar.style.fontSize = fontSizeCorrected + "px";
+		var elementList = document.getElementsByClassName("nav-button");
+		for(var e = 0; e < elementList.length; e++) {
+			var button = elementList[e];
+			button.style.paddingTop = third + "px";
+		}
+		var fraction = Math.round(parseInt(getComputedStyle(document.body).height) / 40);
+		var correctedFraction = fraction % 2 === 0 ? fraction : fraction - 1;
+		document.body.style.fontSize = correctedFraction + "px";
+}
+window.addEventListener("load", positionAndSize);
+//window.addEventListener("resize", positionAndSize); 
+	</script>
+</div>
+<div id="content">
+	<div id="container" >
+	<h1>Genetics Vocab Matching Game</h1>
+	<p class="text" >
+		Click the definition of the given word.
+	</p>
+	<br />
+	<br />
+	<div id="game-area" >
+	<div id="word" >
+		Vocab Word
+	</div>
+	<div id="answers" >
+		<span class="ans-letter" >A</span><span class='answer' id="a" >A</span><br />
+		<span class="ans-letter" >B</span><span class='answer' id="b" >B</span><br />
+		<span class="ans-letter" >C</span><span class='answer' id="c" >C</span><br />
+		<span class="ans-letter" >D</span><span class='answer' id="d" >D</spam><br />
+	</div><br />
+	<div id="response" class="text" >
+		Click on your answer.
+	</div>
+	</div>
+	</div>
+</div>
+<script type='text/javascript' >
+	var a = document.getElementById("a");
+	var b = document.getElementById("b");
+	var c = document.getElementById("c");
+	var d = document.getElementById("d");
+	var w = document.getElementById("word");
+	var response = document.getElementById("response");
+	
+	a.addEventListener("click", aPress);
+	b.addEventListener("click", bPress);
+	c.addEventListener("click", cPress);
+	d.addEventListener("click", dPress);
+	
+	var words = [];
+	var definitions = [];
+	var wordNum = 0;
+	var defPool = [];
+	var answer = "a";
+	
+	function addWord(h, x) {
+		words.push(h);
+		definitions.push(x);
+	}
+	
+	function random(i, x) {
+	return Math.floor(Math.random()*(x + 1)) + i;	
+	}
+	
+	function displayNext() {
+		wordNum = random(0, words.length-1);
+		w.innerHTML = words[wordNum];
+		var ansLetters = ["a", "b", "c", "d"];
+		var aElements = [a, b, c, d];
+		var defPool = JSON.parse(JSON.stringify(definitions));
+		
+		var defs = [];
+		defs.push(defPool.splice(wordNum, 1)[0]);
+		defs.push(defPool.splice(random(0, defPool.length - 1), 1)[0]);
+		defs.push(defPool.splice(random(0, defPool.length - 1), 1)[0]);
+		defs.push(defPool.splice(random(0, defPool.length - 1), 1)[0]);
+		
+		for(y = 0; y < 4; y++) {
+		var r = random(0, defs.length - 1);
+		
+		if(defs[r] == definitions[wordNum]) {
+		answer = ansLetters[y];	
+		}
+		
+		aElements[y].innerHTML = defs.splice(r, 1)[0];
+		}
+		
+		
+		
+	}
+	
+	function right() {
+	response.className = "note";
+	response.innerHTML = "Correct!";
+	displayNext();
+	}
+	
+	function wrong() {
+	response.className = "wrong";
+	response.innerHTML = words[wordNum] + " means:<br /><i>" + definitions[wordNum] + "</i>";
+	displayNext();
+	}
+	
+	function aPress() {
+		if (answer == "a") {
+			right();
+		}
+		else {
+			wrong();
+		}
+	}
+	function bPress() {
+		if (answer == "b") {
+			right();
+		}
+		else {
+			wrong();
+		}
+	}
+	function cPress() {
+		if (answer == "c") {
+			right();
+		}
+		else {
+			wrong();
+		}
+	}
+	function dPress() {
+		if (answer == "d") {
+			right();
+		}
+		else {
+			wrong();
+		}
+	}
+	
+	addWord("Trait", "A physical characteristic of an organism.");
+	addWord("Purebred", "A organism with homozygous genes.");
+	addWord("Inherit", "To get something from your parents or ancestors.");
+	addWord("Fertilization", "The joining of an egg and sperm cell.");
+	addWord("Genetics", "The study of heredity");
+	addWord("Heredity", "Physical characteristics being passed down from parents to offspring");
+	addWord("Gene", "A strand of DNA that controls a trait.");
+	addWord("Dominate Allele", "An allele that always effects the traits of an organism.");
+	addWord("Recessive Allele", "An allele that is hidden when a dominate allele is there.");
+	addWord("Hybrid", "An organism with two different alleles for a trait.");
+	addWord("Probability", "A rate or percentage that shows the chances for something to happen.");
+	addWord("Punnet square", "A chart that lists all the genotypes possible when alleles are crossed.");
+	addWord("Phenotype", "The visible or unmasked characteristics of an organism.");
+	addWord("Genotype", "An organism's genes or alleles, even the hidden ones.");
+	addWord("Homozygous Trait", "A trait for an organism that has two identical alleles.");
+	addWord("Heterozygous Trait", "A trait for an organism that has two different alleles.");
+
+	displayNext();
+</script>
+<span style="font-size: 75%; float:right; margin-right: 5px;" ><i>Author: ExpandingDev</i></span>
+<div id='footer'>
+<a href="index.html" >Home</a>
+&nbsp;&#124;&nbsp;
+<a href="lessons.html" >Lessons</a>
+&nbsp;&#124;&nbsp;
+<a href="about.html" >About</a>
+</div>
+
+</body>
+</html>
