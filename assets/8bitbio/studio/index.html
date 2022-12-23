@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>Game Studio</title>
+	<link rel="stylesheet" type="text/css" href="ResetCSS.css" />
+	<link rel="stylesheet" type="text/css" href="CodeMirror/lib/codemirror.css">
+	<script src="studio.js" type="text/javascript" ></script>
+        <script src="gdrive.js" type="text/javascript" ></script>
+	<script src="CodeMirror/lib/codemirror.js" type="text/javascript"></script>
+	<script src="CodeMirror/modes/javascript.js" type="text/javascript" ></script>
+	<script src="CodeMirror/modes/css.js" type="text/javascript" ></script>
+	<script src="CodeMirror/modes/php.js" type="text/javascript" ></script>
+	<script src="CodeMirror/modes/htmlmixed.js" type="text/javascript" ></script>
+	<link rel="stylesheet" type="text/css" href="style.css" />
+	<meta charset="utf-8" />
+</head>
+<body>
+	<div id="left-pane" >
+		<div id="screen" >
+			<div id="top-bar" >
+				<span id="running-indicator" >-</span>
+                                <input type='text' id='project-name' value="Untitled_Project" />
+				<button type="button" ><b>&lt;</b></button>
+				<button type="button" ><b>&gt;</b></button>
+				<button type="button" onclick="StopGame();" >Stop</button>
+				<button type="button" onclick="StartGame();" >Start</button>
+			</div>
+			<div id="canvas" oncontextmenu="rightClickedScreen(event);" >
+				<canvas id="gamecanvas" onmousemove="updateCoords(event);" height="400px" width="400px" ></canvas>
+			</div>
+			<div id="bottom-bar" >
+				<span id="coords" ><b>X:<span id="x-coord" >0</span>&nbsp;Y:<span id="y-coord" >0</span></b></span>
+				<span id="object-name" >No Selection</span>
+			</div>
+		</div>
+		<div id="debug-area" >
+			<button type="button" onclick="Studio.clearConsole();" >Clear Console</button>
+			<div id="console" ><pre id="script-out"></pre></div><br />
+			<input type="text" id="cmd" /><button type="button" onclick="document.getElementById('script-out').innerHTML = eval(document.getElementById('cmd').value);">Run</button>
+		<button id="authorize-button" style="display: none;">Authorize</button>
+                <button id="signout-button" style="display: none;">Sign Out</button>	
+                <button id="open-file" style="display: none;" >Open</button>
+                <button id="save-file" style="display: none;" >Save</button>
+		</div>
+	</div>
+
+	<div id="right-pane" >
+		<div id="tabs" >
+			<div class="tab" data-tab-id="0" id="selected-tab" onclick="switchTab(event);" >Code</div>
+			<div class="tab" data-tab-id="1" onclick="switchTab(event);" >Images</div>
+			<div class="tab" data-tab-id="2" onclick="switchTab(event);" >Sounds</div>
+			<div class="tab" data-tab-id="3" onclick="switchTab(event);" >Linked Scripts</div>
+		</div>
+		<div id="tab-contents" ></div>
+	</div>
+<script type="text/javascript" id="outputScript" ></script>
+<script>
+
+
+window.onload = function() {
+  Studio.saveButton = document.getElementById("save-file");
+  Studio.openButton = document.getElementById("open-file");
+  Studio.projectNameInput = document.getElementById("project-name");
+  var codeDiv = document.createElement("div");
+  codeDiv.className = "code";
+  var txtArea = document.createElement("textarea");
+  txtArea.textContent = '/*Hello World! The canvas ID is "gamecanvas" Have Fun! */';
+  txtArea.id = "code";
+  txtArea.style.display = "none";
+  codeDiv.appendChild(txtArea);
+  Studio.code = CodeMirror.fromTextArea(txtArea, {
+    lineNumbers: true,
+    mode: "javascript",
+    viewportMargin: 40,
+    dragDrop: false,
+    cursorBlinkRate: 0,
+  });
+  Studio.codeDivSave = codeDiv;
+  Studio.tabs.push(makeCodeDiv);
+
+  Studio.scripts.push(new ScriptItem("RouteEngineA1.js","Route Engine A1"));
+  Studio.tabs.push(makeImagesPane);
+  Studio.tabs.push(makeScriptsPane);
+
+  Studio.updateCurrentTab();
+  loadExternalScripts();
+};
+</script>
+<script async defer src="https://apis.google.com/js/api.js"
+      onload="this.onload=function(){};handleClientLoad()"
+      onreadystatechange="if (this.readyState === 'complete') this.onload()">
+</script>
+</body>
+</html>	

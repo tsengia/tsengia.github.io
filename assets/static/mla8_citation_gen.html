@@ -1,0 +1,707 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>MLA8 Citation Creator</title>
+</head>
+<body>
+
+<div id="type" >
+Type: <select id="sourceType" >
+	<option value="book" >Book</option>
+	<option value="poem" >Poem/Short Story</option>
+	<option value="collection" >Collection (book with multiple essays)</option>
+	<option value="website" >Website</option>
+	<option value="image" >Image</option>
+	<option value="periodical" >Periodical</option>
+	</select>
+</div>
+<div id="static" >
+Source Title: <input type='text' id='docTitle' placeholder='Source Title' /><br />
+<div id="containerInput" >
+Has Container?: <input type="checkbox" id="hasContainer" /> If this is a collection, website, periodical or poem, it <i>should</i> have a container.<br />
+Container Title: <input type="text" id="containerTitle" placeholder="Container Title" /><br />
+Has Second Container?: <input type="checkbox" id="hasSecondContainer" /> Use second containers if the first container was inside of a database, put the database name here<br />
+Second Container Title: <input type="text" id="secondContainerTitle" placeholder="2nd Container Title" />
+</div>
+<hr />
+
+
+<div id="editionInfo" >
+Edition: <input type="checkbox" id="hasEdition" /> <input type="number" id="edition" /><br />
+</div>
+
+<div id="sequences" >
+Work is sequenced?: <input type="checkbox" id="hasSequence" /> (Only check this box if your work is part of a sequence. Examples: multi-volume works, multi-volume journals, TV series).<br />
+Volume: <input type="number" id="volume" /><br />
+Number: <input type="number" id="number" /><br />
+Issue: <input type="number" id="issue" /><br />
+</div>
+</div>
+<hr />
+<div id="authors" >
+</div>
+<div id="authorsControl" ><button type="button" onclick="addContributorUI();">+ Add Contributor</button></div>
+<hr />
+<div id="publicationDates" >
+Original Publication date: <div id="originalPublicationDate" class="pubdate" ></div>
+(Re)Publication date: <div id="publicationDate" class="pubdate" ></div>
+</div>
+<div id="publishers" >
+</div>
+<div id="publishersControl" >
+<button type="button" onclick="addPublisherUI();">+ Add Publisher</button>
+</div>
+<hr />
+
+<div id="locationInfo" >
+Location<br />
+<input type="checkbox" class="location" value="physical" id="physical" />
+<label for="physical" >Physical Location: <input type="text" id="physicalLocation" /></label><br />
+<input type="checkbox" class="location" value="url" id="url" />
+<label for="url" >URL: <input type="text" id="urlLocation" /></label><br />
+<input type="checkbox" class="location" value="pages" id="pages" />
+<label for="pages" >Pages: <input type="text" id="pageLocation" /></label><br />
+<input type="checkbox" class="location" value="doi" id="doi" />
+<label for="doi" >DOI: <input type="text" id="doiLocation" /></label><br />
+</div>
+
+<div id="dateAccessedInfo" >
+Date Accessed: <div class="pubdate" id="dateAccessed" ></div>
+</div>
+
+<div id="finalbar" >
+<button type="button" id="submit" onclick="makeCitation();" >Submit</button>
+</div>
+
+<div id="output" style='border: 1px solid black; padding: 5px; font-family: "Times New Roman"; font-size: 12pt; color: #000;'></div>
+
+<script type="text/javascript" >
+var sourceType = document.getElementById("sourceType");
+var authors = document.getElementById("authors");
+var publishers = document.getElementById("publishers");
+var sourceTitle = document.getElementById("docTitle");
+var containerTitle = document.getElementById("containerTitle");
+var secondContainerTitle = document.getElementById("secondContainerTitle");
+
+var UI = {};
+var Citation = {};
+
+var months = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
+var abbreviations = ["Jan.", "Feb.", "Mar.", "Apr.", "May", "Jun.", "Jul.", "Aug.", "Sep.", "Oct.", "Nov.", "Dec."];
+
+function initUI() {
+	UI.contributorCount = 1;
+	UI.contributorList = [];
+	UI.publisherCount = 1;
+	UI.publisherList = [];
+}
+
+function initData() {
+	Citation.sourceTitle = "";
+	Citation.sourceType = "";
+	Citation.contributors = [];
+	Citation.hasContainer = false;
+	Citation.containerTitle = "";
+	
+	Citation.hasEdition = false;
+	Citation.sequenced = false;
+	Citation.publishers = [];
+	
+	Citation.hasOriginalPublicationDate = false;
+	Citation.hasPublicationDate = false;
+	Citation.originalPublicationDate = "";
+	Citation.publicationDate = "";
+	Citation.locationType = "";
+	Citation.location = "";
+	
+	Citation.hasSecondContainer = false;
+	Citation.secondContainerTitle = "";
+	
+	Citation.hasDateAccessed = false;
+	Citation.dateAccessed = "";
+	
+	Citation.hasDOI = false;
+	Citation.DOI = "";
+}
+
+function init() {
+	initUI();
+	initData();
+}
+
+var ContributorType = ["Author","Editor","Translator"];
+var SectionType = ["----", "Introduction", "Preface", "Foreword", "AfterWord"];
+
+function Contributor(first, middle, last, t, section) {
+	this.firstName = first;
+	this.middleName = middle;
+	this.lastName = last;
+	this.contributionType = t;
+	this.section = section;
+	
+	this.getLastFirstFormat = function () {
+		if(this.middleName.length != 0) {
+			return this.lastName + ", " + this.firstName + " " + this.middleName;
+		}
+		else {
+			return this.lastName + ", " + this.firstName;
+		}
+	};
+	this.getLastFirstFormat.bind(this);
+	
+	this.getFirstLastFormat = function () {
+		if(this.middleName.length != 0) {
+			return  this.firstName + " " + this.middleName + " " + this.lastName;
+		}
+		else {
+			return this.firstName + " " + this.lastName;
+		}
+	};
+	this.getLastFirstFormat.bind(this);
+}
+
+function Publisher(name) {
+	this.name = name;
+}
+
+function addDateUI() {
+	var targets = document.getElementsByClassName("pubdate");
+	for (var i =0; i < targets.length; i++) {
+		uiAddPublicationDateField(targets[i]);	
+	}
+}
+
+function addContributorUI() {
+	UI.contributorCount += 1;
+	var j = UI.contributorCount - 1;
+	UI.contributorList.push(j);
+	var c = document.createElement("div");
+	c.setAttribute("id", "contribContainer"+j);
+	c.appendChild(document.createTextNode("Contributor #"+j+": "));
+	
+	var t = document.createElement("select");
+	t.setAttribute("id", "type"+j);
+	for (var i = 0; i < ContributorType.length; i++) {
+		var o = document.createElement("option");
+		o.setAttribute("value", ContributorType[i]);
+		o.appendChild(document.createTextNode(ContributorType[i]));
+		t.appendChild(o);
+	}
+	c.appendChild(t);
+	
+	var s = document.createElement("select");
+	s.setAttribute("id", "section"+j);
+	for (var i = 0; i < SectionType.length; i++) {
+		var o = document.createElement("option");
+		o.setAttribute("value", SectionType[i]);
+		o.appendChild(document.createTextNode(SectionType[i]));
+		s.appendChild(o);
+	}
+	c.appendChild(s);
+	
+	var f = document.createElement("input");
+	f.setAttribute("id", "firstName"+j);
+	f.setAttribute("placeholder", "First Name");
+	f.setAttribute("type", "text");
+	var m = document.createElement("input");
+	m.setAttribute("id", "middleName"+j);
+	m.setAttribute("placeholder", "Middle Name");
+	m.setAttribute("type", "text");
+	var l = document.createElement("input");
+	l.setAttribute("id", "lastName"+j);
+	l.setAttribute("placeholder", "Last Name");
+	l.setAttribute("type", "text");
+	c.appendChild(f); 
+	c.appendChild(m); 
+	c.appendChild(l);
+	
+	var d = document.createElement("button");
+	d.setAttribute("id", "delete"+j);
+	d.setAttribute("type", "button");
+	
+	d.appendChild(document.createTextNode("Remove"));
+	
+	c.appendChild(d);	
+	
+	authors.appendChild(c);
+	
+	document.getElementById("delete"+j).addEventListener("click", uiRemoveContributor);
+}
+
+function addPublisherUI() {
+	UI.publisherCount += 1;
+	var j = UI.publisherCount - 1;
+	UI.publisherList.push(j);
+	var c = document.createElement("div");
+	c.setAttribute("id", "publisherContainer"+j);
+	c.appendChild(document.createTextNode("Publisher #"+j+": "));
+	
+	var f = document.createElement("input");
+	f.setAttribute("id", "publisher"+j);
+	f.setAttribute("placeholder", "Publisher Name");
+	f.setAttribute("type", "text");
+	
+	c.appendChild(f); 
+	
+	var d = document.createElement("button");
+	d.setAttribute("id", "delete"+j);
+	d.setAttribute("type", "button");
+	
+	d.appendChild(document.createTextNode("Remove"));
+	d.addEventListener("click", uiRemovePublisher);
+	c.appendChild(d);	
+	
+	publishers.appendChild(c);
+	
+	
+}
+
+function uiRemoveContributor(e) {
+	var id = parseInt(e.target.id.substr(6));
+	var index = UI.contributorList.indexOf(id);
+	UI.contributorList.splice(index,1);
+	document.getElementById("authors").removeChild(document.getElementById("contribContainer"+id));
+}
+
+function uiRemovePublisher(e) {
+	var id = parseInt(e.target.id.substr(6));
+	var index = UI.publisherList.indexOf(id);
+	UI.publisherList.splice(index,1);
+	document.getElementById("publishers").removeChild(document.getElementById("publisherContainer"+id));
+}
+
+function uiAddPublicationDateField(p) {
+	//Add date input inside of parent element p
+	var day = document.createElement("input");
+	day.setAttribute("name", "day");
+	day.setAttribute("type", "number");
+	day.setAttribute("placeholder", "Day");
+	
+	var month = document.createElement("select");
+	month.setAttribute("name", "month");
+	month.setAttribute("placeholder", "Month");
+	for (var i = 0; i < abbreviations.length; i++) {
+		var o = document.createElement("option");
+		o.setAttribute("value", abbreviations[i]);
+		o.appendChild(document.createTextNode(months[i]));
+		month.appendChild(o);
+	}
+	var o = document.createElement("option");
+	o.setAttribute("value", "Unknown");
+	o.appendChild(document.createTextNode("Unknown"));
+	o.setAttribute("selected", true);
+	month.appendChild(o);
+	
+	var year = document.createElement("input");
+	year.setAttribute("name","year");
+	year.setAttribute("type","number");
+	year.setAttribute("placeholder", "Year");
+	
+	p.appendChild(day);
+	p.appendChild(month);
+	p.appendChild(year);
+}
+
+function capitalizeFirstLetter(word) {
+	word = word.trim();
+	if (word.length == 1) {
+		return word.toUpperCase();
+	}
+	else if (word.length == 0) {
+		return "";
+	}
+	return word.substr(0,1).toUpperCase() + word.substr(1);
+}
+
+function capitalizeEachWord(string) {
+	var words = string.split(" ");
+	for (var i = 0; i < words.length; i++) {
+		words[i] = 	capitalizeFirstLetter(words[i]);
+	}
+	var res = "";
+	for(var j = 0; j < words.length-1; j++) {
+		if(words[j].length != 0) {
+			res += words[j] + " ";
+		}
+	}
+	res += words[words.length-1];
+	return res;
+}
+
+function italicizeText(string) {
+	return "<i>"+string+"</i>";
+}
+
+function quoteText(string) {
+	return '"'+string+'"';
+}
+
+function getWordyNumber(number) {
+	if(number == 1) {
+		return "1st";
+	}
+	else if (number == 2) {
+		return "2nd";	
+	}
+	else if (number == 3) {
+		return "3rd";
+	}
+	else {
+		return number + "th";	
+	}
+}
+
+function getTitle() {
+	var txt = sourceTitle.value;
+	txt = txt.trim();
+	var regex = /a\s|an\s|the\s/i;
+	var m = txt.match(regex);
+	if(m != null) {
+		
+		var article = m[0];
+		article = capitalizeFirstLetter(article);
+		console.log(article);
+		txt = txt.substr(m[0].length,1).toUpperCase() + txt.substr(m[0].length+1);
+		txt = txt += ", " + article;
+	}
+	Citation.sourceTitle = txt;
+}
+
+function getType() {
+	Citation.sourceType = sourceType.selectedOptions[0].value;
+}
+
+function getContributors() {
+	for (var a = 0; a < UI.contributorList.length; a++) {
+		var n = UI.contributorList[a];
+		var f = capitalizeFirstLetter(document.getElementById("firstName"+n).value);
+		var m = capitalizeFirstLetter(document.getElementById("middleName"+n).value);
+		var l = capitalizeFirstLetter(document.getElementById("lastName"+n).value);
+		var t = document.getElementById("type"+n).selectedOptions[0].value;
+		var s = document.getElementById("section"+n).selectedOptions[0].value;
+		Citation.contributors.push(new Contributor(f, m, l, t, s));
+	}
+}
+
+function getPublishers() {
+	for (var a = 0; a < UI.publisherList.length; a++) {
+		var n = UI.publisherList[a];
+		var f = capitalizeFirstLetter(document.getElementById("publisher"+n).value.trim());
+		Citation.publishers.push(new Publisher(f));
+	}
+}
+
+function getContainer() {
+	if(document.getElementById("hasContainer").checked) {
+		Citation.hasContainer = true;
+		Citation.containerTitle = containerTitle.value;	
+	}
+	else {
+		Citation.hasContainer = false;
+		Citation.containerTitle = "";	
+	}	
+	
+	if(document.getElementById("hasSecondContainer").checked) {
+		Citation.hasSecondContainer = true;
+		Citation.secondContainerTitle = secondContainerTitle.value;	
+	}
+	else {
+		Citation.hasSecondContainer = false;
+		Citation.secondContainerTitle = "";	
+	}	
+}
+
+function countAuthors() {
+	var count = 0;
+	for(var i = 0; i < Citation.contributors.length; i++) {
+		if(Citation.contributors[i].contributionType	== "Author" && Citation.contributors[i].section == "----"){
+			count++;
+		}
+	}
+	return count;
+}
+
+function getAuthor(number) { //This is not 0 indexed! passing in 1 means the 1st author!
+	var count = 0;
+	for(var i = 0; i < Citation.contributors.length; i++) {
+		if(Citation.contributors[i].contributionType	== "Author" && Citation.contributors[i].section == "----"){
+			count++;
+			if (count == number) {
+				return Citation.contributors[i];
+			}
+		}
+	}
+	console.log("Author #" + number + " Not Found!");
+	return null;
+}
+
+function isSectioned() {
+	var sections = ["----"];
+	for (var i = 0; i < Citation.contributors; i++) {
+		if (sections.indexOf(Citation.contributors[i].section) == -1) {
+			sections.push(Citation.contributors[i].section);
+		}	
+	}
+	return sections.length > 1;
+}
+
+function isTranslated() {
+	for(var i = 0; i < Citation.contributors.length; i++) {
+		if(Citation.contributors[i].contributionType	== "Translator"){
+			return true;
+		}
+	}
+	return false;
+}
+
+function getTranslator() {
+for(var i = 0; i < Citation.contributors.length; i++) {
+		if(Citation.contributors[i].contributionType	== "Translator"){
+			return Citation.contributors[i];
+		}
+	}
+	return null;
+}
+
+function isEdited() {
+	for(var i = 0; i < Citation.contributors.length; i++) {
+		if(Citation.contributors[i].contributionType	== "Editor"){
+			return true;
+		}
+	}
+	return false;
+}
+
+function getEditor() {
+for(var i = 0; i < Citation.contributors.length; i++) {
+		if(Citation.contributors[i].contributionType	== "Editor"){
+			return Citation.contributors[i];
+		}
+	}
+	return null;
+}
+
+function getNumberAndEdition() {
+	Citation.hasEdition = document.getElementById("hasEdition").checked;
+	Citation.edition = document.getElementById("edition").value;
+
+	Citation.sequenced = document.getElementById("hasSequence").checked;
+	Citation.number = document.getElementById("number").value;
+	Citation.volume = document.getElementById("volume").value;
+	Citation.issue = document.getElementById("issue").value;
+}
+
+function formatDate(date) {
+	var str = "";
+	if(date.year > 0 || date.year != "") {
+		if (date.month != "Unknown") {
+			if (date.day != "") {
+				//Day, month and year
+				str = date.day + " " + date.month + " " + date.year;
+			}
+			else {
+				//Just list month and year
+				str = date.month + " " + date.year;
+			}
+		} else {
+			//Just list the year
+			str = date.year;
+		}
+	}
+	return str;
+}
+
+function dateExists(date) {
+	if(date.year > 0 || date.year != "") {
+		return true;
+	}
+	else {
+		return false;
+	}
+}
+
+function getDateFromField(field) {
+	var date = {};
+	date.day = field.children['day'].value;
+	date.month = field.children['month'].selectedOptions[0].value;
+	date.year = field.children['year'].value;
+	return date;
+}
+
+function getDates() {
+	var originalDate = getDateFromField(document.getElementById("originalPublicationDate"));
+	
+	Citation.hasOriginalPublicationDate = dateExists(originalDate);
+	Citation.originalPublicationDate = formatDate(originalDate);
+	
+	var otherDate = getDateFromField(document.getElementById("publicationDate"));
+	
+	Citation.hasPublicationDate = dateExists(otherDate);
+	Citation.publicationDate = formatDate(otherDate);
+	
+	var dateAccessed = getDateFromField(document.getElementById("dateAccessed"));
+	Citation.hasDateAccessed = dateExists(dateAccessed);
+	Citation.dateAccessed = formatDate(dateAccessed);
+}
+
+function getRadioValue(name) {
+	var elements = document.getElementsByName(name);
+	for (var i = 0; i < elements.length; i++) {
+		if(elements[i].checked) {
+			return elements[i].value;		
+		}
+	}
+	return null;
+}
+
+function getLocation() {
+	var elements = document.getElementsByClassName("location");
+	
+	if (elements['pages'].checked) {
+		var pages = document.getElementById("pageLocation").value.trim();
+		if (pages.indexOf("-") == -1) {
+			Citation.location += "p. " + pages; // Single page
+		}
+		else {
+			Citation.location += "pp. " + pages; // A range of pages, denoted by a dash (-)
+		}
+	}
+	//TODO: Support for paragraph citing: https://owl.english.purdue.edu/owl/resource/747/08/
+	
+	if (elements['url'].checked) {
+		Citation.location += document.getElementById("urlLocation").value.trim();
+	}
+	else if (elements['physical'].checked) {
+		Citation.location = document.getElementById("physicalLocation").value.trim();
+	}
+	
+	if(elements['doi'].checked) {
+		Citation.hasDOI = true;
+		Citation.DOI = document.getElementById("doiLocation").value.trim();
+	}
+}
+
+function makeCitation() {
+	initData();
+	getTitle();
+	getType();
+	getContributors();
+	getPublishers();
+	getContainer();	
+	getNumberAndEdition();
+	getDates();
+	getLocation();
+	
+	var str = "";	
+	
+	var authorCount = countAuthors();	
+	//TODO: Add in corporate authors
+	if(authorCount >= 3) {
+		var a = getAuthor(1);
+		str += a.getLastFirstFormat() + ", et al.";      
+	}
+	else if (authorCount == 2) {
+		var first = getAuthor(1);
+		var second = getAuthor(2);
+		str += first.getLastFirstFormat() + ", and " + second.firstName + " " + second.lastName + ".";
+	}
+	else if (authorCount == 1) {
+		var first = getAuthor(1);
+		str += first.getLastFirstFormat() + ".";
+	}
+	
+	if (Citation.sourceType == "book") {
+		str += " " + italicizeText(Citation.sourceTitle) + ".";
+	} else if (Citation.sourceType == "poem" || Citation.sourceType == "periodical" || Citation.sourceType == "website" || Citation.sourceType == "collection") {
+		str += " " + quoteText(Citation.sourceTitle + ".");
+	}
+	
+	if(Citation.hasContainer) {
+		str += " " + italicizeText(Citation.containerTitle) + ",";
+	}
+	
+	if (isEdited()) {
+		str += " Edited by " + getEditor().getFirstLastFormat() + ",";
+	}
+	if (isTranslated()) {
+		str += " Translated by " + getTranslator().getFirstLastFormat() + ",";
+	}
+	
+	if (Citation.hasEdition) {
+		str += " " + getWordyNumber(Citation.edition) + " ed.,";
+	}
+	
+	if (Citation.sequenced) {
+		str += " " + "vol. " + Citation.volume + ",";
+		if (Citation.number > 0) {
+			str += " no. " + Citation.number + ",";
+		}
+		if (Citation.issue > 0) {
+			str += " issue " + Citation.issue + ",";
+		}
+	}
+	
+	if(Citation.hasOriginalPublicationDate && Citation.hasPublicationDate) {
+		str += " " + Citation.originalPublicationDate + ".";
+	}
+	
+	if(Citation.publishers.length > 0) { // This can handle multiple publishers.
+		if(Citation.publishers.length > 1) {
+			str += " ";
+			for(var i = 0; i < Citation.publishers.length-1; i++) {
+				str += Citation.publishers[i].name + "/";
+			}
+			str += ",";
+		}
+		else if(Citation.publishers.length == 1) {
+			str += " " + Citation.publishers[0].name + ",";		
+		}
+		else {
+			str += ",";
+		}
+	}
+	
+	if((Citation.hasOriginalPublicationDate && Citation.hasPublicationDate) || (!Citation.hasOriginalPublicationDate && Citation.hasPublicationDate)) {
+		//Either we have both dates and we've already listed the original, or we just have the republished date, so in both cases we will list the republished date
+		str += " " + Citation.publicationDate;
+	}
+	else if (Citation.hasOriginalPublicationDate) {
+		//We only have the original publication date
+		str += " " + Citation.originalPublicationDate;
+	} else{
+		//We have no dates at all
+	}
+	
+	if (Citation.location.length > 3) {
+		str += ", " + Citation.location;
+	}
+	
+	if (Citation.hasSecondContainer) {
+		str += ", " + italicizeText(Citation.secondContainerTitle);
+	}
+	
+	if (Citation.hasDOI) {
+		str += ", doi: " + Citation.DOI;
+	}
+	
+	str.slice(str.length-1, 1);
+	str += ".";
+	
+	if (Citation.hasDateAccessed) {
+		str += " Accessed " + Citation.dateAccessed + ".";
+	}
+	
+	document.getElementById("output").innerHTML = str;
+}
+
+
+window.onload = function () {
+	init();
+	addContributorUI();
+	addPublisherUI();
+	addDateUI();
+};
+</script>
+
+</body>
+</html>
