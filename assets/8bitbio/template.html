@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta http-equiv="Content-Language" content="en-us">
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="stylesheet" type="text/css" href="styles/ResetCSS.css" />
+<link rel="stylesheet" type="text/css" href="styles/style.css" />
+<title>Title | 8 Bit Bio</title>
+
+</head>
+<body>
+<div id='header-large' >
+<span id="header-large-title" >8 Bit Bio</span><br />
+<span id="header-large-description" ></span>
+<script type="text/javascript" >
+    var random_quote_element = document.getElementById("header-large-description");
+    var quotes = ["Better Biology",
+    "By Teens, for Teens",
+    "Interactive Learning",
+    "Under Construction!"];
+    random_quote_element.innerHTML = quotes[Math.floor(Math.random() * quotes.length)];
+</script>
+</div>
+<div id="topbar" >
+	<div class="nav-button" ><a href="index.html" >Home</a></div>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+	<div class="nav-button" ><a href="lessons.html" >Lessons</a></div>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+	<div class="nav-button" ><a href="about.html" >About</a></div>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+	<div class="nav-button" ><a href="contactinfo.html" >Contact</a></div>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+	<script type='text/javascript' >
+		//Vertically center nav-button text on load
+//And correct the font size
+//Some browsers have a funky default font size
+function positionAndSize() {
+		var topbar = document.getElementById("topbar");
+		var barHeight = parseInt(getComputedStyle(topbar).height);
+		var third = Math.round(barHeight / 3);
+		var fontSizeCorrected = third % 2 === 0 ? third : third-1;
+		topbar.style.fontSize = fontSizeCorrected + "px";
+		var elementList = document.getElementsByClassName("nav-button");
+		for(var e = 0; e < elementList.length; e++) {
+			var button = elementList[e];
+			button.style.paddingTop = third + "px";
+		}
+		var fraction = Math.round(parseInt(getComputedStyle(document.body).height) / 40);
+		var correctedFraction = fraction % 2 === 0 ? fraction : fraction - 1;
+		document.body.style.fontSize = correctedFraction + "px";
+}
+window.addEventListener("load", positionAndSize);
+//window.addEventListener("resize", positionAndSize); 
+	</script>
+</div>
+<div id="content">
+	<div id="container" >
+	
+	<!-- Put ALL your code here! 
+	Don't Forget to close ALL your tags properly! -->
+
+	<p class="note" >&lt;Insert Content Here&gt;</p><br />
+
+	</div>
+</div>
+<div id='footer'>
+<a href="index.html" >Home</a>
+&nbsp;&#124;&nbsp;
+<a href="lessons.html" >Lessons</a>
+&nbsp;&#124;&nbsp;
+<a href="about.html" >About</a>
+</div>
+
+</body>
+</html>

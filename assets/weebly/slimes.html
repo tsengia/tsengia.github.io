@@ -1,0 +1,638 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta name="viewport" content="width=320, initial-scale=1, maximum-scale=1">
+<link href='http://fonts.googleapis.com/css?family=Ceviche+One' rel='stylesheet' type='text/css'></link>
+<style type="text/css">
+#canvas {
+display:inline-block;
+
+-webkit-user-select: none;
+
+-khtml-user-select: none;
+
+-moz-user-select: none;
+
+-ms-user-select: none;
+
+user-select: none;
+}
+body {
+margin:0px;
+}
+#topscreen {
+width:320px;
+height:218px;
+text-align:center;
+font-family: 'Ceviche One', cursive;
+font-size:40px;
+color:#2F3; 
+background-color:#777;
+}
+.huge {
+font-style:oblique;
+
+}
+</style>
+
+</head>
+</head>
+
+<body>
+<div id="topscreen"><br />Slimes<br />
+<span class="huge">
+----------
+</span>
+
+</div>
+<canvas id="canvas" height="212" width="320" onmouseout="mouseDown=false;" onmousemove="getPosition(event);"> </canvas></div>
+<script type="text/javascript">
+window.setInterval("document.body.scrollTop=218;",1);
+var c = document.getElementById("canvas");
+var can = c.getContext("2d");
+var cH = c.height;
+var cW = c.width;
+var playing;
+var runninginterval;
+var mouseX;
+var mouseY;
+var key;
+var TempX = 0;
+var TempY = 0;
+var mouseDown = false;
+c.addEventListener("mousedown", mouseClick, false);
+c.addEventListener("mouseup", mouseUp, false);
+var Game = {};
+Game.evolvecount = 4;
+function loadAll() {
+	Game.startbutton = {
+	x:100,
+	y:95,
+	backgroundColor:'#3F5',
+	render: function () {
+	can.fillStyle=this.backgroundColor;
+	can.fillRect(this.x,this.y,110,35);
+	can.fillStyle='#333';
+	can.font='22px Arial Black';
+	can.fillText('Start',122,120);
+	}
+	};
+	Game.startbutton.update = function () {
+	if (MouseOver(100,95,110,35)) {
+	Game.startbutton.backgroundColor = '#555';
+	if (mouseDown) {
+	resetVars();
+	Game.screen='start';
+	}
+	}
+	else {
+	Game.startbutton.backgroundColor = '#3F5';
+	}
+	};
+	loadImage('ForestTileImage','foresttile.png',96,96);
+	loadImage('GrassTileImage','grasstile.png',96,96);
+	
+	resetVars();
+	start();
+}
+
+function start() {
+	playing = true;
+	Game.screen = 'title';
+	runninginterval = window.setInterval("run();", 20);
+}
+
+function run() {
+if (playing) {
+	render();
+}
+else {
+	window.clearInterval(runninginterval);
+	playing = false;
+}
+}
+
+
+function render() {
+	clear();
+	if (Game.screen=='title') {
+	Game.startbutton.update();
+	can.fillStyle='#777';
+	can.fillRect(0,0,cW,cH);
+	can.fillStyle='#2F3';
+	can.font='50px Ceviche One';
+	can.fillText('Slimes',95,55);
+	Game.startbutton.render();
+	}
+	if (Game.screen=='start') {
+	StartOfTurn();
+	}
+	if (Game.screen=='playing') {
+	
+	}
+	if (Game.screen=='paused') {
+	
+	}
+}
+
+function StartOfTurn() {
+	can.fillStyle='#777';
+	can.fillRect(0,0,cW,cH);
+	can.fillStyle='#2F3';
+	can.font='45px Ceviche One';
+	can.fillText('Day',106,40);
+	can.font='70px Ceviche One';
+	can.textAlign='center';
+	can.fillText(Game.turn,137,96);
+	can.textAlign='start';
+	can.font='25px Ceviche One';
+	can.fillText("Days till Evolution:"+Game.evolvecount,53,144);
+
+}
+
+function EndTurn() {
+	Game.turn++;
+	Game.evolvecount--;
+	if (Game.evolvecount == 0) {
+	Game.evolvecount = 5;
+	evolve();
+	}
+}
+
+function evolve() {
+	
+}
+
+function resetVars() {
+	Game.evolvecount = 4;
+	Game.turn = 1;
+	Game.players=[];
+	Game.map=[];
+	Game.Slime = {
+	hp:1,
+	startrange:3,
+	range:3,
+	damage:1,
+	autokill:true,
+	target:'',
+	attack: function () {
+	if (this.range != 0) {
+		this.range--;
+		if (this.range==0) {
+		target.hp -= this.damage;
+		}
+	}
+	else {
+		if (this.autokill) {
+		this.target.kill();
+		}
+		else {
+		target.hp -= this.damage;
+		}
+	}
+	}
+	};
+	Game.survivor = {
+	hp:3,
+	wood:0,
+	scrap:0,
+	meds:0,
+	food:0,
+	items:new Array(),
+	x:'',
+	y:'',
+	strength:2,
+	intel:3,	
+	};
+	Game.player = function () {
+	this.hp=3;
+	this.wood=0;
+	this.scrap=0;
+	this.meds=0;
+	this.food=0;
+	this.items=['pistol'];
+	this.x='';
+	this.y='';
+	this.strength=2;
+	this.intel=3;
+	this.color='#F00',
+	this.render= function () {
+	
+	}
+	};
+	Game.players.push(Game.player);
+	Game.Map = [];
+	
+	Game.Tile = function () {
+	this.image = GrassTileImage;
+	this.searches = 3;
+	this.name = 'grass';
+	this.players = [];
+	this.findChart = ['scrap','scrap','food','food','food','none','none','none','none','none','none','none','none','none','none','survivor','survivor','none'];
+	this.search = function () {
+	if (this.searches!=3) {
+	var o = roll(this.findChart.length);
+	return this.findChart[o-1];
+	this.searches--;
+	}
+	else {
+	return 'out';
+	}
+	}
+	this.render = function (x,y) {
+	can.drawImage(this.image,x*96,y*96);
+	};
+	};
+	Game.GrassTile = new Game.Tile();
+	Game.ForestTile = new Game.Tile();
+	Game.ForestTile.name='forest';
+	Game.ForestTile.image = ForestTileImage;
+}
+
+function MouseListener() {
+	this.x ='';
+	this.y ='';
+	this.width='';
+	this.height='';
+	this.onmouseover=function () {};
+	this.onclick=function () {};
+	this.onmouseout='';
+	this.mouseover=false;
+	this.update = function () {
+	if (MouseOver(this.x,this.y,this.width,this.height)) {	
+	this.mouseover=true;
+	eval(this.onmouseover);
+	if (mouseDown) {
+	eval(this.onclick);
+	}
+	}
+	else {
+	if (this.mouseover) {
+	eval(this.onmouseout);
+   }
+	this.mouseover=false;
+	}
+	}
+}
+
+function _handleRight() {
+	TempX--;
+}
+
+function _handleLeft() {
+	TempX++;
+}
+
+function _handleUp() {
+	TempY++;
+}
+
+function _handleDown() {
+	TempY--;
+}
+
+function _handleA() {
+	
+}
+
+function roll() {
+var s;
+var o;
+if (inArray[1]!=NaN) {
+	if (inArray.length!=1 && inArray[1]+1!=1) {
+		s = inArray[1];
+	var o = Math.floor(Math.random()*s) + 1;
+	}
+	return o;
+}
+}
+
+
+
+window.onkeydown = function(e) {
+
+/* Respond to the key press */
+
+	key = e.keyCode;
+
+	handleKey();
+
+}
+
+
+
+window.onkeyup = function() {
+
+/* Respond to the key release */
+
+	key = " ";
+
+
+
+}
+
+
+
+function handleKey() {
+
+/* Key handling */
+
+	switch (key) {
+
+		case 39:
+
+		_handleRight();
+
+		break;
+
+		case 68:
+
+		_handleRight();
+
+		break;
+
+		case 38:
+
+		_handleUp();
+
+		break;
+
+		case 87:
+
+		_handleUp();
+
+		break;
+
+		case 37:
+
+		_handleLeft();
+
+		break;
+
+		case 40:
+
+		_handleDown();
+
+		break;
+
+		case 83:
+
+		_handleDown();
+
+		break;
+
+		case 13:
+
+		_handleA();
+
+		break;
+
+		case 32:
+
+		_handleA();
+
+		break;
+
+		case 65:
+
+		_handleLeft();
+
+		break;
+
+
+
+	}
+
+}
+
+function mouseUp() {
+	mouseDown = false;
+}
+
+function mouseClick(event) {
+	mouseDown = true;
+	getPosition(event);
+}
+
+function MouseOver(x,y,w,h) {
+	if (mouseX > x && mouseX < x + w && mouseY > y && mouseY < y + h) {
+	return true;
+}
+else {
+	return false;
+}
+}
+
+function getPosition(event) {
+
+	  /* Mouse event handling */
+
+        var x;
+
+        var y;
+
+
+
+        if (event.x != undefined && event.y != undefined)
+
+        {
+
+          x = event.x;
+
+          y = event.y;
+
+        }
+
+        else // Firefox method to get the position
+
+        {
+
+          x = event.clientX + document.body.scrollLeft +
+
+              document.documentElement.scrollLeft;
+
+          y = event.clientY + document.body.scrollTop +
+
+              document.documentElement.scrollTop;
+
+    }
+
+
+
+    x -= c.offsetLeft;
+
+    y -= c.offsetTop;
+
+	x  = x - window.pageXOffset;
+
+	y  = y + window.pageYOffset;
+
+    mouseX = x;
+
+	mouseY = y;
+
+}
+
+
+function clear() {
+
+/* Clears the entire canvas. */
+
+can.clearRect(0, 0, cW, cH);
+
+}
+
+
+
+function loadImage(name, src, height, width) {
+
+/* Loads images */
+
+var name;
+
+var src;
+
+var height;
+
+var width;
+
+loaded = false;
+
+eval(name+' = new Image();');
+
+eval(name+".src='/files/theme/"+src+"';");
+
+eval(name+".width='"+width+"';");
+
+eval(name+".height='"+height+"';");
+
+}
+
+function writeCookie(value, name, hours)
+
+
+
+{
+
+
+
+  var expire = "";
+
+
+
+  if(hours != null)
+
+
+
+  {
+
+
+
+    expire = new Date((new Date()).getTime() + hours * 3600000);
+
+
+
+    expire = "; expires=" + expire.toGMTString();
+
+
+
+  }
+
+
+
+  document.cookie = name + "=" + escape(value) + expire;
+
+
+
+}
+
+
+
+/* Example:
+
+alert( readCookie("myCookie") );
+
+*/
+
+function readCookie(name)
+
+
+
+{
+
+
+
+  var cookieValue = "";
+
+
+
+  var search = name + "=";
+
+
+
+  if(document.cookie.length > 0)
+
+
+
+  { 
+
+
+
+    offset = document.cookie.indexOf(search);
+
+
+
+    if (offset != -1)
+
+
+
+    { 
+
+
+
+      offset += search.length;
+
+
+
+      end = document.cookie.indexOf(";", offset);
+
+
+
+      if (end == -1) end = document.cookie.length;
+
+
+
+      cookieValue = unescape(document.cookie.substring(offset, end))
+
+
+
+    }
+
+
+
+  }
+
+
+
+  return cookieValue;
+
+
+
+}
+
+
+
+function deleteCookie(name) {
+
+var name;
+
+writeCookie("", name, -1);
+
+}
+
+
+
+window.onload=loadAll();
+</script>
+</body>
+</html>

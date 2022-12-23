@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html>
+<head>
+
+<title>
+Popup adventure!
+</title>
+
+<style>
+
+</style>
+</head>
+
+<body>
+
+
+
+
+<script type='text/javascript' >
+var dec;
+Player = new Object();
+Player.HP = 5;
+Player.name = prompt("What is your character's name?");
+Player.Attack = 2;
+Player.Defense = 3;
+Player.Mana = 5;
+
+Enemy = new Object();
+Enemy.HP = 2;
+Enemy.Level = 2;
+Enemy.name = 'orc';
+Enemy.A = 2;
+Enemy.D = 1;
+Enemy.nextTo = false;
+
+Enemy.type = 'mele';
+window.onload = start();
+
+function start() {
+stats();
+alert("An enemy approaches! \n Level 2 orc! \n ----------");
+
+battle();
+}
+
+function battle() {
+dec = prompt("What do you attack with? \n ---------- \n Mele \n Ranged \n Magic \n ----------");
+dec = dec.toLowerCase();
+switch (dec) {
+
+case 'mele':
+	var damage = Math.floor(Math.random()*4);
+	alert('You delt ' + damage + " damage to the " + Enemy.name);
+	Enemy.HP = Enemy.HP - damage;
+	Enemy.nextTo = true;
+break;
+
+case 'ranged':
+	var damage = Math.floor(Math.random()*3);
+	alert('You delt ' + damage + " damage to the " + Enemy.name);
+	Enemy.HP = Enemy.HP - damage;
+break;
+
+case 'magic':
+	if ( Player.Mana > 0) {
+	Player.Mana--;
+	Player.Mana--;
+	var damage = Math.floor(Math.random()*4);
+	alert('You delt ' + damage + " damage to the " + Enemy.name);
+	Enemy.HP = Enemy.HP - damage;
+	}
+	else {
+	alert("You do not have enough mana!");
+	}
+break;
+
+default:
+alert(dec + " is not an option!");
+break;
+
+}
+	if (Enemy.HP <= 0) {
+	alert("You defeated a " + Enemy.name + "!");
+	}
+	else {
+	counter();
+	}
+}
+
+function counter() {
+var type = Enemy.type;
+var enemy = Enemy.name;
+switch (type) {
+case 'mele':
+	if(Enemy.nextTo == true) {
+	var damage = Math.floor(Math.random()*4);
+	alert('The ' + enemy + ' delt ' + damage + " damage to the you!");
+	Player.HP = Player.HP - damage;
+	if (Player.HP <= 0) {
+	alert("You were defeated by a " + enemy + " !");
+	}
+	else {
+	battle();
+	}
+	}
+	else {
+	alert("The " + enemy + " took its time coming after you.");
+	battle();
+	}
+break;
+}
+}
+
+function stats() {
+alert("Stats \n ---------- \n HP:" + Player.HP + "\n Attack:" + Player.Attack + "\n Defense:" + Player.Defense + "\n Mana:" + Player.Mana + "\n ----------");
+}
+</script>
+
+</body>
+
+</html>

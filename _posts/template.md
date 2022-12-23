@@ -6,5 +6,4 @@ categories: journal
 tags: [documentation, sample]
 ---
 
-# Article Title
 Put your content here

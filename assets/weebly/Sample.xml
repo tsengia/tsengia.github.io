@@ -1,0 +1,27 @@
+<?xml version='1.0'?>
+<document author='Proanimation' created='10/20/13'>
+<meta>
+<title>
+Sample
+</title>
+<tags>
+<tag>Sample</tag><tag>XML</tag>
+</tags>
+</meta>
+<content>
+<text>
+This is a sample XML document that may be used in <link url='about:blank'>Zyrix</link> <nl/>
+<i>Italics</i> <nl/>
+<b>Bold</b> <nl/>
+<u>Underline</u> <nl/>
+<big>Big text</big>
+<small>Small text</small>
+<scroll>Scrolling text</scroll> <nl/>
+<color hex='#FF0000'>Red color</color> <nl/>
+<line /> <nl/>
+<square size="10" /> <nl/>
+<button>Button</button> <nl/>
+
+</text>
+</content>
+</document>

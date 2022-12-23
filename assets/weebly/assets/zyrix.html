@@ -1,0 +1,264 @@
+<!DOCTYPE html>
+<html>
+<head>
+
+<title> Zyrix </title>
+
+<style type="text/css">
+#header {
+ border-bottom:1px solid;
+}
+#page_title {
+ color: #06C;
+ font-size: 130%;
+ margin-top: 10px;
+ margin-bottom: 7px;
+}
+#content {
+ padding:3px;
+ background-color:#FFF;
+ color:#222;
+ font-family:Tahoma, Geneva, sans-serif;
+ 
+}
+#footer {
+ border-color:#888;
+ border-top:1px solid;
+ background-color:#E6E6E6;
+ color:#E6E6E6;
+}
+#navbar{
+ padding-left:4px;
+ background-color:#E6E6E6;
+ color:#06C;
+ font-weight:bold;
+ 
+}
+#sidenav {
+	float:left;
+	font-family:'Century Gothic', 'Lao UI';
+	font-size:105%;
+}
+#logo {
+	display:inline;
+}
+a {
+	font-weight:bold;
+	color:#56F;
+	text-decoration:none;
+}
+a:hover {
+	font-style: italic;
+	color:#349;
+	text-decoration:none;
+}
+textarea {
+border-color:#777;
+border:1px solid;
+border-radius:2px;
+padding:2px;
+}
+textarea:hover {
+border-color:#222;
+}
+textarea:focus {
+border-color:#56F;
+}
+input {
+border-color:#777;
+border:1px solid;
+border-radius:2px;
+padding:2px;
+}
+button {
+border-color:#777;
+border:1px solid;
+border-radius:2px;
+padding:2px;
+}
+button:hover {
+padding-left:4px;
+padding-right:4px;
+background-color:#999;
+color:#57F;
+border-color:#222; 
+}
+hr {
+color:#777;
+margin-top:2px;
+margin-bottom:2px;
+}
+.noselect {
+-webkit-user-select: none;
+-khtml-user-select: none;
+-moz-user-select: none;
+-ms-user-select: none;
+user-select: none;
+}
+p{
+margin-top:7px;
+margin-bottom:7px;
+}
+</style>
+
+</head>
+
+
+<body>
+<div id="header">
+<div id="navbar">
+<h3 id="logo"><i>Zyrix</i></h3>
+<button type="button" onclick="home">Home</button><button type="button" onclick="customize" style="float:right;">Customize</button>
+</div>
+</div>
+
+<div id="sidenav">
+Side Nav <br />
+Bar <br />
+Side Nav <br />
+Bar <br />
+Side Nav <br />
+Bar <br />
+Side Nav <br />
+Bar <br />
+Side Nav <br />
+Bar <br />
+</div>
+<div id="contentContainer">
+<h3 id="page_title" >
+Page Title
+</h3>
+<div id="content">
+This is a 
+<a href="about:blank">link</a> to nowhere.
+<p class="noselect"> This text cannot be selected </p>
+<textarea></textarea> <hr />
+<input type="number" /> <button type="button">Submit</button>
+
+</div>
+</div>
+
+
+<div id="footer">
+
+</div>
+<script type="text/javascript">
+/*
+Still working on the XML parsing and handleing for the documents/tutorials
+I will create an API of sort about the XML structure using Zyrix
+*/
+/*
+var doc;
+function customize() {
+	
+}
+function loadXMLDoc(docname)
+{
+if (window.XMLHttpRequest)
+  {
+  xhttp=new XMLHttpRequest();
+  }
+else
+  {
+  xhttp=new ActiveXObject("Microsoft.XMLHTTP");
+  }
+xhttp.open("GET",docname,false);
+xhttp.send();
+return xhttp.responseXML;
+}
+
+function loadDoc() {
+	doc = loadXMLDoc('Sample.xml');
+	
+}
+
+function insertDoc() {
+	document.innerHTML=doc;
+}
+*/
+
+
+function writeCookie(value, name, hours)
+
+{
+
+  var expire = "";
+
+  if(hours != null)
+
+  {
+
+    expire = new Date((new Date()).getTime() + hours * 3600000);
+
+    expire = "; expires=" + expire.toGMTString();
+
+  }
+
+  document.cookie = name + "=" + escape(value) + expire;
+
+}
+
+/* Example:
+alert( readCookie("myCookie") );
+*/
+function readCookie(name)
+
+{
+
+  var cookieValue = "";
+
+  var search = name + "=";
+
+  if(document.cookie.length > 0)
+
+  { 
+
+    offset = document.cookie.indexOf(search);
+
+    if (offset != -1)
+
+    { 
+
+      offset += search.length;
+
+      end = document.cookie.indexOf(";", offset);
+
+      if (end == -1) end = document.cookie.length;
+
+      cookieValue = unescape(document.cookie.substring(offset, end))
+
+    }
+
+  }
+
+  return cookieValue;
+
+}
+
+function deleteCookie(name) {
+var name;
+writeCookie("", name, -1);
+}
+
+function loadImage(name, src, height, width) {
+/* Loads images */
+var name;
+var src;
+var height;
+var width;
+loaded = false;
+eval(name+' = new Image();');
+eval(name+".src='"+src+"';");
+eval(name+".width='"+width+"';");
+eval(name+".height='"+height+"';");
+}
+/*
+window.onload = function () {
+	doc = 'Sample.xml';
+	insertDoc();
+}
+*/
+</script>
+
+</body>
+</html>

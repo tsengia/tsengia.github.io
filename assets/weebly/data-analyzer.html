@@ -1,0 +1,82 @@
+<textarea id="inText" rows="7" cols="30"></textarea> <br />
+<button onclick="analyzeData();">Analyze</button>
+<select id="function">
+<option value="mean">Mean</option>
+<option value="median">Median</option>
+<option value="range">Range</option>
+</select>
+<script type="text/javascript">
+var inData = document.getElementById("inText").value;
+var out;
+var funct = document.getElementById("function").value;
+
+function analyzeData() {
+	out = parseSV();
+	
+	use();
+}
+
+function parseSV() {
+function use() {
+funct = document.getElementById("function").value;
+	switch(funct) {
+	case 'median':
+	median();
+	break;
+	case 'mean':
+	mean();
+	break;
+	case 'range':
+	alert(range(out));
+	break;
+}
+}
+
+
+
+function mean() {
+function range(dataTemp) {
+	var m = max(dataTemp);
+	var i = min(dataTemp);
+	return(m-i);
+}
+
+function median() {
+	var dataTemp = parseSV();
+	dataTemp.sort();
+	var x;
+	var o;
+	while (dataTemp.length > 2 ) {
+	dataTemp.shift();
+	if (dataTemp.length <= 2) {
+	break;
+	}
+	else {
+	dataTemp.pop();
+	}
+	}
+	alert(dataTemp.length);
+	if (dataTemp.length==1) {
+	alert(parseFloat(dataTemp[0]));
+	}
+	if (dataTemp.length==2) {
+	alert(parseFloat(dataTemp[0]) + parseFloat(range(dataTemp)/2));
+	}
+}
+
+function max(data) {
+function min(data) {
+function sum() {
+	var dataTemp = parseSV();
+	var s = parseFloat(dataTemp[0]);
+	var x;
+	dataTemp.shift();
+	while (dataTemp.length >= 1) {
+	s = s + parseFloat(dataTemp[0]);
+	dataTemp.shift();
+	x++;
+	}
+	return s;
+}
+
+</script>

@@ -1,0 +1,126 @@
+<h3> Code Corner </h3> 
+<h4> HTML </h4> 
+<textarea id='HTMLin' rows=10 cols=60 >  </textarea>
+<h4> Javascript </h4> 
+<textarea id='JSin' rows=10 cols=60 > </textarea>
+<hr />
+<button onclick='save1();' type='button' > Save to file 1 </button> <button onclick='load1();' type='button' > Load file 1 </button> <button onclick='save2();' type='button' > Save to file 2 </button> <button onclick='load2();' type='button' > Load file 2 </button> <p> Note: The HTML cannot link to the javascript half of your code. So buttons/elements using the onclick or other such eventd won't be able to link/call the javascript function. <br /> To solve this use the element.addEventListener() method to link/call javascript functions on events.
+<hr />
+<div id='output' >
+
+</div>
+<hr />
+
+<script type='text/javascript' >
+var Hin = document.getElementById('HTMLin').value;
+var Jin = document.getElementById('JSin').value;
+var tJ;
+var tH;
+var out = document.getElementById('output');
+window.onload= load1();
+
+
+function save1() {
+Hin = document.getElementById('HTMLin').value;
+Jin = document.getElementById('JSin').value;
+writeCookie(Jin, 'JS1', 8765.81);
+writeCookie(Hin, 'H1', 8765.81);
+out.innerHTML = Hin;
+eval(Jin);
+}
+
+function save2() {
+Hin = document.getElementById('HTMLin').value;
+Jin = document.getElementById('JSin').value;
+writeCookie(Jin, 'JS2', 8765.81);
+writeCookie(Hin, 'H2', 8765.81);
+out.innerHTML = Hin;
+eval(Jin);
+}
+
+function load1() {
+tJ = readCookie('JS1');
+tH = readCookie('H1');
+document.getElementById('HTMLin').value = tH;
+document.getElementById('JSin').value = tJ;
+out.innerHTML = tH;
+eval(tJ);
+}
+
+function load2() {
+tJ = readCookie('JS2');
+tH = readCookie('H2');
+document.getElementById('HTMLin').value = tH;
+document.getElementById('JSin').value = tJ;
+out.innerHTML = tH;
+eval(tJ);
+}
+
+
+
+
+
+
+
+
+/* Example:
+ writeCookie("hello", "message", 24);
+ Stores the string "hello" in the cookie "message" which expires after 24 hours.
+*/
+function writeCookie(value, name, hours)
+
+{
+
+  var expire = "";
+
+  if(hours != null)
+
+  {
+
+    expire = new Date((new Date()).getTime() + hours * 3600000);
+
+    expire = "; expires=" + expire.toGMTString();
+
+  }
+
+  document.cookie = name + "=" + escape(value) + expire;
+
+}
+
+/* Example:
+alert( readCookie("myCookie") );
+*/
+function readCookie(name)
+
+{
+
+  var cookieValue = "";
+
+  var search = name + "=";
+
+  if(document.cookie.length > 0)
+
+  { 
+
+    offset = document.cookie.indexOf(search);
+
+    if (offset != -1)
+
+    { 
+
+      offset += search.length;
+
+      end = document.cookie.indexOf(";", offset);
+
+      if (end == -1) end = document.cookie.length;
+
+      cookieValue = unescape(document.cookie.substring(offset, end))
+
+    }
+
+  }
+
+  return cookieValue;
+
+}
+</script>

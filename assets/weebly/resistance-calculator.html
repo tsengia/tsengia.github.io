@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html>
+<head>
+
+<style>
+#border {
+border-color:#000000;
+border:5px solid;
+}
+</style>
+</head>
+
+<body class='wsite-theme-light'>
+
+<div style='display:none'>{menu}</div>
+<div style='display:none'>{title}</div>
+<div style='display:none'> {content} </div>
+<div>
+<h3> Resistance Calculator </h3>
+<div id='border' style='display:inline'>
+<select id='firstBand'><option value='black' selected> Black </option> <option value='brown' > Brown </option> <option value='red' > Red </option>
+<option value='orange' > Orange </option> <option value='yellow' > Yellow </option><option value='green' > Green </option><option value='blue' > Blue </option><option value='violet' > Violet </option><option value='gray' > Gray </option><option value='white' > White </option>
+</select><select id='secondBand'> <option value='black' selected> Black </option> <option value='brown' > Brown </option> <option value='red' > Red </option>
+<option value='orange' > Orange </option> <option value='yellow' > Yellow </option><option value='green' > Green </option><option value='blue' > Blue </option><option value='violet' > Violet </option><option value='gray' > Gray </option><option value='white' > White </option>
+ </select><select id='thirdBand'> <option value='black' selected> Black </option> <option value='brown' > Brown </option> <option value='red' > Red </option>
+<option value='orange' > Orange </option> <option value='yellow' > Yellow </option><option value='green' > Green </option><option value='blue' > Blue </option><option value='violet' > Violet </option><option value='gray' > Gray </option><option value='white' > White </option>
+</select><select id='fourthBand'> <option value='gold' selected> Gold </option> <option value='silver' > Silver </option><option value='none' > None </option> </select></div><button type='button' onclick='run();'> Enter </button>
+<div style='display:inline;' id='ohms'> </div> &#937; +/-<div id='tolerance' style='display:inline;'> </div> <p> Select the colors of the bands found on the resistor. <br />  The calculated ohms will be displayed on the right along with the tolerance. </p>
+</div>
+
+<script type='text/javascript' >
+var bnd1 = document.getElementById('firstBand');
+var bnd2 = document.getElementById('secondBand');
+var bnd3 = document.getElementById('thirdBand');
+var bnd4 = document.getElementById('fourthBand');
+var ohms = document.getElementById('ohms');
+var tolerance = document.getElementById('tolerance');
+var out = '';
+var tol = '';
+window.onload = run();
+
+function run() {
+if(bnd4.value == 'gold') {
+tol = '5%';
+}
+else {
+if(bnd4.value == 'silver') {
+tol = '10%';
+}
+else{
+tol = '20%';
+}
+}
+tolerance.innerHTML=tol;
+var firstDigit = '';
+
+switch(bnd1.value) {
+case 'black':
+firstDigit='';
+break;
+case 'brown':
+firstDigit=1;
+break;
+case 'red':
+firstDigit=2;
+break;
+case 'orange':
+firstDigit=3;
+break;
+case 'yellow':
+firstDigit=4;
+break;
+case 'green':
+firstDigit=5;
+break;
+case 'blue':
+firstDigit=6;
+break;
+case 'violet':
+firstDigit=7;
+break;
+case 'gray':
+firstDigit=8;
+break;
+case 'white':
+firstDigit=9;
+break;
+}
+
+var secDigit ='';
+switch(bnd2.value) {
+case 'black':
+secDigit=0;
+break;
+case 'brown':
+secDigit=1;
+break;
+case 'red':
+secDigit=2;
+break;
+case 'orange':
+secDigit=3;
+break;
+case 'yellow':
+secDigit=4;
+break;
+case 'green':
+secDigit=5;
+break;
+case 'blue':
+secDigit=6;
+break;
+case 'violet':
+secDigit=7;
+break;
+case 'gray':
+secDigit=8;
+break;
+case 'white':
+secDigit=9;
+break;
+}
+
+var thirdDigit = '';
+switch(bnd3.value) {
+case 'black':
+thirdDigit='';
+break;
+case 'brown':
+thirdDigit=1;
+break;
+case 'red':
+thirdDigit=2;
+break;
+case 'orange':
+thirdDigit=3;
+break;
+case 'yellow':
+thirdDigit=4;
+break;
+case 'green':
+thirdDigit=5;
+break;
+case 'blue':
+thirdDigit=6;
+break;
+case 'violet':
+thirdDigit=7;
+break;
+case 'gray':
+thirdDigit=8;
+break;
+case 'white':
+thirdDigit=9;
+break;
+}
+if(thirdDigit != 0) {
+thirdDigit = Math.pow(10, thirdDigit);
+}
+var d = firstDigit + '' + secDigit;
+if (thirdDigit == '') {
+out = d;
+}
+else {
+out = d * thirdDigit;
+}
+ohms.innerHTML =out;
+}
+</script>
+
+</body>
+
+</html>
