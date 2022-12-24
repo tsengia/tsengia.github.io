@@ -6,4 +6,6 @@ categories: journal
 tags: [documentation, sample]
 ---
 
-Put your content here
+Put your content here. Brief hook.  
+
+In this article, I will ...
