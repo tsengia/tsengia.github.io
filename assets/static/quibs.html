@@ -1,36 +1,44 @@
 <!DOCTYPE html>
-<html><head><meta http-equiv="Content-Type" content="text/html; charset=windows-1252">
+<html>
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=windows-1252" />
 
-<title>Evolving AI</title>
-<style>
-#konsole {
-    background-color:#000;
-    color:#FFF;
-    overflow:auto;
-    display:inline-block;
-    padding:3px;
-    font-family:monospace;
-    font-size:80%;
-    float:left;
-    height:500px;
-    min-width: 200px;
-}
-canvas {
-padding: 5px;
-border: 3px dashed #CCC;
-}
-h2 {
-border-bottom: 2px solid black;
-width: 700px;
-}
-#content {
-width: 700px;
-}
-</style>
+    <title>Quibs Experiment</title>
+    <style>
+        #konsole {
+            background-color:#000;
+            color:#FFF;
+            overflow:auto;
+            display:inline-block;
+            padding:3px;
+            font-family:monospace;
+            font-size:80%;
+            float:left;
+            height:500px;
+            min-width: 200px;
+        }
+        canvas {
+            padding: 5px;
+            border: 3px dashed #CCC;
+        }
+        h2 {
+            border-bottom: 2px solid black;
+            width: 700px;
+        }
+        #content {
+            width: 700px;
+        }
+    </style>
 </head>
-<body><div>
+<body>
+<div>
+    
 <canvas height="500" width="500" id="canvas"></canvas>
-<div id="konsole"><span class="log"><b><u>Console:</u></b></span><br></div>
+<div id="konsole">
+    <span class="log"><b><u>Console:</u></b></span>
+    <br />
+</div>
+
 <script type="text/javascript">
 var c = document.getElementById('canvas');
 var cH = 500;
@@ -207,52 +215,52 @@ think(this);
 }
 
 function think(q) {
-var w = q.weights;
-var i1 = q.objectAbove();
-var i2 = q.objectBelow();
-var i3 = q.objectLeft();
-var i4 = q.objectRight();
-var a = (w[0] * i1) + (w[1] * i2) + (w[2] * i3) + (w[3] * i4);
-var b = (w[4] * i1) + (w[5] * i2) + (w[6] * i3) + (w[7] * i4);
-var c = (w[8] * i1) + (w[9] * i2) + (w[10] * i3) + (w[11] * i4);
-var d = (w[12] * i1) + (w[13] * i2) + (w[14] * i3) + (w[15] * i4);
-var e = (w[16] * i1) + (w[17] * i2) + (w[18] * i3) + (w[19] * i4);
-var f = (w[20] * a) + (w[21] * b) + (w[22] * c) + (w[23] * d) + (w[24] * e);
-var g = (w[25] * a) + (w[26] * b) + (w[27] * c) + (w[28] * d) + (w[29] * e);
-var h = (w[30] * a) + (w[31] * b) + (w[32] * c) + (w[33] * d) + (w[34] * e);
-var i = (w[35] * a) + (w[36] * b) + (w[37] * c) + (w[38] * d) + (w[39] * e);
+    var w = q.weights;
+    var i1 = q.objectAbove();
+    var i2 = q.objectBelow();
+    var i3 = q.objectLeft();
+    var i4 = q.objectRight();
+    var a = (w[0] * i1) + (w[1] * i2) + (w[2] * i3) + (w[3] * i4);
+    var b = (w[4] * i1) + (w[5] * i2) + (w[6] * i3) + (w[7] * i4);
+    var c = (w[8] * i1) + (w[9] * i2) + (w[10] * i3) + (w[11] * i4);
+    var d = (w[12] * i1) + (w[13] * i2) + (w[14] * i3) + (w[15] * i4);
+    var e = (w[16] * i1) + (w[17] * i2) + (w[18] * i3) + (w[19] * i4);
+    var f = (w[20] * a) + (w[21] * b) + (w[22] * c) + (w[23] * d) + (w[24] * e);
+    var g = (w[25] * a) + (w[26] * b) + (w[27] * c) + (w[28] * d) + (w[29] * e);
+    var h = (w[30] * a) + (w[31] * b) + (w[32] * c) + (w[33] * d) + (w[34] * e);
+    var i = (w[35] * a) + (w[36] * b) + (w[37] * c) + (w[38] * d) + (w[39] * e);
 
-if(f > g) {
-    q.moveUp(f);
-}
-else if(f < g) {
-    q.moveDown(g);
-}
+    if(f > g) {
+        q.moveUp(f);
+    }
+    else if(f < g) {
+        q.moveDown(g);
+    }
 
-if(h > i) {
-    q.moveLeft(h);
-}
-else if(h < i) {
-    q.moveRight(i);
-}
+    if(h > i) {
+        q.moveLeft(h);
+    }
+    else if(h < i) {
+        q.moveRight(i);
+    }
 }
 
 function updateLiving() {
-for(var i = 0; i < living.length; i++) {
-    if(living[i].living) {
-        living[i].update();
+    for(var i = 0; i < living.length; i++) {
+        if(living[i].living) {
+            living[i].update();
+        }
+        else {
+        addObject(living[i].x, living[i].y);
+        living.splice(i, 1);
+        }
     }
-    else {
-      addObject(living[i].x, living[i].y);
-      living.splice(i, 1);
-    }
-}
 }
 
 function nearestObject(x, y) {
-var a = [];
-var c =  99999999999999;
-var ci = 0;
+    var a = [];
+    var c =  99999999999999;
+    var ci = 0;
 	for(var i = 0; i < objects.length; i++) {
 		var o = objects[i];
 		var dist = Math.pow((o.x - x), 2) + Math.pow((o.y - y), 2);
@@ -267,33 +275,33 @@ var ci = 0;
 
 function eatObject(x, y) {
 for(var i = 0; i < objects.length; i++) {
-var nO = objects[i];
-if((nO.x + 5 >= x && nO.x <= x+10) && (nO.y +5 >= y && nO.y <= y+10)) {
-//console.log("eat");
-return nO;
-}
-}
-return false;
+    var nO = objects[i];
+    if((nO.x + 5 >= x && nO.x <= x+10) && (nO.y +5 >= y && nO.y <= y+10)) {
+    //console.log("eat");
+    return nO;
+    }
+    }
+    return false;
 }
 
 function updateObjects() {
-for(var i = 0; i < objects.length; i++) {
-    if(!objects[i].here) {
-        objects.splice(i, 1);
+    for(var i = 0; i < objects.length; i++) {
+        if(!objects[i].here) {
+            objects.splice(i, 1);
+        }
     }
-}
 }
 
 function AIObject() {
-this.x = 0;
-this.y = 0;
-this.here = true;
-this.eat = function() {
-  this.here = false; 
-}
-this.create = function() {
-objects.push(this);    
-}
+    this.x = 0;
+    this.y = 0;
+    this.here = true;
+    this.eat = function() {
+    this.here = false; 
+    }
+    this.create = function() {
+    objects.push(this);    
+    }
 }
 
 function addObject(x, y) {
@@ -304,53 +312,54 @@ function addObject(x, y) {
 }
 
 function run() {
-updateObjects();
-updateLiving();
-draw();
-round();
+    updateObjects();
+    updateLiving();
+    draw();
+    round();
 }
 
 function draw() {
-can.clearRect(0, 0, cW, cH);
-can.fillStyle='#000';
-can.fillRect(0, 0, cW, cH);
-can.fillStyle='#FFF';
-can.fillText(time, 2, 12);
-can.fillText(tick, 2, 22);
-can.fillText("Pop: "+population, 2, 32);
-can.fillText("Gen: "+gen, 2, 42);
-can.fillStyle='#F00';
-for(var i = 0; i < living.length; i++) {
-    can.fillStyle='#F00';
-    can.fillRect(living[i].x, living[i].y, 10, 10);
+    can.clearRect(0, 0, cW, cH);
+    can.fillStyle='#000';
+    can.fillRect(0, 0, cW, cH);
     can.fillStyle='#FFF';
-    can.fillText(living[i].id, living[i].x, living[i].y+9);
-    var e = (living[i].energy / 15);
-    if(e >= 0) {
-    can.fillStyle='#909';    
+    can.fillText(time, 2, 12);
+    can.fillText(tick, 2, 22);
+    can.fillText("Pop: "+population, 2, 32);
+    can.fillText("Gen: "+gen, 2, 42);
+    can.fillStyle='#F00';
+    for(var i = 0; i < living.length; i++) {
+        can.fillStyle='#F00';
+        can.fillRect(living[i].x, living[i].y, 10, 10);
+        can.fillStyle='#FFF';
+        can.fillText(living[i].id, living[i].x, living[i].y+9);
+        var e = (living[i].energy / 15);
+        if(e >= 0) {
+        can.fillStyle='#909';    
+        }
+        if(e >= 0.30) {
+        can.fillStyle='#F00';    
+        }
+        if(e >= 0.50) {
+        can.fillStyle='#F55';    
+        }
+        if(e >= 0.60) {
+        can.fillStyle='#FF1';    
+        }
+        if(e >= 0.75) {
+        can.fillStyle='#0F0';    
+        }
+        if(e >= 0.90) {
+        can.fillStyle='#00F';    
+        }
+        can.fillText(living[i].id+": "+living[i].energy, 370, 353+(living[i].id*11));
     }
-    if(e >= 0.30) {
-    can.fillStyle='#F00';    
+    can.fillStyle='#0FF';
+    for(var i = 0; i < objects.length; i++) {
+        can.fillRect(objects[i].x, objects[i].y, 5, 5);
     }
-    if(e >= 0.50) {
-    can.fillStyle='#F55';    
-    }
-    if(e >= 0.60) {
-    can.fillStyle='#FF1';    
-    }
-    if(e >= 0.75) {
-    can.fillStyle='#0F0';    
-    }
-    if(e >= 0.90) {
-    can.fillStyle='#00F';    
-    }
-    can.fillText(living[i].id+": "+living[i].energy, 370, 353+(living[i].id*11));
 }
-can.fillStyle='#0FF';
-for(var i = 0; i < objects.length; i++) {
-    can.fillRect(objects[i].x, objects[i].y, 5, 5);
-}
-}
+
 var pool = [];
 function breedQuibs() {
 /* find the alpha Quib */
@@ -498,9 +507,9 @@ function round() {
 }
 window.setInterval("run();", 200);
 </script>
-
 </div>
 
+<!--
 <div id="content" >
 <h2>About</h2>
 <p>
@@ -544,5 +553,5 @@ All I know is that after a few minutes of observing these virtual creatures, you
 There are Quibs that exhibit other movement patterns. Some are "floaters" that constantly move in one direction across the screen (which is sometimes just as effective as zig zags). Some get stuck between two or three Food objects. Some will zig zag towards a Food object to their left, but will not respond to a food object on its right!<br />
 It's almost like a safari, enjoy watching them!
 </p>
-</div>
+</div>-->
 </body></html>
