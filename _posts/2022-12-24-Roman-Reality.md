@@ -11,7 +11,9 @@ During my highschool years, I participated in a local computer fair and develope
 
 In this article, I will discuss how the Roman Reality app is used, how it works, and the shortcomings of the application.  
 
-You can view [the source code for Roman Reality on GitHub](https://github.com/tsengia/Roman-Reality).  
+<div class="note">
+You can view <a href="https://github.com/tsengia/Roman-Reality" >the source code for Roman Reality on GitHub</a>.  
+</div>
 
 ## Using Roman Reality
 The purpose of the Roman Reality app is to educate users about the Roman Colosseum in the exciting realm of VR. It's essentially a Power Point presentation in VR.  
