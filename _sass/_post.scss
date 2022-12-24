@@ -17,6 +17,31 @@
   }
 }
 
+.info {
+  background-color: #DDD;
+  border-left: 4px solid #999;
+  padding: 20px;
+  color: black;
+}
+
+.note {
+  background-color: #CEF;
+  border-left: 4px solid #09F;
+  padding: 20px;
+}
+
+.warn, .warning {
+  background-color: #EE9;
+  border-left: 4px solid #FA0;
+  padding: 20px;
+}
+
+.error, .fatal, .danger {
+  background-color: #F99;
+  border-left: 4px solid #F23;
+  padding: 20px;
+}
+
 .related {
   padding-bottom: 2rem;
 }
