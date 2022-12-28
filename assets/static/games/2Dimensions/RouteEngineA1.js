@@ -1,0 +1,636 @@
+if (!RouteEngine) {
+    /**
+     * @namespace RouteEngine
+     * @prop {Array} games Holds all of the {@link Game} Objects that are in the document
+     * @prop {Array} images Holds all of the images that have been loaded
+     * @prop {Array} ImagesLoaders Holds all of the {@link ImageLoadStack} Objects that are in the document.
+     * @prop {Image} noImage This is a placeholder image that is used when errors occur during image loading.
+     */
+    var RouteEngine = {};
+    RouteEngine.games = [];
+    RouteEngine.images = [];
+    RouteEngine.ImageLoaders = [];
+    RouteEngine.noImage = loadImage("none.png", 20, 20);
+    RouteEngine.GameClicked = function(event) {
+        RouteEngine.games[event.target.dataset.gameId].clicked(event);
+    };
+    RouteEngine.GameDown = function(event) {
+        RouteEngine.games[event.target.dataset.gameId].down(event);
+    };
+    RouteEngine.GameUp = function(event) {
+        RouteEngine.games[event.target.dataset.gameId].up(event);
+    };
+    RouteEngine.GameMouseMove = function(event) {
+        RouteEngine.games[event.target.dataset.gameId].mousemove(event);
+    };
+    RouteEngine.GameMouseOut = function(event) {
+        RouteEngine.games[event.target.dataset.gameId].mouseout(event);
+    };
+    RouteEngine.IdImageLoaded = function(e) {
+        //All image loaders assign their image objects with "ImageId" + loader's id + ":" + image id.
+        //Redirect the image load event to the loader event via id.
+        var id = e.target.id.substring(7);
+        RouteEngine.ImageLoaders[id.split(":")[0]].imageLoaded(id.split(":")[1]);
+    };
+}
+
+/**
+ * @class Game
+ * @constructor
+ * @param {Object} element An HTML5 canvas (use document.getElementById)
+ * @prop {Integer} id
+ * @prop {Object} c - The HTML5 canvas element that this game is being drawn onto
+ * @prop {Object} can - The 2D rendering context the game is using
+ * @prop {Integer} cW - The width of the canvas element
+ * @prop {Integer} cH - The height of the canvas element
+ * @prop {Array} images An array of images that are being used by the game
+ * @prop {Array} sprites The array of sprites that are in the game
+ * @prop {Boolean} mouseDown Is set to true if the user's left mouse click is currently down
+ * @prop {Background} background The current {@link Background} that the game is using
+ */
+function Game(element) {
+    this.id = RouteEngine.games.length;
+    RouteEngine.games.push(this);
+    this.c = element;
+    this.can = this.c.getContext("2d");
+    this.cW = this.c.width;
+    this.cH = this.c.height;
+    this.self = this;
+    this.images = [];
+    this.sprites = [];
+    this.mouseDown = false;
+    this.background = new Background("clear");
+    
+    /**
+      * @memberof Game
+      * @abstract
+      * @method onclick
+	  * @param {Object} e - An Event Object of the triggering event
+      * @description Meant to be overridden, called when the user clicks within the game canvas.
+      */
+    this.onclick = function(e) {};
+    
+     /**
+      * @memberof Game
+      * @abstract
+      * @method onmouseup
+	  * @param {Object} e - An Event Object of the triggering event
+      * @description Meant to be overridden, called when the user lets go of the left mouse click.
+      */
+    this.onmouseup = function(e) {};
+    
+    /**
+      * @memberof Game
+      * @abstract
+      * @method onmousedown
+	  * @param {Object} e - An Event Object of the triggering event
+      * @description Meant to be overridden, called when the user presses down the left mouse button.
+      */
+    this.onmousedown = function(e) {};
+    
+    /**
+      * @memberof Game
+      * @abstract
+      * @method onmouseup
+	  * @param {Object} e - An Event Object of the triggering event
+      * @description Meant to be overridden, called when the user moves the mouse across the game canvas
+      */
+    this.onmousemove = function(e) {};
+    
+    /**
+      * @memberof Game
+      * @abstract
+      * @method onstart
+      * @description Meant to be overridden, called the game loop is started.
+      */
+    this.onstart = function() {};
+    
+    /**
+      * @memberof Game
+      * @abstract
+      * @method onstart
+      * @description Meant to be overridden, called the game is loaded. CURRENTLY NOT WORKING
+      */
+    this.onload = function() {};
+    
+    /**
+      * @memberof Game
+      * @abstract
+      * @method onstart
+      * @description Meant to be overridden, called when the user moves the mouse out of the game canvas.
+      */
+    this.onmouseout = function(e) {};
+    
+    this.setSize = function (w, h) {
+	  this.c.setAttribute("width", w + "px");
+	  this.c.setAttribute("height", h + "px");  
+	  this.cW = this.c.width;
+	  this.cH = this.c.height;
+	};
+    
+    this.clicked = function(event) {
+        this.onclick();
+    };
+    
+    this.mousemove = function(event) {
+        this.getPosition(event);
+        this.onmousemove(event);
+    };
+    
+    this.down = function(event) {
+        this.mouseDown = true;
+        this.onmousedown(event);
+    };
+    
+    this.up = function(event) {
+        this.mouseDown = false;
+        this.onmouseup(event);
+    };
+    
+    this.mouseout = function(event) {
+        this.self.mouseDown = false;
+        this.self.mouseX = -1;
+        this.self.mouseY = -1;
+        this.self.onmouseout();
+    };
+   
+    this.c.dataset.gameId = this.id;
+    
+    this.c.addEventListener("click", function(event) {
+        RouteEngine.GameClicked(event);
+    });
+    this.c.addEventListener("mousedown", function(event) {
+        RouteEngine.GameDown(event);
+    });
+    this.c.addEventListener("mouseup", function(event) {
+        RouteEngine.GameUp(event);
+    });
+    this.c.addEventListener("mousemove", function(event) {
+        RouteEngine.GameMouseMove(event);
+    });
+    this.c.addEventListener("mouseout", function(event) {
+        RouteEngine.GameMouseOut(event);
+    });
+
+	/**
+	  * @method render
+	  * @memberof Game
+	  * @description - Renders the background and all sprites onto the game's canvas
+	  */
+    this.render = function() {
+        this.background.draw(this.self);
+        for (var s = 0; s < this.sprites.length; s++) {
+            this.sprites[s].draw(this.self);
+        }
+    };
+
+	/**
+	  * @method clear
+	  * @memberof Game
+	  * @description - Clears the entire game's canvas
+	  */
+    this.clear = function() {
+        this.can.clearRect(0, 0, this.cW, this.cH);
+    };
+
+	/**
+	  * @method getPosition
+	  * @memberof Game
+	  * @callback
+	  * @description - Used by event handlers to update the location of the mouse pointer. You really should have no need to ever touch this.
+	  */
+    this.getPosition = function(event) {
+        var totalOffsetX = 0;
+        var totalOffsetY = 0;
+        var canvasX = 0;
+        var canvasY = 0;
+        var currentElement = event.target;
+
+        do {
+            totalOffsetX += currentElement.offsetLeft - currentElement.scrollLeft;
+            totalOffsetY += currentElement.offsetTop - currentElement.scrollTop;
+        }
+        while (currentElement = currentElement.offsetParent)
+
+        canvasX = event.pageX - totalOffsetX;
+        canvasY = event.pageY - totalOffsetY;
+        this.mouseX = canvasX;
+        this.mouseY = canvasY;
+    };
+
+}
+
+/**
+  * @class Background
+  * @constructor
+  * @param {String} type - The type of background that this Background object will be. Acceptable values: "color", "image" or "img", "clear"
+  * @param {Object} value - This parameter is either a HTML color ("#00F" or "#0000FF") or an image object. Depends upon the type you specified. If the type is "clear", then this parameter is ignored
+  * @prop {String} color - The current color of this Background object if it is the "color" type
+  * @prop {Object} img - The current background image if this object is the "image" or "img" type.
+  * @prop {String} type - The type of background this Background object currently is. Acceptable values: "color", "image" or "img", "clear"
+  * @description This Background class is used as a simple way to set backgrounds for games. Background Objects can have three different types: "color", "image" or "img", "clear" If the background type is "color", then the background will render as the solid color as specified by the value parameter you pass in. If the background type is "img" or "image" (there is no difference), then the background will render as the image that you pass in via the value parameter. If the background type is "clear", then the background will not render at all.
+  */
+function Background(type, value) {
+    this.color = "#FFF";
+    this.img = RouteEngine.noImage;
+    this.type = type;
+
+    switch (this.type) {
+        case "color":
+            this.color = value;
+            break;
+        case "image":
+        case "img":
+            this.img = value;
+            break;
+        case "clear":
+            //Nothing
+            break;
+        default:
+            //No Type! Default to clear
+            this.type = "clear";
+            break;
+    }
+
+	/**
+	  * @method draw
+	  * @memberof Background
+	  * @param {Game} game - The {@link Game} that we are rendering this background onto
+	  * @description - Renders the background onto the game canvas according to the type of background this is.
+	  */
+    this.draw = function(game) {
+        switch (this.type) {
+            case "color":
+                game.can.fillStyle = this.color;
+                game.can.fillRect(0, 0, game.cW, game.cH);
+                break;
+            case "image":
+            case "img":
+                game.can.drawImage(this.img, 0, 0);
+                break;
+            case "clear":
+                game.clear();
+                break;
+            default:
+                console.log("Impossible really, how can this happen?");
+                break;
+        }
+    };
+}
+
+/** 
+  * @class Sound
+  * @description Basically a wrapper object for loading and playing sounds.
+  * @constructor
+  * @param {String} src The uri for the audiofile to be loaded
+  * @prop {String} src The uri/filepath for the sound
+  * @prop {Audio} sound
+  */
+function Sound(src) {
+    this.src = src;
+    this.sound = new Audio();
+    this.sound.src = this.src;
+    
+    /**
+      * @method onload
+      * @callback
+      * @abstract
+      * @memberof Sound
+      * @description This function is meant to be extended, it is called once the sound loads.
+      */
+    this.onload = function() {};
+    
+    /**
+      * @method onplay
+      * @callback
+      * @abstract
+      * @memberof Sound
+      * @description This function is meant to be extended, it is called whenever the sound plays.
+      */
+    this.onplay = function() {};
+    
+    /**
+      * @memberof Sound
+      * @method load
+      * @description Loads the sound.
+      */
+    this.load = function() {
+        this.sound.load();
+    };
+    
+    this.sound.onload = function() {
+        this.onload();
+    };
+
+	/**
+      * @method play
+      * @public
+      * @memberof Sound
+      * @description Will load and play the sound.
+      */
+    this.play = function() {
+        this.sound.load();
+        this.sound.play();
+        this.onplay();
+    };
+
+}
+
+/**
+  * @class TextSprite
+  * @description A sprite that is a string of text. It can change position, visibility, color, font, alignment, and the actual text. Also includes hitbox detection.
+  * @param {String} text - The String that will be rendered
+  * @param {Number} x - The x position of this sprite
+  * @param {Number} y - The y position of this sprite
+  * @prop {String} align - Which direction this text is aligned to. Acceptable values: "left", "start", "center", "right", "end". Default: "left"
+  * @prop {String} text - The String that will be rendered
+  * @prop {Number} x - The x position of this sprite
+  * @prop {Number} y - The y position of this sprite
+  * @prop {Boolean} visible - A boolean value of whether of not this sprite is visible/will be rendered. True means it will be rendered
+  * @prop {String} color - The color of the text
+  * @prop {String} font - The size and font of the text. Default value: "30px Arial"
+  */
+function TextSprite(text, x, y) {
+    this.align = "left"; //left, start, center, right, end
+    this.text = text;
+    this.font = "30px Arial";
+    this.x = x;
+    this.y = y;
+    this.visible = true;
+    this.color = "#222";
+
+	/**
+	  * @memberof TextSprite
+	  * @method draw
+	  * @param {Game} game - The game this sprite will be rendered onto
+	  * @description Renders the sprite onto the give game canvas.
+	  */
+    this.draw = function(game) {
+        if (this.visible) {
+            game.can.font = this.font;
+            game.can.fillStyle = this.color;
+            game.can.textAlign = this.align;
+            game.can.fillText(this.text, this.x, this.y);
+        }
+    };
+
+	/**
+	  * @memberof TextSprite
+	  * @method hide
+	  * @description Makes this sprite not visible
+	  */
+    this.hide = function() {
+        this.visible = false;
+    };
+
+	/**
+	  * @memberof TextSprite
+	  * @method hide
+	  * @description Makes this sprite visible
+	  */
+    this.show = function() {
+        this.visible = true;
+    };
+
+    this.toggle = function() {
+        if (this.visible) {
+            this.visible = false;
+        } else {
+            this.visible = true;
+        }
+    };
+
+	/**
+	  * @memberof TextSprite
+	  * @method inHit
+	  * @param {Number} cx - The x coordinate
+	  * @param {Number} cy - The y coordinate
+	  * @description Checks to see if the given coordinates are within the sprite's "hit box"
+	  * @returns {Boolean} True is the coordinates are within the "hit box", False otherwise.
+	  */
+    this.inHit = function(cx, cy) {
+        var c = document.createElement("canvas").getContext("2d");
+        c.font = this.font;
+        var metrics = c.measureText(this.text);
+        switch (this.align) {
+            case "left":
+            case "start":
+                if (this.x < cx && this.x + metrics.width > cx && cy < this.y && this.y - parseInt(this.font.split("px")[0]) < cy) {
+                    return true;
+                } else {
+                    return false;
+                }
+                break;
+            case "center":
+                if (this.x < cx && this.x + (metrics.width / 2) > cx && cy < this.y && this.y - (parseInt(this.font.split("px")[0]) / 2) < cy) {
+                    return true;
+                } else {
+                    return false;
+                }
+                break;
+            case "right":
+            case "end":
+                if (this.x > cx && this.x - metrics.width < cx && cy < this.y && this.y - parseInt(this.font.split("px")[0]) < cy) {
+                    return true;
+                } else {
+                    return false;
+                }
+                break;
+        }
+    };
+}
+
+/**
+  * @class ImageSprite
+  * @constructor
+  * @description A sprite that is simply an image. The sprite can change between images, visibility, position, and rotation. Also includes basic hitbox detection.
+  * @param {Image} img The starting images that this sprite will render as. Will be in index 0 of the images array.
+  * @param {Number} x The starting x-position of this sprite
+  * @param {Number} y The starting y-position of this sprite
+  * @prop {Number} x The current x-position of this sprite
+  * @prop {Number} y The current y-position of this sprite
+  * @prop {Number} rotation - The number of degrees this sprite is currently rotated. Default: 0
+  * @prop {Boolean} visible - Whether or not this sprite is visible
+  * @prop {Array} images - An Array of Images that this sprite can switch between
+  * @prop {Image} img - The current image the sprite will render as
+  *
+  *
+  */
+function ImageSprite(img, x, y) {
+    this.img = img;
+    this.x = x;
+    this.y = y;
+    this.images = [];
+    this.visible = true;
+    this.rotation = 0;
+    this.images[0] = img;
+
+	/**
+	  * @memberof ImageSprite
+	  * @method draw
+	  * @param {Game} game - The game this sprite will be rendered onto
+	  * @description Renders the sprite onto the give game canvas.
+	  */
+    this.draw = function(game) {
+        if (this.visible) {
+            game.can.save();
+            game.can.translate(this.img.width + this.x, this.img.height + this.y);
+            game.can.rotate((Math.PI / 180) * this.rotation);
+            game.can.drawImage(this.img, -1 * this.img.width / 2, -1 * this.img.height / 2);
+            game.can.restore();
+        }
+    };
+
+	/**
+	  * @memberof ImageSprite
+	  * @method hide
+	  * @description Makes this sprite not visible
+	  */
+    this.hide = function() {
+        this.visible = false;
+    };
+
+	/**
+	  * @memberof ImageSprite
+	  * @method hide
+	  * @description Makes this sprite visible
+	  */
+    this.show = function() {
+        this.visible = true;
+    };
+
+    this.toggle = function() {
+        if (this.visible) {
+            this.visible = false;
+        } else {
+            this.visible = true;
+        }
+    };
+
+	/**
+	  * @memberof ImageSprite
+	  * @method inHit
+	  * @param {Number} cx - The x coordinate
+	  * @param {Number} cy - The y coordinate
+	  * @description Checks to see if the given coordinates are within the sprite's "hit box"
+	  * @returns {Boolean} True is the coordinates are within the "hit box", False otherwise.
+	  */	
+    this.inHit = function(cx, cy) {
+        if (this.x < cx && this.x + this.img.width > cx && cy > this.y && this.y + this.img.height > cy) {
+            return true;
+        } else {
+            return false;
+        }
+    };
+}
+
+
+/**
+  * @class ImageLoadStack
+  * @description An object used to load a series/collection of images all at once and give progress statistics and has an onload function once all images are loaded. Specify all images to be loaded with the addImage function and then initiate loading with the start function
+  * @construtor
+  * @param {Array} images - An array of all the images that this ImageLoadStack loaded
+  * @param {Boolean} finished - Tells if all of the images are loaded or not. 
+  *  @param {Boolean} started - Tells if the ImageLoadStack has started loading images yet or not. (Start loading by calling the start() function)
+  * @param {Integer} loaded - The number of images that are loaded
+  * @param {Integer} total - The number of images that are loaded or not loaded.
+  * @param {Integer} id - The id of this ImageLoadStack
+  */
+function ImageLoadStack() {
+    this.images = [];
+    this.finished = false; //Are all of the images loaded
+    this.loaded = 0; //The number of images that are loaded
+    this.total = 0; //The total number of images, finished or not
+    this.started = false;
+    this.progress = 0; //Percentage of loading done
+    
+    this.id = RouteEngine.ImageLoaders.length;
+    RouteEngine.ImageLoaders.push(this);
+    
+    /**
+      * @memberof ImageLoadStack
+      * @method onload
+      * @abstract
+      * @callback
+      * @description Meant to be overrided, called once all of the images have loaded.
+      */
+    this.onload = function() {};
+    
+    /**
+      * @method start
+      * @memberof ImageLoadStack
+      * @description Call this function once all images are in the que to start loading them. Will set this.started to True.
+      *
+      */
+    this.start = function() {
+        this.started = true;
+        if (this.total == this.loaded) {
+            this.finished = true;
+            this.onload();
+        }
+    };
+
+	/**
+      * @method addImage
+      * @memberof ImageLoadStack
+      * @param {String} src - The URI of the image to be loaded
+      * @param {Integer} width - The width in pixels of the image
+      * @param {Integer} height - The height in pixels of the image
+      * @description Use this function to add images to the loading que before starting loading.
+      * @returns {Integer} The index of the image in the images array
+      */
+    this.addImage = function(src, width, height) {
+        var img = loadIdImage(src, width, height, "ImageId" + this.id + ":" + this.images.length);
+        img.addEventListener("load", RouteEngine.IdImageLoaded);
+        this.images.push(img);
+        this.total++;
+        return this.images.length - 1;
+    };
+
+	/**
+	  * @memberof ImageLoadStack
+	  * @protected
+	  * @param {Integer} imgId
+	  * @callback
+	  * @function imageLoaded
+	  * @description An event handler that is called when an image is done loading. Really no reason for developers to touch this function.
+	  */
+    this.imageLoaded = function(imgId) {
+        this.loaded++;
+        this.progress = Math.round((this.loaded / this.total) * 100);
+        if (this.total == this.loaded) {
+            this.finished = true;
+            this.onload();
+        }
+    };
+}
+
+/**
+  * @global
+  * @function loadIdImage
+  * @param {String} src - The source URI for the image to be loaded
+  * @param {Integer} width - The width in pixels of the image
+  * @param {Integer} height - The height in pixels of the image
+  * @param {Integer} id - The ID of the image. Used by {@link ImageLoadStack}s.
+  * @returns {Image} An Image object, regardless of whether it has loaded yet or not.
+  */
+function loadIdImage(src, width, height, id) {
+    var i = new Image(width, height);
+    i.src = src;
+    i.id = id;
+    return i;
+}
+
+/**
+  * @global
+  * @function loadImage
+  * @param {String} src - The source URI for the image to be loaded
+  * @param {Integer} width - The width in pixels of the image
+  * @param {Integer} height - The height in pixels of the image
+  * @returns {Image} An Image object, regardless of whether it has loaded yet or not.
+  */
+function loadImage(src, width, height) {
+    var i = new Image(width, height);
+    i.src = src;
+    return i;
+}
