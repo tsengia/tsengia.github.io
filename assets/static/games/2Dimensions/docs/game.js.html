@@ -33,1292 +33,585 @@
 
 //TODO: Clean up this loading and start-up mess
 
+
 /**
-  * @global
-  * @description Variable holding the current game type the player is in. IN DEVELOPMENT
-  */
+ * @global
+ * @description Variable holding the current game type the player is in. IN DEVELOPMENT
+ */
 var GAME_TYPE = 0; // 0 = New Map, 1 = Loaded Map, 2 = Join Server
 
-
-/**
- * @namespace game
- * @prop {Boolean} drawGrid - If set to true, the game will render a black border round every block rendered.
- * @prop {Integer} INTERVAL_TIME - The number of milliseconds between each game tick interval.
- * @prop {Number} mouseX - The current x position of the user's cursor
- * @prop {Number} mouseY - The current y position of the user's cursor
- * @description The "game" object is a Game Object from the RouteEngineA1 javascript engine. See the RouteEngineA1 documentation for more details. RouteEngineA1 should be used for any UI elements, image loading, and sound loading.
- */
-var game = new Game(document.getElementById("gamecanvas")); //Create a new RouteEngineA1 Game
-
-game.setSize(500, 500);
-
-game.background = new Background("color", "#59F"); //Default blue background is #59F
-game.render();
-
-game.can.fillStyle = "#FFF";
-game.can.fillText("Loading...", 50, 50);
-game.loaded = 0
-game.needsLoaded = 0;
-game.drawGrid = true; //Draw grid should be false in prod, it is only used for testing (for now)
-game.INTERVAL_TIME = 50;
+var STUDIO_DEV = false;
 
 var BLOCK_SIZE = 32; //this is the dimensions of the images. DOES NOT SCALE! Also, the blocks folder should have a directory named the block size (ie the directory holding 32x32px blocks is named "32")
 
-/**
-  * @memberof game
-  * @description Holds input about user interactions. Not necessarily key presses and mouse clicks, but those can be mapped to here too.
-  * @prop {Boolean} up - True if the user has triggered the "up" action.
-  * @prop {Boolean} down - True if the user has triggered the "down" action.
-  * @prop {Boolean} left - True if the user has triggered the "left" action.
-  * @prop {Boolean} right - True if the user has triggered the "right" action.
-  * @prop {Boolean} space - True if the user has triggered the "space" action.
-  * @prop {Boolean} leftClick - True if the user has triggered the "left click" action.
-  */
-game.inputMatrix = {
-    up: false,
-    down: false,
-    left: false,
-    right: false,
-    space: false,
-    leftClick: false
-};
+var game = {};
 
-game.mouseX = 0;
-game.mouseY = 0;
-
-/**
-  * @memberof game
-  * @description Holds info about the current position of the user's cursor.
-  * @prop {Integer} mScreenBlockX - The x position of the block the cursor is over on the screen. Relative to the screen, not the map!
-  * @prop {Integer} mScreenBlockY - The y position of the block the cursor is over on the screen. Relative to the screen, not the map!
-  * @prop mapBlockPosition {BlockPosition} - The {@link BlockPosition} that the cursor is currently over. This is based on the {@link SectoredBlockMap}.
-  *
-  */
-game.cursor = {
-    mScreenBlockX: 0,
-    mScreenBlockY: 0,
-    mapBlockPosition: null,
-    block: null
-};
-
-/**
-  * @memberof game
-  * @description Holds information about where the game's viewport/window is located. Basically, the set of coordinates that the user is will be looking at on their window.
-  * @prop {Integer} focusSectorX - The x index of the sector the game window is currently centered over
-  * @prop {Integer} focusSectorY - The y index of the sector the game window is currently centered over
-  * @prop {Number} focusLocalX - The x coordinate of the block in the focused sector that the game window is currently centered over. This can be a decimal!
-  * @prop {Number} focusLocalY - The y coordinate of the block in the focused sector that the game window is currently centered over. This can be a decimal!
-  */
-game.view = {
-    focusLocalX: 0.0,
-    focusLocalY: 0.0,
-    focusSectorX: 0,
-    focusSectorY: 0
-};
-
-/**
- * @memberof game
- * @description Holds the global map generation settings for the game
- * @prop {Boolean} GENERATE_WITH_PLAYER - If set to true, the map will generate a new sector whenever the player can see the edge of the map/an non generated sector. Default: true
- * @prop {Integer} SECTOR_SIZE - The height and width of one sector in blocks. This must be an ODD number! Default: 101
- * @prop {Integer} GENERATION_DISTANCE - The number of sectors ahead that the WorldGenerator will generate around the player. Default: 1
- */
-game.generation = {
-    GENERATE_WITH_PLAYER: true, //Add another sector if the player sees the edge of the map?
-    SECTOR_SIZE: 101, // The height and width of one sector in blocks. This must be an ODD number!
-    GENERATION_DISTANCE: 1
-};
-
-/**
- * @memberof game
- * @description Holds a list of BlockPosition objects that hold the sector coords that are to be generated with the next game.update() call
- */
-game.generation.generationQue = [];
-
-game.ils = new ImageLoadStack(); //ImageLoadStack to load in all of the blocks for the game
-game.ils.onload = function() {
-    game.images = game.ils.images; //Hand the images over to the game to keep everything unified
-    game.loaded++; //Increment the assets load count
-    if (game.loaded == game.needsLoaded) { //If all assets are loaded, start the game
-        game.onstart(); //Start the game
-    }
-}
-
-/**
- * @class Block
- * @description Class for a new block type, holds the data about the registered block.
- * @param {Integer} imageId - The image id of the block. The image id is the same as the index of the image in the ImageLoadStack when the images are loaded.
- * @param {Boolean} solid - A boolean value representing whether or not the block is solid
- * @param {String} name - The canonical name of this block ("dirt", "grass", "stone")
- * @prop {Integer} imageId - The image id of the block. The image id is the same as the index of the image in the ImageLoadStack when the images are loaded.
- * @prop {Boolean} solid - A boolean value representing whether or not the block is solid
- * @prop {String} name - The canonical name of this block ("dirt", "grass", "stone")
- */
-function Block(imageId, solid, name) {
-    this.imageId = imageId;
-    this.solid = true;
-    this.name = name;
-}
-
-/**
-  * @memberof game
-  * @description Holds a list of all Block objects, indexed by ids (blockList[0] = DirtBlockObject)
-  */
-game.blockList = []; // Holds a list of all Block objects, indexed by ids (blockList[0] = DirtBlockObject)
-game.blockList[0] = new Block(-1, false, "sky"); // Add in the sky block cause its special
-
-/**
-  * @memberof game
-  * @description Holds a list of all block names and ids, indexed by names (blockIdList["dirt"] = 1)
-  */
-game.blockIdList = []; // Holds a list of all block names and ids, indexed by names (blockIdList["dirt"] = 1)
-game.blockIdList["sky"] = 0; // Add in the sky block cause its special
-
-/**
-  * @memberof game
-  * @method addBlock
-  * @description This method is for registering normal sized blocks (square, taking up 1 tile) into the game. It enters the image to be loaded, assigns the image ID, and registers its name and ID into the blockList and blockIdList arrays.
-  * @param {String} src - The URI of the image for this block
-  * @param {Boolean} solid - If true, this block will be treated as a solid. If false, projectiles and entities will be able to pass through it.
-  * @param {String} name - The canonical name of this block ("dirt", "grass", "stone")
-  * @returns {Integer} The Block ID of this block. This will represent the block in the {@link BlockMap}.
-  */
-game.addBlock = function (src, solid, name) {
-	game.blockIdList[name] = game.blockList.length; // Store the name of the block and its ID
-	game.blockList.push(new Block(game.ils.addImage(src, BLOCK_SIZE, BLOCK_SIZE), solid, name)); // Enter the image to be loaded and use the returned ID to set the image ID of the block, and push it into the array of blocks indexed by IDs
-	return game.blockList.length - 1; // Return the Block ID
-};
-
-/**
- * @memberof game
- * @function
- * @description Loads all of the images, sounds, and other assets at the start of the game
- */
-game.loadAssets = function() {
-    //IMAGES
-    game.needsLoaded++; //Images need to be loaded
-    game.addBlock("../2Dimensions/images/blocks/" + BLOCK_SIZE + "/0.png", true, "grass");
-    game.addBlock("../2Dimensions/images/blocks/" + BLOCK_SIZE + "/1.png", true, "dirt"); //Load dirt
-    game.addBlock("../2Dimensions/images/blocks/" + BLOCK_SIZE + "/2.png", true, "stone"); //Load stone
-    game.addBlock("../2Dimensions/images/blocks/" + BLOCK_SIZE + "/3.png", true, "bush"); //Load bush
-    
-    game.ils.start();
-};
-
-/** 
- * @memberof game
- * @function
- * @description Initializes values, clears the screen, calls map generation, and calls for the game loop to start
- */
-game.onstart = function() { //When the game starts...
-    game.render(); //Clear the canvas with the blue sky
-    game.blockSize = game.images[0].width; //Set the blocksize
-    game.dimensions = game.calculateDimensions(game.cW, game.cH, game.blockSize); //Calculate the dimensions
-
-    switch (GAME_TYPE) { //Switch to the game mode (note: mostly just for testing, remove in prod)
-        case (0): //0 is single-player offline
-            game.generateMap(); //Create the map
-            game.player = new Player("Bob");
-            //game.map.sectorRows[0][0].rows[50][50] = new game.blocks.bushBlock();
-            game.startLoop(); //Start the actual game
-            break;
-    }
-};
-
-/**
- * @memberof game
- * @function
- * @description Generates the map and initializes it
- */
-game.generateMap = function() {
-    game.map = new SectoredBlockMap(game.generation.SECTOR_SIZE, game.generation.SECTOR_SIZE, new DefaultWorldGenerator());
-    game.map.init();
-};
-
-/**
- * @memberof game
- * @function
- * @description Starts the main game loop
- */
-game.startLoop = function() {
-    game.interval = window.setInterval(game.loop, game.INTERVAL_TIME);
-};
-
-/**
- * @memberof game
- * @function
- * @description Stops the main game loop
- */
-game.stopLoop = function() {
-    window.clearInterval(game.interval);
-};
-
-Studio.addStopListener(function() {
-    game.stopLoop();
-});
-
-/**
- * @memberof game
- * @function
- * @callback
- * @description The main loop for the game.
- */
-game.loop = function() {
-    game.locateCursor();
-    game.handleInput();
-    game.update();
-    game.refocusView();
-    game.render(); //Draw the background, this is a RouteEngineA1 built in function
-    game.drawEverything(); //Draw the tiles, sprites, etc
-};
-
-/**
- * @memberof game
- * @function
- * @description Realigns the global view settings to the position of the player
- */
-game.refocusView = function() {
-    game.view.focusLocalX = game.player.position.localX;
-    game.view.focusLocalY = game.player.position.localY;
-    game.view.focusSectorX = game.player.position.sectorX;
-    game.view.focusSectorY = game.player.position.sectorY;
-};
-
-/**
- * @memberof game
- * @function
- * @protected
- * @description Updates game values to reflect the BlockPosition that the cursor is selecting
- */
-game.locateCursor = function() {
-
-    var scrollingX = (game.blockSize) * (Math.abs(game.view.focusLocalX) - Math.floor(Math.abs(game.view.focusLocalX)));
-    var scrollingY = (game.blockSize) * (Math.abs(game.view.focusLocalY) - Math.floor(Math.abs(game.view.focusLocalY)));
-
-    var centeringX = (((game.dimensions.renderedBlocksWide - game.dimensions.blocksWide) / 2) * game.blockSize) - (game.dimensions.paddingWidth / 2);
-    var centeringY = ((game.dimensions.renderedBlocksHigh - game.dimensions.blocksHigh) / 2) * game.blockSize - (game.dimensions.paddingHeight / 2);
-
-    var totalX = scrollingX + centeringX + game.blockSize;
-    var totalY = scrollingY + centeringY;
-
-    game.cursor.mScreenBlockX = Math.floor((game.mouseX + totalX) / game.blockSize);
-    game.cursor.mScreenBlockY = Math.floor((game.mouseY + totalY) / game.blockSize);
-
-    game.cursor.mapBlockPosition = game.map.getPositionRelativeTo(new BlockPosition(game.view.focusSectorX, game.view.focusSectorY, Math.floor(game.view.focusLocalX), Math.floor(game.view.focusLocalY)), -1 * (Math.floor((game.dimensions.renderedBlocksWide / 2) + 1) - game.cursor.mScreenBlockX), -1 * ((Math.floor(game.dimensions.renderedBlocksHigh / 2) + 1) - game.cursor.mScreenBlockY));
-
-};
-
-/**
- * @class
- * @global
- * @name BlockPosition
- * @description Represents the location of a block, can be an existing, or nonexistant block.
- * @prop {Integer} sectorX - The sector x-position that the block is located
- * @prop {Integer} sectorY - The sector y-position that the block is located
- * @prop {Number} localX - The local (within the sector) x-position of the block (this can be a decimal!)
- * @prop {Number} localY - The local (within the sector) y-position of the block (this can be a decimal!)
- */
-function BlockPosition(sectorX, sectorY, localX, localY) {
-    this.sectorX = sectorX;
-    this.sectorY = sectorY;
-    this.localX = localX;
-    this.localY = localY;
-}
-
-/**
- * @memberof game
- * @private
- * @function
- * @description Physics, hunger, environmental events are all checked and handled in this function.
- */
-game.update = function() { //Physics, hunger, time, events
-    if (game.generation.generationQue.length > 0) { // If there are sectors needing to be generated...
-        for (var i = 0; i &lt; game.generation.generationQue.length; i++) { // Loop through the requested sectors to be generated
-            game.map.generator.generate(game.map, game.generation.generationQue[i].sectorX, game.generation.generationQue[i].sectorY); // Call the map generator to generate each sector
-        }
-        game.generation.generationQue = []; // Clear the generation que
-    }
-};
-
-/**
- * @memberof game
- * @protected
- * @function
- * @description Called at the start of the game to calculate padding values and the amount of blocks that fit on the screen
- * @returns An object containing the values it calculated. You really don't need to know the specifics, this is a core function that should never be modified.
- */
-game.calculateDimensions = function(width, height, blockSize) {
-    var paddingWidth = width % blockSize;
-    var paddingHeight = height % blockSize;
-    var blocksWide = (width - paddingWidth) / blockSize;
-    var blocksHigh = (height - paddingHeight) / blockSize;
-
-    var renderedBlocksWide = (blocksWide % 2 == 0) ? blocksWide + 3 : blocksWide + 4; //Number of blocks that have to rendered on the screen (must be odd)
-    var renderedBlocksHigh = (blocksHigh % 2 == 0) ? blocksHigh + 3 : blocksHigh + 4; // and + 2 for odds as it means that the blocks fit perfectly, but we need a buffer
-    return {
-        "blocksWide": blocksWide,
-        "blocksHigh": blocksHigh,
-        "paddingWidth": paddingWidth,
-        "paddingHeight": paddingHeight,
-        "renderedBlocksWide": renderedBlocksWide,
-        "renderedBlocksHigh": renderedBlocksHigh
-    };
-};
-
-/**
- * @memberof game
- * @function
- * @description Renders an array of blocks on the screen (does not adjust to padding or dimensions!)
- * @param {Array} array - An 2D array of blocks to be rendered. 
- */
-game.drawArray = function(array) { //Draws an array of blocks, centered according to the padding and dimensions
-    for (var r = 0; r &lt; array.length; r++) {
-        var row = array[r];
-        for (var b = 0; b &lt; row.length; b++) {
-            if (game.blockList[row[b]].imageId != -1) { //-1 is the image ID for sky blocks
-                game.can.drawImage(game.images[game.blockList[row[b]].imageId], (game.blockSize * b), (game.blockSize * r));
-            }
-
-            if (game.drawGrid) { //Draws a black grid over the blocks, if the flag is set
-                game.can.strokeRect((game.blockSize * b), (game.blockSize * r), game.blockSize, game.blockSize);
-            }
-        }
-    }
-};
-
-/**
- * @private
- * @function
- * @description Draws a black border for padding, usually disabled
- */
-game.drawPadding = function() { //Draws the black border for the padding, not drawn by default
-    game.can.fillStyle = "#000";
-    game.can.fillRect(0, 0, game.dimensions.paddingWidth / 2, game.cH);
-    game.can.fillRect(game.cW - game.dimensions.paddingWidth / 2, 0, game.cW, game.cH);
-    game.can.fillRect(0, 0, game.cW, game.dimensions.paddingHeight / 2);
-    game.can.fillRect(0, game.cH - game.dimensions.paddingHeight / 2, game.cW, game.dimensions.paddingHeight / 2);
-};
-
-/**
- * @memberof game
- * @function
- * @description Draws EVERYTHING. Blocks, cursor, and player. Scrolling and padding is taken into account.
- */
-game.drawEverything = function() {
-    //Note: Sprites and background are already drawn by game.render()
-    //Draw everything that is tile bound, then translate according to the localX and localY (scrolling effect), then draw the player
-    game.translateView();
-    game.drawTiles();
-    game.drawCursor();
-    game.unTranslateView();
-    game.player.render((game.cW / 2) - (game.blockSize / 2), (game.cH / 2) - ((3 * game.blockSize / 2)), game);
-};
-
-/**
- * @memberof game
- * @function
- * @description Translates the game canvas according to scrolling and padding
- */
-game.translateView = function() { // This function translates the currently drawn canvas to the perspective of the localX and localY (scrolling effect)
-    var scrollingX = (game.blockSize) * (Math.abs(game.view.focusLocalX) - Math.floor(Math.abs(game.view.focusLocalX)));
-    var scrollingY = (game.blockSize) * (Math.abs(game.view.focusLocalY) - Math.floor(Math.abs(game.view.focusLocalY)));
-
-    var centeringX = (((game.dimensions.renderedBlocksWide - game.dimensions.blocksWide) / 2) * game.blockSize) - (game.dimensions.paddingWidth / 2);
-    var centeringY = ((game.dimensions.renderedBlocksHigh - game.dimensions.blocksHigh) / 2) * game.blockSize - (game.dimensions.paddingHeight / 2);
-
-    var totalX = scrollingX + centeringX + game.blockSize;
-    var totalY = scrollingY + centeringY;
-    game.can.translate(-totalX, -totalY);
-};
-
-/**
- * @function
- * @memberof game
- * @description Un-translates the canvas after being translated by the {@link game.translateView} function.
- */
-game.unTranslateView = function() {
-    var scrollingX = (game.blockSize) * (Math.abs(game.view.focusLocalX) - Math.floor(Math.abs(game.view.focusLocalX)));
-    var scrollingY = (game.blockSize) * (Math.abs(game.view.focusLocalY) - Math.floor(Math.abs(game.view.focusLocalY)));
-
-    var centeringX = (((game.dimensions.renderedBlocksWide - game.dimensions.blocksWide) / 2) * game.blockSize) - (game.dimensions.paddingWidth / 2);
-    var centeringY = ((game.dimensions.renderedBlocksHigh - game.dimensions.blocksHigh) / 2) * game.blockSize - (game.dimensions.paddingHeight / 2);
-
-    var totalX = scrollingX + centeringX + game.blockSize;
-    var totalY = scrollingY + centeringY;
-
-    game.can.translate(totalX, totalY);
-};
-
-/**
- * @memberof game
- * @function
- * @description Renders the cursor on the game screen.
- */
-game.drawCursor = function() {
-    var cX = game.cursor.mScreenBlockX * game.blockSize;
-    var cY = game.cursor.mScreenBlockY * game.blockSize;
-
-    game.can.strokeStyle = "#F00";
-    game.can.strokeRect(cX, cY, game.blockSize, game.blockSize);
-    game.can.strokeRect(cX + (game.blockSize / 4), cY + (game.blockSize / 4), game.blockSize * 0.5, game.blockSize * 0.5);
-    game.can.strokeStyle = "#000";
-};
-
-/**
- * @private
- * @function
- * @description Grabs a ViewWindow of the current focus point and renders it on the game screen.
- */
-game.drawTiles = function() {
-    //Focus variable is to emphasize that we are focusing on a position, not always the player
-    var centerPosition = new BlockPosition(game.view.focusSectorX, game.view.focusSectorY, Math.floor(game.view.focusLocalX), Math.floor(game.view.focusLocalY));
-
-    game.drawArray(game.map.getWindow(centerPosition, game.dimensions.renderedBlocksWide, game.dimensions.renderedBlocksHigh));
-};
-
-/**
- * @public
- * @class
- * @name Player
- * @constructor
- * @param {String} nick The nickname for the player
- * @prop {String} nickname - The nickname of the player
- * @prop {Number} id - The id of the player
- * @prop {Integer} HP - The current number of health points the player has.
- * @prop {integer} maxHP - The maximum number of health points the player can have.
- * @prop {BlockPosition} position - The current {@link BlockPosition} of the player. This is the {@link BlockPosition} of the player's feet.
- * @prop {Number} xSpeed - The speed at which the player changes their x position per tick when moving.
- * @prop {Number} ySpeed - The speed at which the player changes their x position per tick when moving.
- */
-function Player(nick) {
-    this.nickname = nick;
-    this.id = 0;
-    this.HP = 10;
-    this.maxHP = 10;
-
-    this.position = new BlockPosition(0, 0, 0, 0); // This block position is the position of the bottom-most, left corner block of the player entity. (their feet block)
-    
-    /**
-      * @function
-      * @memberof Player
-      * @param {Object} entity - The entity that is being tested to see if testPosition is within its hitbox
-      * @param {BlockPosition} testPosition - The {@link BlockPosition} that represents the position that is being tested to see if it is within the entity's hitbox
-      * @returns {Boolean} True if the BlockPosition is within the target entity's hitbox. False otherwise.
-      * @description This function tests to see if the given BlockPosition is within the target entity's hitbox. Takes into account sectors!
-      *
-      */
-    this.positionInHitBox = function (entity, testPosition) {
-    	
-		if (entity.position.sectorX == testPosition.sectorY &amp;&amp; entity.position.sectorY == testPosition.sectorY) {
-			//Great, they're in the same sector! Let's test it.
-			if (entity.position.localX &lt;= testPosition.localX &amp;&amp; entity.position.localX + entity.dimensions.bWidth >= testPosition.localX) {
-				//Ok, within the needed X range, lets test Y
-				if (entity.position.localY >= testPosition.localY &amp;&amp; entity.position.localY - entity.dimensions.bHeight &lt;= testPosition.localY) {
-					return true;
-				}
-			}
-			return false;
-		}    	
-    	
-    	//First let's make sure that this is even remotely near the entity by checking how many sectors its away
-    	if (Math.sqrt(Math.pow(testPosition.sectorX - entity.position.sectorX, 2) + Math.pow(testPosition.sectorY - entity.position.sectorY, 2)) &lt;= 1) {
-    		//Ok fine, it's close enough to waste the CPU time to check if its in the hitbox
-	    	var leftBound = new BlockPosition(entity.position.sectorX, entity.position.sectorY, entity.position.localX, entity.position.localY); //Left bound is the sectorX and localX, needs no modification
-	    	var rightBound = game.map.getPositionRelativeTo(new BlockPosition(entity.position.sectorX, entity.position.sectorY, entity.position.localX, entity.position.localY), entity.dimensions.bWidth, 0); //Right bound is the sectorX and localX plus the width of the entity
-	    	var topBound = game.map.getPositionRelativeTo(new BlockPosition(entity.position.sectorX, entity.position.sectorY, entity.position.localX, entity.position.localY), 0, -1 * entity.dimensions.bHeight); //Top bound is the sectorY and localY minus the height of the entity
-	    	var bottomBound = new BlockPosition(entity.position.sectorX, entity.position.sectorY, entity.position.localX, entity.position.localY); //Bottom bound is the sectorY and localY, needs no modification
-
-    		//Test each bound to see if the testPosition violates any requirements of the position. If it doesn't violate any requirements, then it must be in the hitbox, so return true.
-    		if (leftBound.sectorX > testPosition.sectorX) {
-    			return false;	
-    		}
-    		else if (leftBound.sectorX == testPosition.sectorX) {
-    			if (leftBound.localX > testPosition.localX) {
-    				return false;
-    			}
-    		}
-    		
-			if (rightBound.sectorX &lt; testPosition.sectorX) {
-				return false;
-			}
-			else if (rightBound.sectorX == testPosition.sectorX) {
-				if (rightBound.localX &lt; testPosition.sectorX) {
-					return false;
-				}
-			}    		
-    		
-			if (topBound.sectorY > testPosition.sectorY) {
-				return false;
-			}    		
-			else if (topBound.sectorY == testPosition.sectorY) {
-				if (topBound.localY > testPosition.localY) {
-					return false;
-				}
-			}
-			
-			if (bottomBound.sectorY &lt; testPosition.sectorY) {
-				return false;
-			}
-			else if (bottomBound.sectorY == testPosition.sectorY) {
-				if (bottomBound.localY &lt; testPosition.sectorY) {
-					return false;
-				}
-			}    
-			
-    		return true;
-    	}
-    	else {
-    		return false;
-    	}
-    };
-    
-
-    this.dimensions = {
-        bWidth: 1,
-        bHeight: 3
-    };
-
-    this.xSpeed = 4 / game.blockSize;
-    this.ySpeed = 4 / game.blockSize;
-
-    this.updateSectorPosition = function() {
-        if (this.position.localY &lt; 0) { // If we go above the our previous sector, decrement the sectorY and calculate the new localY
-            this.position.sectorY--;
-            this.position.localY = game.generation.SECTOR_SIZE + this.position.localY;
-        } else if (this.position.localY > game.generation.SECTOR_SIZE) { // If we go below the our previous sector, increment the sectorY and calculate the new localY
-            this.position.sectorY++;
-            this.position.localY -= game.generation.SECTOR_SIZE;
-        }
-
-        if (this.position.localX &lt; 0) { // If we go left of the previous sector, decrement the sectorX and calculate the new localX
-            this.position.sectorX--;
-            this.position.localX = game.generation.SECTOR_SIZE + this.position.localX;
-        } else if (this.position.localX > game.generation.SECTOR_SIZE) { // If we go right of the previous sector, increment the sectorX and calculate the new localX
-            this.position.sectorX++;
-            this.position.localX -= game.generation.SECTOR_SIZE;
-        }
-    };
-
-    this.render = function(x, y, g) {
-        g.can.fillStyle = "#FF0";
-        g.can.fillRect(x, y, g.blockSize, g.blockSize * 3);
-    };
-
-    this.goRight = function() {
-        this.position.localX += this.xSpeed;
-        this.updateSectorPosition();
-    };
-    this.goLeft = function() {
-        this.position.localX -= this.xSpeed;
-        this.updateSectorPosition();
-    };
-    this.goUp = function() {
-        this.position.localY -= this.ySpeed;
-        this.updateSectorPosition();
-    };
-    this.goDown = function() {
-        this.position.localY += this.ySpeed;
-        this.updateSectorPosition();
-    };
-}
-
-//TODO: Create a MapUtil class with all these methods
-
-/**
- * @global
- * @function
- * @param t A constructor for the blocks/tiles to be created
- * @param w The number of blocks/tiles of type t that will be returned
- * @returns {Array} An array of length w of blocks/tiles of type t
- *
- */
-function getTileRow(t, w) { //Creates an array of w tile t objects
-    var row = [];
-    for (var i = 0; i &lt; w; i++) {
-        row.push(new t());
-    }
-    return row;
-}
-
-/**
- * @global
- * @function
- * @param {Array} first
- * @param {Array} last
- * @description Concats two 2D arrays into one 2D array
- * @returns {Array} A 2D array created by concatenating the last array onto the end of the first array
- */
-function concatRows(first, last) {
-    var a = [];
-    for (var r = 0; r &lt; first.length; r++) {
-        a[r] = first[r].concat(last[r]);
-    }
-    return a;
-}
-
-/**
-  * @class
-  * @abstract
-  * @name WorldGenerator
-  * @description An abstract class to extend to create different sector based world generators.
-  */
-function WorldGenerator() {
-	
-	/**
-	  * @memberof WorldGenerator
-	  * @abstract
-	  * @method
-	  * @param {SectoredBlockMap} mapM
-	  * @param {Number} sectorX
-	  * @param {Number} sectorY
-	  * @description Generates the sector located at sectorX and sectorY for the given SectoredBlockMap mapM.
-	  */
-	this.generate = function (mapM, sectorX, sectorY) { };
-	
-	/**
-	  * @memberof WorldGenerator
-	  * @abstract
-	  * @method
-	  * @param {SectoredBlockMap} mapM
-	  * @description Generates the origin sector for the given SectoredBlockMap mapM.
-	  */
-	this.generateOrigin = function (mapM) { };
-}
-
-/**
- * @class
- * @description Generates each sector with the bottom half as dirt and the top half as sky blocks. This class extends {@link WorldGenerator}.
- */
-function DefaultWorldGenerator() {
-    this.solid = game.blockIdList["dirt"];
-    this.empty = game.blockIdList["sky"];
-    this.generate = function(mapM, sectorX, sectorY) {
-        var rows = [];
-        for (var r = 0; r &lt; mapM.sectorHeight; r++) {
-            var a = [];
-            for (var c = 0; c &lt; mapM.sectorWidth; c++) {
-                if (r > game.generation.SECTOR_SIZE / 2) {
-                    a.push(this.solid);
-                    a[c].number = c;
-                } else {
-                    a.push(this.empty);
-                    a[c].number = c;
-                }
-            }
-            rows.push(a);
-        }
-        var bs = new BlockSector();
-        bs.rows = rows;
-        bs.height = bs.rows.length;
-        bs.width = bs.rows[0].length;
-        mapM.setSector(bs, sectorX, sectorY);
-
-    };
-    this.generateOrigin = function(mapM) {
-        var rows = [];
-        for (var r = 0; r &lt; mapM.sectorHeight; r++) {
-            var a = [];
-            for (var c = 0; c &lt; mapM.sectorWidth; c++) {
-                if (r > game.generation.SECTOR_SIZE / 2) {
-                    a.push(this.solid);
-                    a[c].number = c;
-                } else {
-                    a.push(this.empty);
-                    a[c].number = c;
-                }
-            }
-            rows.push(a);
-        }
-        var bs = new BlockSector();
-        bs.rows = rows;
-        bs.height = bs.rows.length;
-        bs.width = bs.rows[0].length;
-        mapM.sectorRows[0].push(bs);
-    };
-}
-
-/**
- * @class
- * @description Generates each sector with just sky blocks. This class extends {@link WorldGenerator}.
- */
-function EmptySectorGenerator() {
-    this.empty = game.blocks["sky"];
-    this.generate = function(mapM, sectorX, sectorY) {
-        if (sectorX == 0 &amp;&amp; sectorY == 0) {
-            var rows = [];
-            for (var r = 0; r &lt; mapM.sectorHeight; r++) {
-                var a = [];
-                for (var c = 0; c &lt; mapM.sectorWidth; c++) {
-                    a.push(this.empty);
-                }
-                rows.push(a);
-            }
-            var bs = new BlockSector();
-            bs.rows = rows;
-            bs.height = bs.rows.length;
-            bs.width = bs.rows[0].length;
-            mapM.setSector(bs, sectorX, sectorY);
-        }
-    };
-    this.generateOrigin = function(mapM) {
-        var rows = [];
-        for (var r = 0; r &lt; mapM.sectorHeight; r++) {
-            var a = [];
-            for (var c = 0; c &lt; mapM.sectorWidth; c++) {
-                a.push(this.empty);
-                a[c].number = c;
-            }
-            rows.push(a);
-        }
-        var bs = new BlockSector();
-        bs.rows = rows;
-        bs.height = bs.rows.length;
-        bs.width = bs.rows[0].length;
-        mapM.sectorRows[0].push(bs);
-    };
-}
-
-/**
- * @name BlockSector
- * @class
- * @description An object representing a sector. Contains all 2D arrays of blocks and any sector-specific information.
- */
-function BlockSector() {
-    /** 
-	  * @field {Array} rows - A 2D array of Block IDs in the BlockSector 
-	  * @memberof BlockSector
-      */
-    this.rows = [];
-}
-
-/**
- * @class SectoredBlockMap
- * @name SectoredBlockMap
- * @constructor
- * @param {Integer} sectorWidth - The number of blocks wide each sector should be (must be odd!)
- * @param {Integer} sectorHeight - The number of blocks high each sector should be (must be odd!)
- * @param {WorldGenerator} worldGenerator - The {@link WorldGenerator} Object to be used for this map
- * @prop {WorldGenerator} generator - The {@link WorldGenerator} to be used for this map
- * @prop {Array} sectorRows - A 2D array of BlockSectors and undefined values that make up the map
- * @prop {Integer} sWidth - A number representing the width of the map in sectors.
- * @prop {Integer} sHeight - A number representing the height of the map in sectors.
- * @prop {Integer} sectorWidth - An odd number representing the width of a sector in blocks
- * @prop {Integer} sectorHeight - An odd number representing the height of a sector in blocks
- * @prop {Integer} sectorCenterX - The index in the center row where the center sector of the map is
- * @prop {Integer} sectorCenterY - The index of the center row where the center sector of the map is
- * @prop {Integer} originSectorX - The x coordinate of the origin sector of the map
- * @prop {Integer} originSectorY - The y coordinate of the origin sector of the map
- * @prop {Integer} sectorRightBound - The x coordinate of the furthest right sector of the map
- * @prop {Integer} sectorLeftBound - The x coordinate of the furthest left sector of the map
- * @prop {Integer} sectorTopBound - The y coordinate of the furthest up sector of the map
- * @prop {Integer} sectorBottomBound - The y coordinate of the furthest down sector of the map
- * 
- */
-function SectoredBlockMap(sectorWidth, sectorHeight, worldGenerator) {
-    /*
-     * The sectorRows in this sector map will create ONE rectangular shape, however, sectors/sector indexes may be filled in as "undefined" allowing gaps to exist in maps.
-     *
-     * For a SectoredBlockMap and for Sectors:
-     *
-     * +----------> Right is increasing X (the leftmost sector/block is 0)
-     * | Down is increasing Y (The highest sector/block is 0)
-     * |
-     *\|/
-     * *
-     */
-    this.generator = worldGenerator;
-    this.sectorRows = [];
-    this.sWidth = 1; //Width and height is in sectors, NOT BLOCKS!
-    this.sHeight = 1;
-    this.sectorXOffset = 0; //This allows us to add in one sector at a time, we don't need to create a duplicate/empty sector on the other side, simply compensate for the difference
-    this.sectorYOffset = 0; //If there is more sectors on the right, sectorXOffset should be negative, more on the left, it should be positive
-
-    this.sectorWidth = sectorWidth;
-    if (this.sectorWidth % 2 == 0) {
-        this.sectorWidth++; //If the width is not odd, add one to make it odd
-    }
-
-    this.sectorHeight = sectorHeight;
-    if (this.sectorHeight % 2 == 0) {
-        this.sectorHeight++; //If the height is not odd, add one to make it odd
-    }
-
-    //Add the origin sector
-    this.sectorRows.push(new Array());
-
-    /**
-     * @method init
-     * @memberof SectoredBlockMap
-     * @description Itializes the  map, should be called before the map is used!
-     */
-    this.init = function() {
-        this.generator.generateOrigin(this);
-    };
-
-    this.sectorCenterX = ((this.sectorWidth - 1 - this.sectorXOffset) / 2); //For example, width of 3: 3-1 = 2, 2 / 2 = 1, centerX is 1: [0][1][2]
-    this.sectorCenterY = ((this.sectorHeight - 1 - this.sectorYOffset) / 2);
-    this.originSectorX = 0; //Currently, there is only 1 sector existing, so the origin's index is 0,0
-    this.originSectorY = 0;
-    this.sectorRightBound = 0; //The X position of the rightmost sector
-    this.sectorLeftBound = 0; //The X position of the leftmost sector
-    this.sectorTopBound = 0; //The Y position of the topmost sector
-    this.sectorBottomBound = 0; //The Y position of the bottommost sector
-
-    /**
-     * @method sectorCoordsToSectorIndex
-     * @memberof SectoredBlockMap
-     * @arg {Number} sectorX
-     * @arg {Number} sectorY
-     * @description This methods converts x and y coordinates into the indexes in the map's 2D array to access the specified sector.
-     * @returns (Object) An object with two properties "sectorXIndex" and "sectorYIndex" that contain the x and y indexes of the sector specified with the x and y coords.
-     */
-    this.sectorCoordsToSectorIndex = function(sectorX, sectorY) {
-        return {
-            sectorXIndex: sectorX + this.originSectorX,
-            sectorYIndex: sectorY + this.originSectorY
-        };
-    };
-
-    /**
-     * @method getOriginSector
-     * @memberof SectoredBlockMap
-     * @returns {BlockSector} The origin BlockSector of the map.
-     */
-    this.getOriginSector = function() {
-        return this.sectorRows[this.originSectorY][this.originSectorX]; //Returns the center tile of the map
-    };
-    this.getOriginSector.bind(this);
-
-    /**
-     * @method getSector
-	 * @memberof SectoredBlockMap
-     * @arg sectorX
-     * @arg sectorY
-     * @description Returns the BlockSector specified by the sector coords. Will return a BlockSector full of air/empty blocks if the sector doesn't exist!
-     * @returns {BlockSector} Returns the BlockSector specified by the sector coords. Will return a BlockSector full of air/empty blocks if the sector doesn't exist!
-     *
-     */
-    this.getSector = function(sectorX, sectorY) {
-        if (!this.sectorExists(sectorX, sectorY)) {
-            return new BlockSector(this.sectorWidth, this.sectorHeight); //Return a sector of air/empty blocks if the sector doesn't exist
-        }
-        var i = this.sectorCoordsToSectorIndex(sectorX, sectorY);
-
-        return this.sectorRows[i.sectorYIndex][i.sectorXIndex];
-    };
-
-    /**
-     * @method sectorInBounds
-     * @memberof SectoredBlockMap
-     * @arg sectorX
-     * @arg sectorY
-     * @description Tests to see if the specified sector is within the current bounds of the SectoredBlockMap.
-     * @returns {Boolean} true if the sector is within the current bounds, false if not. This does not check to see if the sector exists!
-     */
-    this.sectorInBounds = function(sectorX, sectorY) { //Checks to see if the given coords point within the current boundaries
-        if ((sectorX &lt;= this.sectorRightBound) &amp;&amp; (sectorX >= this.sectorLeftBound)) { //Too far to the right
-            if ((sectorY >= this.sectorTopBound) &amp;&amp; (sectorY &lt;= this.sectorBottomBound)) {
-                return true; //Everything checks out, return true
-            }
-        }
-        return false;
-    };
-    this.sectorInBounds.bind(this);
-
-    /**
-     * @method sectorExists
-	 * @memberof SectoredBlockMap
-     * @arg {Number} sectorX
-     * @arg {Number} sectorY
-     * @returns {Boolean} True if the sector is within the map bounds and has been generated, false if otherwise.
-     */
-    this.sectorExists = function(sectorX, sectorY) { //Checks to see if the given coords point to an extisting sector
-        if (this.sectorInBounds(sectorX, sectorY)) {
-            var i = this.sectorCoordsToSectorIndex(sectorX, sectorY);
-            if (this.sectorRows[i.sectorYIndex][i.sectorXIndex] == undefined) {
-                return false; //Sector has not been generated/created yet, return false
-            } else {
-                return true; //Sector has been generated, return true
-            }
-        }
-        return false; //Sector isn't even within the boundaries, return false
-    };
-
-    //Return 1 if an old sector was replaced with the new one, return 2 if new sector was in the bounds and replaced an undefinied sector, return 3 if the sector was out of the boundaries and the map's structure had to be changed
-    this.setSector = function(newSector, sectorX, sectorY) { //This can replace sectors and also add on new ones
-        if (newSector.width != this.sectorWidth || newSector.height != this.sectorHeight) {
-            Studio.error("The new sector's dimensions do not match the sector size of the SectoredBlockMap!");
-            return false;
-        }
-
-        if (this.sectorExists(sectorX, sectorY)) { //Sector already existed, replacing with new Sector, returning 1
-            var i = this.sectorCoordsToSectorIndex(sectorX, sectorY);
-            this.sectorRows[i.sectorYIndex][i.sectorXIndex] = newSector;
-            return 1;
-        } else {
-            if (this.sectorInBounds(sectorX, sectorY)) { //Ok, the sector is within the bounds, we don't have to do anything to the map structure, just put in the sector, return 2
-                var i = this.sectorCoordsToSectorIndex(sectorX, sectorY);
-                this.sectorRows[i.sectorYIndex][i.sectorXIndex] = newSector;
-                return 2;
-            } else {
-                //Ok, sector is not in the bounds, we will have to adjust the map to fit it in, returning 3
-                if (sectorX > this.sectorRightBound) {
-                    //console.log("right" + sectorX);
-                    var diff = sectorX - this.sectorRightBound;
-                    for (var row = 0; row &lt; this.sHeight; row++) {
-                        for (var i = 0; i &lt; diff; i++) {
-                            this.sectorRows[i].push(undefined);
-
-                        }
-
-                    }
-                    this.sectorRightBound += diff;
-                    this.sWidth += diff;
-                    //When we push elements, the origin sector does not change.
-                } else if (sectorX &lt; this.sectorLeftBound) {
-                    //console.log("left" + sectorX);
-                    var diff = this.sectorLeftBound - sectorX;
-                    for (var row = 0; row &lt; this.sHeight; row++) {
-                        for (var i = 0; i &lt; diff; i++) {
-                            this.sectorRows[i].unshift(undefined);
-                        }
-                    }
-                    this.sectorLeftBound -= diff;
-                    this.sWidth += diff;
-                    this.originSectorX += diff;
-                }
-
-                if (sectorY &lt; this.sectorTopBound) {
-                    //console.log("top" + sectorY);
-                    var diff = this.sectorTopBound - sectorY;
-                    var blankRow = [];
-                    for (var col = 0; col &lt; this.sWidth; col++) {
-                        blankRow.push(undefined);
-                    }
-                    for (var i = 0; i &lt; diff; i++) {
-                        this.sectorRows.unshift(blankRow);
-                    }
-                    this.sHeight += diff;
-                    this.originSectorY += diff;
-                    this.sectorTopBound -= diff;
-                } else if (sectorY > this.sectorBottomBound) {
-                   // console.log("bottom" + sectorY);
-                    var diff = sectorY - this.sectorBottomBound;
-                    var blankRow = [];
-                    for (var col = 0; col &lt; this.sWidth; col++) {
-                        blankRow.push(undefined);
-                    }
-                    for (var i = 0; i &lt; diff; i++) {
-                        this.sectorRows.push(blankRow);
-                    }
-                    this.sHeight += diff;
-                    this.sectorBottomBound += diff;
-                }
-
-                var index = this.sectorCoordsToSectorIndex(sectorX, sectorY);
-                this.sectorRows[index.sectorYIndex][index.sectorXIndex] = newSector;
-                return 3;
-            }
-        }
-    };
-
-	this.getBlockIdAt = function(blockPosition) {
-        return this.getSector(blockPosition.sectorX, blockPosition.sectorY).rows[Math.round(blockPosition.localY)][Math.round(blockPosition.localX)];
-    };
-    
-    this.setBlockIdAt = function(blockPosition, newId) {
-        this.getSector(blockPosition.sectorX, blockPosition.sectorY).rows[Math.round(blockPosition.localY)][Math.round(blockPosition.localX)] = newId;
-    };
-
-    //TODO: Figure out what the below function does and why it even exists....
-    this.isInMap = function(blockX, blockY) {
-        //blockX and blockY are the distance in blocks from the origin block
-        if (!game.generation.GENERATE_WITH_PLAYER) { //if we have an infinite world, we should always have some map for the cursor to land in
-            var nX = Math.abs(Math.floor(blockX + this.sectorCenterX));
-            var nY = Math.abs(Math.floor(blockY + this.sectorCenterY));
-            var sectorX = (nX / this.sectorWidth) - ((nX % this.sectorWidth) * this.sectorWidth);
-            var sectorY = (nY / this.sectorHeight) - ((nY % this.sectorHeight) * this.sectorHeight);
-            if (this.sectorExists(sectorX, sectorY)) {
-                return true;
-            } else {
-                return false;
-            }
-        } else {
-            return true;
-        }
-    };
-    this.isInMap.bind(this);
-    this.setBlockIdAt.bind(this);
-    this.getBlockIdAt.bind(this);
-
-    // Get the BlockPosition of the block that is relX to right of and relY below the block given by originPosition
-    /**
-      * @memberof SectoredBlockMap
-      * @method getPositionRelativeTo
-      * @description Returns a new {@link BlockPosition} based upon relX blocks left and right and relY blocks up and down from the original {@link BlockPosition} originPosition
-      * @param {BlockPosition} originPosition - The position that will be used as a point of reference.
-      * @param {Integer} relX - Number of blocks to the right of the point of reference. (left if negative)
-      * @param {Integer} relY - Number of blocks below the point of reference (up if negative).
-      * @returns {BlockPosition}
-      */
-    this.getPositionRelativeTo = function(originPosition, relX, relY) {
-        var newLocalX = originPosition.localX + relX;
-        var newLocalY = originPosition.localY + relY;
-        var sectorX = originPosition.sectorX;
-        var sectorY = originPosition.sectorY;
-
-        while (newLocalY &lt; 0) {
-            sectorY--;
-            newLocalY += game.generation.SECTOR_SIZE;
-        }
-
-        while (newLocalY > game.generation.SECTOR_SIZE) {
-            newLocalY = Math.abs(game.generation.SECTOR_SIZE - newLocalY);
-            sectorY++;
-        }
-
-        while (newLocalX &lt; 0) {
-            sectorX--;
-            newLocalX += game.generation.SECTOR_SIZE;
-        }
-
-        while (newLocalX > game.generation.SECTOR_SIZE) {
-            newLocalX = Math.abs(game.generation.SECTOR_SIZE - newLocalX);
-            sectorX++;
-        }
-
-        return new BlockPosition(sectorX, sectorY, newLocalX, newLocalY);
-    };
-    this.getPositionRelativeTo.bind(this);
-
+function initializeGame() {
 
 	/**
-	 * @memberof SectoredBlockMap
-	 * @method getWindow
-	 * @param {BlockPosition} centerPosition - The position of the block that the window is centered around
-	 * @param {Integer} width - The number of blocks from left bound to right bound of the window (must be odd!)
-	 * @param {Integer} height - The number of blocks from the top bound to the bottom bound of the window (must be odd!)
-	 * @description This function takes a center position and dimensions to select an area of blocks from the SectoredBlockMap to return as a 2D array of blocks. It is a way to select all blocks in an area, even if that area contains multiple sectors.
-	 * @returns {Array} A 2D array of blocks that are within the window
+	 * @namespace game
+	 * @prop {Boolean} drawGrid - If set to true, the game will render a black border round every block rendered.
+	 * @prop {Integer} INTERVAL_TIME - The number of milliseconds between each game tick interval.
+	 * @prop {Number} mouseX - The current x position of the user's cursor
+	 * @prop {Number} mouseY - The current y position of the user's cursor
+	 * @description The "game" object is a Game Object from the RouteEngineA1 javascript engine. See the RouteEngineA1 documentation for more details. RouteEngineA1 should be used for any UI elements, image loading, and sound loading.
+	 */
+	game = new Game(document.getElementById("gamecanvas")); //Create a new RouteEngineA1 Game
+
+	game.setSize(513, 513);
+
+	game.INTERVAL_TIME = 50;
+
+	game.background = new Background("color", "#59F"); //Default blue background is #59F
+	game.render();
+
+	game.can.fillStyle = "#FFF";
+	game.can.fillText("Loading...", 50, 50);
+
+	game.loaded = 0;
+	game.needsLoaded = 0;
+	game.drawGrid = false; //Draw grid should be false in prod, it is only used for testing (for now)
+
+	/**
+	 * @memberof game
+	 * @description Holds input about user interactions. Not necessarily key presses and mouse clicks, but those can be mapped to here too.
+	 * @prop {Boolean} up - True if the user has triggered the "up" action.
+	 * @prop {Boolean} down - True if the user has triggered the "down" action.
+	 * @prop {Boolean} left - True if the user has triggered the "left" action.
+	 * @prop {Boolean} right - True if the user has triggered the "right" action.
+	 * @prop {Boolean} space - True if the user has triggered the "space" action.
+	 * @prop {Boolean} leftClick - True if the user has triggered the "left click" action.
+	 */
+	game.inputMatrix = {
+		up: false,
+		down: false,
+		left: false,
+		right: false,
+		space: false,
+		leftClick: false
+	};
+
+	game.mouseX = 0;
+	game.mouseY = 0;
+
+	/**
+	 * @memberof game
+	 * @description Holds info about the current position of the user's cursor.
+	 * @prop {Integer} mScreenBlockX - The x position of the block the cursor is over on the screen. Relative to the screen, not the map!
+	 * @prop {Integer} mScreenBlockY - The y position of the block the cursor is over on the screen. Relative to the screen, not the map!
+	 * @prop mapBlockPosition {BlockPosition} - The {@link BlockPosition} that the cursor is currently over. This is based on the {@link SectoredBlockMap}.
 	 *
 	 */
-    this.getWindow = function(centerPosition, width, height) { //Height and Width must be odd!
-        //centerPoition holds the position of the center block of the window:
-        // x is the localX position of the center block
-        // y is the localY position of the center block
-        // width is the number of blocks from left bound to right bound of the window
-        // height is the number of blocks from the top bound to the bottom bound of the window
+	game.cursor = {
+		mScreenBlockX: 0,
+		mScreenBlockY: 0,
+		mapBlockPosition: null,
+		block: null
+	};
 
-        //First let's figure out the number rows and columns this window will span
+	/**
+	 * @memberof game
+	 * @description Holds information about where the game's viewport/window is located. Basically, the set of coordinates that the user is will be looking at on their window.
+	 * @prop {Integer} focusSectorX - The x index of the sector the game window is currently centered over
+	 * @prop {Integer} focusSectorY - The y index of the sector the game window is currently centered over
+	 * @prop {Number} focusLocalX - The x coordinate of the block in the focused sector that the game window is currently centered over. This can be a decimal!
+	 * @prop {Number} focusLocalY - The y coordinate of the block in the focused sector that the game window is currently centered over. This can be a decimal!
+	 */
+	game.view = {
+		focusLocalX: 0.0,
+		focusLocalY: 0.0,
+		focusSectorX: 0,
+		focusSectorY: 0
+	};
 
-        var localLeftBound = Math.floor((centerPosition.localX - (width / 2)));
-        var localRightBound = Math.floor((centerPosition.localX + (width / 2)));
-        var localTopBound = Math.floor((centerPosition.localY - (height / 2)));
-        var localBottomBound = Math.floor((centerPosition.localY + (height / 2)));
+	/**
+	 * @memberof game
+	 * @description Holds the global map generation settings for the game
+	 * @prop {Boolean} GENERATE_WITH_PLAYER - If set to true, the map will generate a new sector whenever the player can see the edge of the map/an non generated sector. Default: true
+	 * @prop {Integer} SECTOR_SIZE - The height and width of one sector in blocks. This must be an ODD number! Default: 101
+	 * @prop {Integer} GENERATION_DISTANCE - The number of sectors ahead that the WorldGenerator will generate around the player. Default: 1
+	 */
+	game.generation = {
+		GENERATE_WITH_PLAYER: true, //Add another sector if the player sees the edge of the map?
+		SECTOR_SIZE: 101, // The height and width of one sector in blocks. This must be an ODD number!
+		GENERATION_DISTANCE: 1
+	};
 
-        //Now lets calculate the number of sectors in each direction (other than the given sector) that will need to be added
-        var sectorsAbove = 0;
-        var sectorsBelow = 0;
-        var sectorsLeft = 0;
-        var sectorsRight = 0;
+	/**
+	 * @memberof game
+	 * @description Holds a list of BlockPosition objects that hold the sector coords that are to be generated with the next game.update() call
+	 */
+	//game.generation.generationQue = [];
 
-        if (localTopBound &lt; 0) {
-            sectorsAbove = Math.ceil((localTopBound + game.generation.SECTOR_SIZE) / game.generation.SECTOR_SIZE);
-        }
-        if (localBottomBound > game.generation.SECTOR_SIZE) {
-            sectorsBelow = Math.ceil((localBottomBound - game.generation.SECTOR_SIZE) / game.generation.SECTOR_SIZE)
-        }
+	/**
+	 * @memberof game
+	 * @description Holds a list of all Block objects, indexed by ids (blockList[0] = DirtBlockObject)
+	 */
+	game.blockList = []; // Holds a list of all Block objects, indexed by ids (blockList[0] = DirtBlockObject)
+	game.blockList[0] = new Block(-1, false, "sky"); // Add in the sky block cause its special
 
-        if (localLeftBound &lt; 0) {
-            sectorsLeft = Math.ceil((localLeftBound + game.generation.SECTOR_SIZE) / game.generation.SECTOR_SIZE);
-        }
-        if (localRightBound > game.generation.SECTOR_SIZE) {
-            sectorsRight = Math.ceil((localRightBound - game.generation.SECTOR_SIZE) / game.generation.SECTOR_SIZE);
-        }
-
-        var windowList = []; // The windowList is an array of rows. Each row is an array of blocks. Top left is 0,0, bottom right is length,length
-        //Now we will piece together our windowList, we will start from top left, go to the right, and then drop down one sector and repeat until we reach bottom right
-        var currentSectorX = centerPosition.sectorX - sectorsLeft;
-
-        for (var currentSectorY = centerPosition.sectorY - sectorsAbove; currentSectorY &lt;= centerPosition.sectorY + sectorsBelow; currentSectorY++) {
-            var windowRow = [];
-            for (var currentSectorX = centerPosition.sectorX - sectorsLeft; currentSectorX &lt;= centerPosition.sectorX + sectorsRight; currentSectorX++) {
-                //We will calculate the center of a large window in terms of blocks (local) relative to the local bounds of the target sector
-
-                var signX = (currentSectorX == centerPosition.sectorX) ? 1 : -1 * (Math.abs(currentSectorX - centerPosition.sectorX) / (currentSectorX - centerPosition.sectorX));
-                var signY = (currentSectorY == centerPosition.sectorY) ? 1 : -1 * (Math.abs(currentSectorY - centerPosition.sectorY) / (currentSectorY - centerPosition.sectorY));
-                var relativeLocalX = (game.generation.SECTOR_SIZE * (Math.abs(currentSectorX - centerPosition.sectorX))) + (signX * centerPosition.localX);
-                var relativeLocalY = (game.generation.SECTOR_SIZE * (Math.abs(currentSectorY - centerPosition.sectorY))) + (signY * centerPosition.localY);
-                windowRow.push(this.windowOfSector(new BlockPosition(currentSectorX, currentSectorY, relativeLocalX, relativeLocalY), width, height, game.generation.GENERATE_WITH_PLAYER));
-            }
-            windowList.push(windowRow);
-        }
+	/**
+	 * @memberof game
+	 * @description Holds a list of all block names and ids, indexed by names (blockIdList["dirt"] = 1)
+	 */
+	game.blockIdList = []; // Holds a list of all block names and ids, indexed by names (blockIdList["dirt"] = 1)
+	game.blockIdList["sky"] = 0; // Add in the sky block cause its special
 
 
-        //Now we have to merge all of these windows into one big window to return
-        var rows = [];
-        for (var windowRow = 0; windowRow &lt; windowList.length; windowRow++) { // For each row of windows
-            var mergedRows = [];
-            for (var windowColumn = 0; windowColumn &lt; windowList[windowRow].length; windowColumn++) { // For each window in a row
-                //For each row in a window
-                for (var r = 0; r &lt; windowList[windowRow][windowColumn].length; r++) {
-                    if (windowColumn != 0) {
-                        mergedRows[r] = mergedRows[r].concat(windowList[windowRow][windowColumn][r]);
-                    } else {
-                        mergedRows[r] = windowList[windowRow][windowColumn][r];
-                    }
-                }
-            }
+	game.ils = new ImageLoadStack(); //ImageLoadStack to load in all of the blocks for the game
+	game.ils.onload = function() {
+		game.images = game.ils.images; //Hand the images over to the game to keep everything unified
+		game.loaded++; //Increment the assets load count
+		if (game.loaded == game.needsLoaded) { //If all assets are loaded, start the game
+			game.onstart(); //Start the game
+		}
+	}
 
-            if (windowRow != 0) {
-                rows = rows.concat(mergedRows);
-            } else {
-                rows = mergedRows;
-            }
-        }
-        //console.log(rows);
-        return rows;
+	/**
+	 * @memberof game
+	 * @method addBlock
+	 * @description This method is for registering normal sized blocks (square, taking up 1 tile) into the game. It enters the image to be loaded, assigns the image ID, and registers its name and ID into the blockList and blockIdList arrays.
+	 * @param {String} src - The URI of the image for this block
+	 * @param {Boolean} solid - If true, this block will be treated as a solid. If false, projectiles and entities will be able to pass through it.
+	 * @param {String} name - The canonical name of this block ("dirt", "grass", "stone")
+	 * @returns {Integer} The Block ID of this block. This will represent the block in the {@link BlockMap}.
+	 */
+	game.addBlock = function(src, solid, name) {
+		game.blockIdList[name] = game.blockList.length; // Store the name of the block and its ID
+		game.blockList.push(new Block(game.ils.addImage(src, BLOCK_SIZE, BLOCK_SIZE), solid, name)); // Enter the image to be loaded and use the returned ID to set the image ID of the block, and push it into the array of blocks indexed by IDs
+		return game.blockList.length - 1; // Return the Block ID
+	};
+
+	/**
+	 * @memberof game
+	 * @function
+	 * @description Loads all of the images, sounds, and other assets at the start of the game
+	 */
+	game.loadAssets = function() {
+		//IMAGES
+		game.needsLoaded++; //Images need to be loaded
+		game.addBlock("../2Dimensions/images/blocks/" + BLOCK_SIZE + "/0.png", true, "grass");
+		game.addBlock("../2Dimensions/images/blocks/" + BLOCK_SIZE + "/1.png", true, "dirt"); //Load dirt
+		game.addBlock("../2Dimensions/images/blocks/" + BLOCK_SIZE + "/2.png", true, "stone"); //Load stone
+		game.addBlock("../2Dimensions/images/blocks/" + BLOCK_SIZE + "/3.png", true, "bush"); //Load bush
+
+		game.ils.start();
+	};
+
+	/** 
+	 * @memberof game
+	 * @function
+	 * @description Initializes values, clears the screen, calls map generation, and calls for the game loop to start
+	 */
+	game.onstart = function() { //When the game starts...
+		game.render(); //Clear the canvas with the blue sky
+		game.blockSize = game.images[0].width; //Set the blocksize
+		game.dimensions = game.calculateDimensions(game.cW, game.cH, game.blockSize); //Calculate the dimensions
+
+		switch (GAME_TYPE) { //Switch to the game mode (note: mostly just for testing, remove in prod)
+			case (0): //0 is single-player offline
+				game.generateMap(); //Create the map
+				game.player = new Player("Bob");
+				game.view.position = new BlockPosition(game.player.position.sectorX, game.player.position.sectorY, game.player.position.localX, game.player.position.localY);
+				//game.map.sectorRows[0][0].rows[50][50] = new game.blocks.bushBlock();
+				game.startLoop(); //Start the actual game
+				break;
+		}
+	};
+
+	/**
+	 * @memberof game
+	 * @function
+	 * @description Generates the map and initializes it
+	 */
+	game.generateMap = function() {
+		game.map = new SectoredBlockMap(game.generation.SECTOR_SIZE, game.generation.SECTOR_SIZE, new SuperFlatGrassWorldGenerator());
+		game.map.init();
+	};
+
+	/**
+	 * @memberof game
+	 * @function
+	 * @description Starts the main game loop
+	 */
+	game.startLoop = function() {
+		game.interval = window.setInterval(game.loop, game.INTERVAL_TIME);
+	};
+
+	/**
+	 * @memberof game
+	 * @function
+	 * @description Stops the main game loop
+	 */
+	game.stopLoop = function() {
+		window.clearInterval(game.interval);
+	};
+
+	if (STUDIO_DEV) {
+		Studio.addStopListener(function() {
+			game.stopLoop();
+		});
+	}
+
+	/**
+	 * @memberof game
+	 * @protected
+	 * @function
+	 * @description Called at the start of the game to calculate padding values and the amount of blocks that fit on the screen
+	 * @returns An object containing the values it calculated. You really don't need to know the specifics, this is a core function that should never be modified.
+	 */
+	game.calculateDimensions = function(width, height, blockSize) {
+		var paddingWidth = width % blockSize;
+		var paddingHeight = height % blockSize;
+		var blocksWide = (width - paddingWidth) / blockSize;
+		var blocksHigh = (height - paddingHeight) / blockSize;
+
+		var renderedBlocksWide = (blocksWide % 2 == 0) ? blocksWide + 3 : blocksWide + 4; //Number of blocks that have to rendered on the screen (must be odd)
+		var renderedBlocksHigh = (blocksHigh % 2 == 0) ? blocksHigh + 3 : blocksHigh + 4; // and + 2 for odds as it means that the blocks fit perfectly, but we need a buffer
+		return {
+			"blocksWide": blocksWide,
+			"blocksHigh": blocksHigh,
+			"paddingWidth": paddingWidth,
+			"paddingHeight": paddingHeight,
+			"renderedBlocksWide": renderedBlocksWide,
+			"renderedBlocksHigh": renderedBlocksHigh
+		};
+	};
+
+	/**
+	 * @memberof game
+	 * @function
+	 * @callback
+	 * @description The main loop for the game.
+	 */
+	game.loop = function() {
+		game.locateCursor();
+		game.handleInput();
+		game.update();
+		game.refocusView();
+		game.render(); //Draw the background, this is a RouteEngineA1 built in function
+		game.drawEverything(); //Draw the tiles, sprites, etc
+	};
+
+	/**
+	 * @memberof game
+	 * @function
+	 * @description Realigns the global view settings to the position of the player
+	 */
+	game.refocusView = function() {
+		game.view.position = new BlockPosition(game.player.position.sectorX, game.player.position.sectorY, game.player.position.localX, game.player.position.localY);
+	};
+
+	/**
+	 * @memberof game
+	 * @private
+	 * @function
+	 * @description Physics, hunger, environmental events are all checked and handled in this function.
+	 */
+	game.update = function() { //Physics, hunger, time, events
+		if (game.map.generationQue.length > 0) { // If there are sectors needing to be generated...
+			for (var i = 0; i &lt; game.map.generationQue.length; i++) { // Loop through the requested sectors to be generated
+				game.map.generator.generate(game.map, game.map.generationQue[i].sectorX, game.map.generationQue[i].sectorY); // Call the map generator to generate each sector
+				console.log("GEN CALLED");
+			}
+			game.map.generationQue = []; // Clear the generation que
+		}
+		game.player.update();
+		
+		
+	};
+	
+	game.physics = {};
+    game.physics.blockSolidAt = function (blockPosition) {
+        return game.blockList[game.map.getBlockIdAt(blockPosition)].solid;
     };
+    game.physics.blockSolidAt.bind(game);
+	
+	
+	game.physics.playerAboveSolidBlock = function (p) {
+		 if(p.dimensions.bWidth &lt; 1) { //Only need to worry about two positions
+            var farRight = game.map.getPositionRelativeTo(p.position, p.dimensions.bWidth, 1);
+            var farLeft = game.map.getPositionRelativeTo(p.position, 0, 1);
+            
+            return game.physics.blockSolidAt(farRight) || game.physics.blockSolidAt(farLeft);
+            
+		 }
+		 else { //Need to worry about multiple positions (the ends and the blocks inbetween)
+            return false;	  
+		 }
+		 
+		 
+		 /*var t = false;
+		 if ((Math.floor(blockPosition.localX) == blockPosition.localX)) {
+		 	return game.blockList[game.map.getBlockIdAt(game.map.getPositionRelativeTo(blockPosition, 0, 1))].solid;
+		 }
+         
+		 else { // Directly below and to the left below
+		 	var direct = Math.round(blockPosition.localX) - blockPosition.localX &lt; 0 ? -1 : 1;
+		 	return game.blockList[game.map.getBlockIdAt(game.map.getPositionRelativeTo(blockPosition, 0, 1))].solid || game.blockList[game.map.getBlockIdAt(game.map.getPositionRelativeTo(blockPosition, direct, 1))].solid;
+		 } */
+		 
+		 /*
+		 else if (game.player.position.localX - Math.floor(game.player.position.localX) &lt; 0) { // Directly below and to the right below
+		 	return game.blockList[game.map.getBlockIdAt(game.map.getPositionRelativeTo(blockPosition, 0, 1))].solid || game.blockList[game.map.getBlockIdAt(game.map.getPositionRelativeTo(blockPosition, 1, 1))].solid;
+		 }
+		 else { // Directly below and to the left below
+		 	return game.blockList[game.map.getBlockIdAt(game.map.getPositionRelativeTo(blockPosition, 0, 1))].solid || game.blockList[game.map.getBlockIdAt(game.map.getPositionRelativeTo(blockPosition, -1, 1))].solid;
+		 }*/
+		  
+	};
+	game.physics.playerAboveSolidBlock.bind(game);
+	
+	game.physics.belowSolidBlock = function (blockPosition) {
+		var t = false;
+		 if ((Math.floor(blockPosition.localX) == blockPosition.localX)) {
+		 	return game.blockList[game.map.getBlockIdAt(game.map.getPositionRelativeTo(blockPosition, 0, -1))].solid;
+		 }
+		 else if (blockPosition.localX - Math.floor(blockPosition.localX) &lt; 0) {
+		 	return game.blockList[game.map.getBlockIdAt(game.map.getPositionRelativeTo(blockPosition, 0, -1))].solid || game.blockList[game.map.getBlockIdAt(game.map.getPositionRelativeTo(blockPosition, 1, -1))].solid;
+		 }
+		 else {
+		 	return game.blockList[game.map.getBlockIdAt(game.map.getPositionRelativeTo(blockPosition, 0, -1))].solid || game.blockList[game.map.getBlockIdAt(game.map.getPositionRelativeTo(blockPosition, -1, -1))].solid;
+		 }
+		  
+	};
+	game.physics.belowSolidBlock.bind(game);
 
-    //This returns a window of the specified sector. Note, it does not include from other sectors. So if the window only include the top right corner of the specified sector, only the top right corner is returned.
-    this.windowOfSector = function(centerPosition, width, height, generateIfNeeded) {
-        //centerPosition holds the BlockPosition of the center block of the window
-        //localX is the x position of the center of the window
-        //localY is the y position of the center of the window
+	/**
+	 * @memberof game
+	 * @function
+	 * @description Renders an array of blocks on the screen (does not adjust to padding or dimensions!)
+	 * @param {Array} array - An 2D array of blocks to be rendered. 
+	 */
+	game.drawArray = function(array) { //Draws an array of blocks, centered according to the padding and dimensions
+		
+		for (var r = 0; r &lt; array.length; r++) {
+			var row = array[r];
+			for (var b = 0; b &lt; row.length; b++) {
+				if (game.blockList[row[b]].imageId != -1) { //-1 is the image ID for sky blocks
+					game.can.drawImage(game.images[game.blockList[row[b]].imageId], (game.blockSize * b), (game.blockSize * r));
+				}
 
-        var sector = this.getSector(centerPosition.sectorX, centerPosition.sectorY).rows;
-        //First lets calculate the normal boundaries	   
-        var localLeftBound = Math.floor((centerPosition.localX - (width / 2)));
-        var localRightBound = Math.floor((centerPosition.localX + (width / 2)));
-        var localTopBound = Math.floor((centerPosition.localY - (height / 2)));
-        var localBottomBound = Math.floor((centerPosition.localY + (height / 2)));
+				if (game.drawGrid) { //Draws a black grid over the blocks, if the flag is set
+					game.can.strokeRect((game.blockSize * b), (game.blockSize * r), game.blockSize, game.blockSize);
+				}
+			}
+		}
+	};
 
-        //Now lets limit the boundaries to the sector bounds
-        if (localTopBound &lt; 0) {
-            localTopBound = 0;
-        }
-        if (localBottomBound > game.generation.SECTOR_SIZE) {
-            localBottomBound = game.generation.SECTOR_SIZE - 1;
-        }
+	/**
+	 * @private
+	 * @function
+	 * @description Draws a black border for padding, usually disabled
+	 */
+	game.drawPadding = function() { //Draws the black border for the padding, not drawn by default
+		game.can.fillStyle = "#000";
+		game.can.fillRect(0, 0, game.dimensions.paddingWidth / 2, game.cH);
+		game.can.fillRect(game.cW - game.dimensions.paddingWidth / 2, 0, game.cW, game.cH);
+		game.can.fillRect(0, 0, game.cW, game.dimensions.paddingHeight / 2);
+		game.can.fillRect(0, game.cH - game.dimensions.paddingHeight / 2, game.cW, game.dimensions.paddingHeight / 2);
+	};
 
-        if (localLeftBound &lt; 0) {
-            localLeftBound = 0;
-        }
-        if (localRightBound > game.generation.SECTOR_SIZE) {
-            localRightBound = game.generation.SECTOR_SIZE - 1;
-        }
+	/**
+	 * @memberof game
+	 * @function
+	 * @description Renders the cursor on the game screen.
+	 */
+	game.drawCursor = function() {
+		var cX = game.cursor.mScreenBlockX * game.blockSize;
+		var cY = game.cursor.mScreenBlockY * game.blockSize;
 
-        if (this.sectorExists(centerPosition.sectorX, centerPosition.sectorY)) {
-            //Now lets splice the array to get our array to return
-            var rows = sector.slice(localTopBound, localBottomBound + 1);
-            for (var i = 0; i &lt; rows.length; i++) {
-                rows[i] = rows[i].slice(localLeftBound, localRightBound + 1);
-            }
-            return rows;
-        } else {
-            //Sector doesnt exist
+		game.can.strokeStyle = "#F00";
+		game.can.strokeRect(cX, cY, game.blockSize, game.blockSize);
+		game.can.strokeRect(cX + (game.blockSize / 4), cY + (game.blockSize / 4), game.blockSize * 0.5, game.blockSize * 0.5);
+		game.can.strokeStyle = "#000";
+	};
 
-            if (generateIfNeeded) {
-                //Add the non-existant sector to the generation que for the next tick if we are generating as the player moves/this sector needs generated
-                game.generation.generationQue.push(centerPosition);
-            }
+	/**
+	 * @private
+	 * @function
+	 * @description Grabs a ViewWindow of the current focus point and renders it on the game screen.
+	 */
+	game.drawTiles = function() {
+		//Focus variable is to emphasize that we are focusing on a position, not always the player
+		var centerPosition = new BlockPosition(game.player.position.sectorX, game.player.position.sectorY, Math.floor(game.player.position.localX), Math.floor(game.player.position.localY));
+		var win = game.map.getWindow(centerPosition, game.dimensions.renderedBlocksWide, game.dimensions.renderedBlocksHigh);
+		//console.log(win.length, win[0].length);
+		game.drawArray(win);
+	};
 
-            //In the meantime, lets generate a blank set of blocks to be generated
-            var blankRows = [];
-            var row = [];
-            var h = localBottomBound - localTopBound;
-            var w = localRightBound - localLeftBound;
-            for (var c = 0; c &lt; w + 1; c++) {
-                row.push(game.blockIdList["sky"]);
-            }
-            for (var r = 0; r &lt; h + 1; r++) {
-                blankRows.push(row);
-            }
-            return blankRows;
-        }
-    };
+	/**
+	 * @memberof game
+	 * @function
+	 * @description Draws EVERYTHING. Blocks, cursor, and player. Scrolling and padding is taken into account.
+	 */
+	game.drawEverything = function() {
+		//Note: Sprites and background are already drawn by game.render()
+		//Draw everything that is tile bound, then translate according to the localX and localY (scrolling effect), then draw the player
+		game.translateView();
+		game.drawTiles();
+		game.drawCursor();
+		game.unTranslateView();
+		game.player.render((game.cW / 2) - (game.blockSize / 2), (game.cH / 2) - ((3 * game.blockSize / 2)), game);
+	};
 
-    //Below, allows methods to access their parent
-    this.getWindow.bind(this);
-    this.sectorExists.bind(this);
-    this.setSector.bind(this);
-    this.windowOfSector.bind(this);
-    this.sectorCoordsToSectorIndex.bind(this);
-    this.getSector.bind(this);
+	/**
+	 * @memberof game
+	 * @function
+	 * @description Translates the game canvas according to scrolling and padding
+	 */
+	game.translateView = function() { // This function translates the currently drawn canvas to the perspective of the localX and localY (scrolling effect)
+		var scrollingX = (game.blockSize) * (Math.abs(game.view.position.localX) - Math.floor(Math.abs(game.view.position.localX)));
+		var scrollingY = (game.blockSize) * (Math.abs(game.view.position.localY) - Math.floor(Math.abs(game.view.position.localY)));
+
+		var centeringX = (((game.dimensions.renderedBlocksWide - game.dimensions.blocksWide) / 2) * game.blockSize) - (game.dimensions.paddingWidth / 2);
+		var centeringY = ((game.dimensions.renderedBlocksHigh - game.dimensions.blocksHigh) / 2) * game.blockSize - (game.dimensions.paddingHeight / 2);
+
+		var totalX = scrollingX + centeringX + game.blockSize;
+		var totalY = scrollingY + centeringY;
+		game.can.translate(-totalX, -totalY);
+	};
+
+	/**
+	 * @function
+	 * @memberof game
+	 * @description Un-translates the canvas after being translated by the {@link game.translateView} function.
+	 */
+	game.unTranslateView = function() {
+		var scrollingX = (game.blockSize) * (Math.abs(game.view.position.localX) - Math.floor(Math.abs(game.view.position.localX)));
+		var scrollingY = (game.blockSize) * (Math.abs(game.view.position.localY) - Math.floor(Math.abs(game.view.position.localY)));
+
+		var centeringX = (((game.dimensions.renderedBlocksWide - game.dimensions.blocksWide) / 2) * game.blockSize) - (game.dimensions.paddingWidth / 2);
+		var centeringY = ((game.dimensions.renderedBlocksHigh - game.dimensions.blocksHigh) / 2) * game.blockSize - (game.dimensions.paddingHeight / 2);
+
+		var totalX = scrollingX + centeringX + game.blockSize;
+		var totalY = scrollingY + centeringY;
+
+		game.can.translate(totalX, totalY);
+	};
+
+	game.onmousedown = function() {
+		game.inputMatrix.leftClick = true;
+	};
+
+	game.onmouseup = function() {
+		game.inputMatrix.leftClick = false;
+	};
+
+	/**
+	 * @protected
+	 * @function
+	 * @description Calls functions based upon the current state of {@link game.inputMatrix}
+	 *
+	 */
+	game.handleInput = function() {
+		if (game.inputMatrix.left) {
+			game.player.goLeft();
+		}
+		if (game.inputMatrix.right) {
+			game.player.goRight();
+		}
+		if (game.inputMatrix.up) {
+			if (game.player.gravity &amp;&amp; !game.player.noClipMode) { // Player must jump
+				if (game.player.canJump) {
+					game.player.jump();
+				}
+			}
+			else { // Player can fly
+				game.player.goUp();
+			}
+		}
+		if (game.inputMatrix.down) {
+			if (!game.player.gravity || game.player.noClipMode) {
+				game.player.goDown();
+			}
+		}
+		if (game.inputMatrix.leftClick) {
+			game.map.setBlockIdAt(game.cursor.mapBlockPosition, game.blockIdList["sky"]);
+			console.log(game.cursor.mapBlockPosition);
+		}
+	};
+
+	/**
+	 * @memberof game
+	 * @function
+	 * @protected
+	 * @description Updates game values to reflect the BlockPosition that the cursor is selecting
+	 */
+	game.locateCursor = function() {
+		
+		var scrollingX = ((game.blockSize) * (Math.abs(game.view.position.localX) - Math.floor(Math.abs(game.view.position.localX))));
+		var scrollingY = (game.blockSize) * (Math.abs(game.view.position.localY) - Math.floor(Math.abs(game.view.position.localY)));
+
+		var centeringX = (((game.dimensions.renderedBlocksWide - game.dimensions.blocksWide) / 2) * game.blockSize) - (game.dimensions.paddingWidth / 2);
+		var centeringY = ((game.dimensions.renderedBlocksHigh - game.dimensions.blocksHigh) / 2) * game.blockSize - (game.dimensions.paddingHeight / 2);
+
+		var totalX = scrollingX + centeringX + game.blockSize;
+		var totalY = scrollingY + centeringY;
+
+		game.cursor.mScreenBlockX = Math.floor((game.mouseX + totalX) / game.blockSize);
+		game.cursor.mScreenBlockY = Math.floor((game.mouseY + totalY) / game.blockSize);
+
+		//Alright, to figure out the actual BlockPosition of the cursor, lets figure out how many x and y blocks away from the Player's position we are
+		//First, we need to figure out what SCREEN block the player is always rendered on. This changes slightly based upon the amount of scrolling we have going on
+		//Once we figure that out, then we figure out the horizontal number of blocks different the mScreenBlockX is from the Player's screen X and do the same with mScreenBlockY and player's screen Y
+		//Then we use game.map.getPositonRelativeTo(Player.position, xDiff, yDiff) to get the BlockPosition of the cursor.
+		var playerScreenBlockX = (Math.floor((game.dimensions.renderedBlocksWide - 1) / 2) + 1) + Math.round(scrollingX/game.blockSize);
+		var playerScreenBlockY = Math.floor((game.dimensions.renderedBlocksHigh - 1) / 2) + 1  + Math.round(scrollingY/game.blockSize);
+		
+		var xDiff = game.cursor.mScreenBlockX - playerScreenBlockX;
+		var yDiff = game.cursor.mScreenBlockY - playerScreenBlockY;
+		
+		game.cursor.mapBlockPosition = game.map.getPositionRelativeTo(game.view.position, xDiff, yDiff);
+
+		/*
+		game.cursor.mapBlockPosition = game.map.getPositionRelativeTo(new BlockPosition(game.view.position.sectorX, game.view.position.sectorY, Math.floor(game.view.position.localX), Math.floor(game.view.position.localY)), -1 * (Math.floor((game.dimensions.renderedBlocksWide / 2) + 1) - game.cursor.mScreenBlockX), -1 * ((Math.floor(game.dimensions.renderedBlocksHigh / 2) + 1) - game.cursor.mScreenBlockY));
+		*/
+	};
+
+	game.loadAssets();
 }
 
-/**
- * @protected
- * @function
- * @description Calls functions based upon the current state of {@link game.inputMatrix}
- *
- */
-game.handleInput = function() {
-    if (game.inputMatrix.left) {
-        game.player.goLeft();
-    }
-    if (game.inputMatrix.right) {
-        game.player.goRight();
-    }
-    if (game.inputMatrix.up) {
-        game.player.goUp();
-    }
-    if (game.inputMatrix.down) {
-        game.player.goDown();
-    }
-    if (game.inputMatrix.leftClick) {
-        game.map.setBlockIdAt(game.cursor.mapBlockPosition, game.blockIdList["sky"]);
-        console.log(game.cursor.mapBlockPosition);
-    }
-};
 
 window.onkeydown = function(event) {
-    var k = String.fromCharCode(event.keyCode);
-    if (k == 'D') {
-        game.inputMatrix.right = true;
-    }
-    if (k == 'A') {
-        game.inputMatrix.left = true;
-    }
-    if (k == 'W') {
-        game.inputMatrix.up = true;
-    }
-    if (k == 'S') {
-        game.inputMatrix.down = true;
-    }
-    if (k == ' ') {
-        game.inputMatrix.space = true;
-    }
+	var k = String.fromCharCode(event.keyCode);
+	if (k == 'D') {
+		game.inputMatrix.right = true;
+	}
+	if (k == 'A') {
+		game.inputMatrix.left = true;
+	}
+	if (k == 'W') {
+		game.inputMatrix.up = true;
+	}
+	if (k == 'S') {
+		game.inputMatrix.down = true;
+	}
+	if (k == ' ') {
+		game.inputMatrix.space = true;
+	}
 };
 
 window.onkeyup = function(event) {
-    var k = String.fromCharCode(event.keyCode);
-    if (k == 'D') {
-        game.inputMatrix.right = false;
-    }
-    if (k == 'A') {
-        game.inputMatrix.left = false;
-    }
-    if (k == 'W') {
-        game.inputMatrix.up = false;
-    }
-    if (k == 'S') {
-        game.inputMatrix.down = false;
-    }
-    if (k == ' ') {
-        game.inputMatrix.space = false;
-    }
+	var k = String.fromCharCode(event.keyCode);
+	if (k == 'D') {
+		game.inputMatrix.right = false;
+	}
+	if (k == 'A') {
+		game.inputMatrix.left = false;
+	}
+	if (k == 'W') {
+		game.inputMatrix.up = false;
+	}
+	if (k == 'S') {
+		game.inputMatrix.down = false;
+	}
+	if (k == ' ') {
+		game.inputMatrix.space = false;
+	}
 };
 
-game.onmousedown = function() {
-    game.inputMatrix.leftClick = true;
-};
-
-game.onmouseup = function() {
-    game.inputMatrix.leftClick = false;
-};
-
-game.loadAssets();</code></pre>
+document.onload = initializeGame();</code></pre>
         </article>
     </section>
 
@@ -1328,13 +621,13 @@ game.loadAssets();</code></pre>
 </div>
 
 <nav>
-    <h2><a href="index.html">Home</a></h2><h3>Classes</h3><ul><li><a href="Block.html">Block</a></li><li><a href="BlockPosition.html">BlockPosition</a></li><li><a href="BlockSector.html">BlockSector</a></li><li><a href="DefaultWorldGenerator.html">DefaultWorldGenerator</a></li><li><a href="EmptySectorGenerator.html">EmptySectorGenerator</a></li><li><a href="Player.html">Player</a></li><li><a href="SectoredBlockMap.html">SectoredBlockMap</a></li><li><a href="WorldGenerator.html">WorldGenerator</a></li></ul><h3>Namespaces</h3><ul><li><a href="game.html">game</a></li></ul><h3>Global</h3><ul><li><a href="global.html#concatRows">concatRows</a></li><li><a href="global.html#GAME_TYPE">GAME_TYPE</a></li><li><a href="global.html#getTileRow">getTileRow</a></li></ul>
+    <h2><a href="index.html">Home</a></h2><h3>Namespaces</h3><ul><li><a href="RouteEngine.html">RouteEngine</a></li><li><a href="game_.html">game</a></li></ul><h3>Classes</h3><ul><li><a href="Background.html">Background</a></li><li><a href="Block.html">Block</a></li><li><a href="BlockPosition.html">BlockPosition</a></li><li><a href="BlockSector.html">BlockSector</a></li><li><a href="DefaultWorldGenerator.html">DefaultWorldGenerator</a></li><li><a href="EmptySectorGenerator.html">EmptySectorGenerator</a></li><li><a href="Game.html">Game</a></li><li><a href="ImageLoadStack.html">ImageLoadStack</a></li><li><a href="ImageSprite.html">ImageSprite</a></li><li><a href="Player.html">Player</a></li><li><a href="SectoredBlockMap.html">SectoredBlockMap</a></li><li><a href="Sound.html">Sound</a></li><li><a href="SuperFlatGrassWorldGenerator.html">SuperFlatGrassWorldGenerator</a></li><li><a href="TextSprite.html">TextSprite</a></li><li><a href="WorldGenerator.html">WorldGenerator</a></li></ul><h3>Global</h3><ul><li><a href="global.html#GAME_TYPE">GAME_TYPE</a></li><li><a href="global.html#concatRows">concatRows</a></li><li><a href="global.html#getTileRow">getTileRow</a></li><li><a href="global.html#loadIdImage">loadIdImage</a></li><li><a href="global.html#loadImage">loadImage</a></li></ul>
 </nav>
 
 <br class="clear">
 
 <footer>
-    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.5.5</a> on Mon Aug 27 2018 21:57:52 GMT-0400 (EDT)
+    Documentation generated by <a href="https://github.com/jsdoc/jsdoc">JSDoc 4.0.0</a> on Tue Dec 27 2022 22:10:39 GMT-0500 (Eastern Standard Time)
 </footer>
 
 <script> prettyPrint(); </script>

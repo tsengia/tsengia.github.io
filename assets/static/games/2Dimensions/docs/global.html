@@ -142,7 +142,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="game.js.html">game.js</a>, <a href="game.js.html#line12">line 12</a>
+        <a href="game.js.html">game.js</a>, <a href="game.js.html#line13">line 13</a>
     </li></ul></dd>
     
 
@@ -294,7 +294,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="game.js.html">game.js</a>, <a href="game.js.html#line623">line 623</a>
+        <a href="mapClass.js.html">mapClass.js</a>, <a href="mapClass.js.html#line26">line 26</a>
     </li></ul></dd>
     
 
@@ -304,6 +304,8 @@
 
     
 </dl>
+
+
 
 
 
@@ -460,7 +462,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="game.js.html">game.js</a>, <a href="game.js.html#line607">line 607</a>
+        <a href="mapClass.js.html">mapClass.js</a>, <a href="mapClass.js.html#line10">line 10</a>
     </li></ul></dd>
     
 
@@ -470,6 +472,8 @@
 
     
 </dl>
+
+
 
 
 
@@ -511,6 +515,431 @@
 
 
         
+            
+
+    
+
+    
+    <h4 class="name" id="loadIdImage"><span class="type-signature"></span>loadIdImage<span class="signature">(src, width, height, id)</span><span class="type-signature"> &rarr; {Image}</span></h4>
+    
+
+    
+
+
+
+
+
+
+
+
+
+
+
+    <h5>Parameters:</h5>
+    
+
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>src</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">String</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">The source URI for the image to be loaded</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>width</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">Integer</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">The width in pixels of the image</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>height</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">Integer</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">The height in pixels of the image</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>id</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">Integer</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">The ID of the image. Used by <a href="ImageLoadStack.html">ImageLoadStack</a>s.</td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="RouteEngineA1.js.html">RouteEngineA1.js</a>, <a href="RouteEngineA1.js.html#line608">line 608</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<h5>Returns:</h5>
+
+        
+<div class="param-desc">
+    An Image object, regardless of whether it has loaded yet or not.
+</div>
+
+
+
+<dl>
+    <dt>
+        Type
+    </dt>
+    <dd>
+        
+<span class="param-type">Image</span>
+
+
+    </dd>
+</dl>
+
+    
+
+
+
+
+
+        
+            
+
+    
+
+    
+    <h4 class="name" id="loadImage"><span class="type-signature"></span>loadImage<span class="signature">(src, width, height)</span><span class="type-signature"> &rarr; {Image}</span></h4>
+    
+
+    
+
+
+
+
+
+
+
+
+
+
+
+    <h5>Parameters:</h5>
+    
+
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>src</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">String</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">The source URI for the image to be loaded</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>width</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">Integer</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">The width in pixels of the image</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>height</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">Integer</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">The height in pixels of the image</td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="RouteEngineA1.js.html">RouteEngineA1.js</a>, <a href="RouteEngineA1.js.html#line624">line 624</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<h5>Returns:</h5>
+
+        
+<div class="param-desc">
+    An Image object, regardless of whether it has loaded yet or not.
+</div>
+
+
+
+<dl>
+    <dt>
+        Type
+    </dt>
+    <dd>
+        
+<span class="param-type">Image</span>
+
+
+    </dd>
+</dl>
+
+    
+
+
+
+
+
+        
     
 
     
@@ -526,13 +955,13 @@
 </div>
 
 <nav>
-    <h2><a href="index.html">Home</a></h2><h3>Classes</h3><ul><li><a href="Block.html">Block</a></li><li><a href="BlockPosition.html">BlockPosition</a></li><li><a href="BlockSector.html">BlockSector</a></li><li><a href="DefaultWorldGenerator.html">DefaultWorldGenerator</a></li><li><a href="EmptySectorGenerator.html">EmptySectorGenerator</a></li><li><a href="Player.html">Player</a></li><li><a href="SectoredBlockMap.html">SectoredBlockMap</a></li><li><a href="WorldGenerator.html">WorldGenerator</a></li></ul><h3>Namespaces</h3><ul><li><a href="game.html">game</a></li></ul><h3>Global</h3><ul><li><a href="global.html#concatRows">concatRows</a></li><li><a href="global.html#GAME_TYPE">GAME_TYPE</a></li><li><a href="global.html#getTileRow">getTileRow</a></li></ul>
+    <h2><a href="index.html">Home</a></h2><h3>Namespaces</h3><ul><li><a href="RouteEngine.html">RouteEngine</a></li><li><a href="game_.html">game</a></li></ul><h3>Classes</h3><ul><li><a href="Background.html">Background</a></li><li><a href="Block.html">Block</a></li><li><a href="BlockPosition.html">BlockPosition</a></li><li><a href="BlockSector.html">BlockSector</a></li><li><a href="DefaultWorldGenerator.html">DefaultWorldGenerator</a></li><li><a href="EmptySectorGenerator.html">EmptySectorGenerator</a></li><li><a href="Game.html">Game</a></li><li><a href="ImageLoadStack.html">ImageLoadStack</a></li><li><a href="ImageSprite.html">ImageSprite</a></li><li><a href="Player.html">Player</a></li><li><a href="SectoredBlockMap.html">SectoredBlockMap</a></li><li><a href="Sound.html">Sound</a></li><li><a href="SuperFlatGrassWorldGenerator.html">SuperFlatGrassWorldGenerator</a></li><li><a href="TextSprite.html">TextSprite</a></li><li><a href="WorldGenerator.html">WorldGenerator</a></li></ul><h3>Global</h3><ul><li><a href="global.html#GAME_TYPE">GAME_TYPE</a></li><li><a href="global.html#concatRows">concatRows</a></li><li><a href="global.html#getTileRow">getTileRow</a></li><li><a href="global.html#loadIdImage">loadIdImage</a></li><li><a href="global.html#loadImage">loadImage</a></li></ul>
 </nav>
 
 <br class="clear">
 
 <footer>
-    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.5.5</a> on Mon Aug 27 2018 21:57:52 GMT-0400 (EDT)
+    Documentation generated by <a href="https://github.com/jsdoc/jsdoc">JSDoc 4.0.0</a> on Tue Dec 27 2022 22:10:39 GMT-0500 (Eastern Standard Time)
 </footer>
 
 <script> prettyPrint(); </script>

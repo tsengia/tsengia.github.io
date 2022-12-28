@@ -18,7 +18,7 @@ In this article, I'll show how to play the game, how it works, and discuss some 
 </div>
 
 ## Playing 2Dimensions
-You can play 2Dimensions from your web browser by clicking on [this link](assets/static/games/2Dimensions/game.html).
+You can play 2Dimensions on your web browser by clicking on [this link](assets/static/games/2Dimensions/game.html).
 
 The controls are:
 - WASD - Move
