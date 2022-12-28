@@ -1,0 +1,16 @@
+<html>
+<body>
+<input type="file" onchange="encodeImageFileAsURL(this)" id="ft" />
+<button type="button" onclick="encodeImageFileAsURL(document.getElementById('ft'))" >blarg</button>
+
+</body> <script> function 
+encodeImageFileAsURL(element) {
+  var file = element.files[0]
+  var reader = new FileReader();
+  reader.onloadend = function() {
+    document.write(reader.result)
+  }
+  reader.readAsDataURL(file);
+}
+</script>
+</body</html>
