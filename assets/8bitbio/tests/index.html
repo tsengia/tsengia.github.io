@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>RouteEngineA1 Testing</title>
+</head>
+<body>
+<canvas id='canvas' height='200' width='200' ><b>Your browser doesn't support HTML5 canvas!</b></canvas>
+<script type='text/javascript' src='RouteEngineA1.js' ></script>
+<script type='text/javascript' >
+var g = new Game(document.getElementById("canvas"));
+var i = new ImageLoadStack();
+i.addImage("none.png", 20, 20);
+
+g.onload = function() {
+	var s = new ImageSprite(i.images[0], 50, 50);
+	g.sprites.push(s);
+	var t = new TextSprite("Hello World", 10, 25);
+	t.color = "#FFF";
+	g.sprites.push(t);
+	g.background = new Background("color", "#5C5");
+	g.render();
+	
+g.onmousedown = function() {
+if(g.sprites[1].inHit(g.mouseX, g.mouseY)) {
+g.sprites[1].color = "#68F";
+}
+
+if(g.sprites[0].inHit(g.mouseX, g.mouseY)) {
+g.sprites[0].clicked = true;
+g.sprites[0].x = g.mouseX;
+g.sprites[0].y = g.mouseY;
+}
+
+g.render();
+};
+
+g.onmouseup = function() {
+g.sprites[0].clicked = false;	
+};
+
+g.onmousemove = function() {
+if(g.sprites[1].inHit(g.mouseX, g.mouseY)) {
+g.sprites[1].color = "#FFF";
+}
+else {
+g.sprites[1].color = "#222";
+}
+
+if(g.sprites[0].clicked) {
+g.sprites[0].x = g.mouseX;
+g.sprites[0].y = g.mouseY;
+
+}
+g.render();
+};
+
+
+};
+
+i.onload = function() {
+	g.onload();
+};
+i.start();
+</script>
+</body>
+</html>

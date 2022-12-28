@@ -1,0 +1,485 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>JSDoc: Class: Background</title>
+
+    <script src="scripts/prettify/prettify.js"> </script>
+    <script src="scripts/prettify/lang-css.js"> </script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <link type="text/css" rel="stylesheet" href="styles/prettify-tomorrow.css">
+    <link type="text/css" rel="stylesheet" href="styles/jsdoc-default.css">
+</head>
+
+<body>
+
+<div id="main">
+
+    <h1 class="page-title">Class: Background</h1>
+
+    
+
+
+
+
+<section>
+
+<header>
+    
+        <h2><span class="attribs"><span class="type-signature"></span></span>Background<span class="signature">(type, value)</span><span class="type-signature"></span></h2>
+        
+            <div class="class-description">Background</div>
+        
+    
+</header>
+
+<article>
+    <div class="container-overview">
+    
+        
+
+    
+    <h2>Constructor</h2>
+    
+
+    
+    <h4 class="name" id="Background"><span class="type-signature"></span>new Background<span class="signature">(type, value)</span><span class="type-signature"></span></h4>
+    
+
+    
+
+
+
+<div class="description">
+    This Background class is used as a simple way to set backgrounds for games. Background Objects can have three different types: "color", "image" or "img", "clear" If the background type is "color", then the background will render as the solid color as specified by the value parameter you pass in. If the background type is "img" or "image" (there is no difference), then the background will render as the image that you pass in via the value parameter. If the background type is "clear", then the background will not render at all.
+</div>
+
+
+
+
+
+
+
+
+
+    <h5>Parameters:</h5>
+    
+
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>type</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">String</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">The type of background that this Background object will be. Acceptable values: "color", "image" or "img", "clear"</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>value</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">Object</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">This parameter is either a HTML color ("#00F" or "#0000FF") or an image object. Depends upon the type you specified. If the type is "clear", then this parameter is ignored</td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+
+
+
+
+
+    <h5 class="subsection-title">Properties:</h5>
+
+    
+
+<table class="props">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>color</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">String</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">The current color of this Background object if it is the "color" type</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>img</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">Object</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">The current background image if this object is the "image" or "img" type.</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>type</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">String</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">The type of background this Background object currently is. Acceptable values: "color", "image" or "img", "clear"</td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="RouteEngineA1.js.html">RouteEngineA1.js</a>, <a href="RouteEngineA1.js.html#line233">line 233</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    
+    </div>
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+        <h3 class="subsection-title">Methods</h3>
+
+        
+            
+
+    
+
+    
+    <h4 class="name" id=".draw"><span class="type-signature">(static) </span>draw<span class="signature">(game)</span><span class="type-signature"></span></h4>
+    
+
+    
+
+
+
+<div class="description">
+    - Renders the background onto the game canvas according to the type of background this is.
+</div>
+
+
+
+
+
+
+
+
+
+    <h5>Parameters:</h5>
+    
+
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>game</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type"><a href="Game.html">Game</a></span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">The <a href="Game.html">Game</a> that we are rendering this background onto</td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="RouteEngineA1.js.html">RouteEngineA1.js</a>, <a href="RouteEngineA1.js.html#line255">line 255</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+        
+    
+
+    
+
+    
+</article>
+
+</section>
+
+
+
+
+</div>
+
+<nav>
+    <h2><a href="index.html">Home</a></h2><h3>Namespaces</h3><ul><li><a href="RouteEngine.html">RouteEngine</a></li><li><a href="game_.html">game</a></li></ul><h3>Classes</h3><ul><li><a href="Background.html">Background</a></li><li><a href="Block.html">Block</a></li><li><a href="BlockPosition.html">BlockPosition</a></li><li><a href="BlockSector.html">BlockSector</a></li><li><a href="DefaultWorldGenerator.html">DefaultWorldGenerator</a></li><li><a href="EmptySectorGenerator.html">EmptySectorGenerator</a></li><li><a href="Game.html">Game</a></li><li><a href="ImageLoadStack.html">ImageLoadStack</a></li><li><a href="ImageSprite.html">ImageSprite</a></li><li><a href="Player.html">Player</a></li><li><a href="SectoredBlockMap.html">SectoredBlockMap</a></li><li><a href="Sound.html">Sound</a></li><li><a href="SuperFlatGrassWorldGenerator.html">SuperFlatGrassWorldGenerator</a></li><li><a href="TextSprite.html">TextSprite</a></li><li><a href="WorldGenerator.html">WorldGenerator</a></li></ul><h3>Global</h3><ul><li><a href="global.html#GAME_TYPE">GAME_TYPE</a></li><li><a href="global.html#concatRows">concatRows</a></li><li><a href="global.html#getTileRow">getTileRow</a></li><li><a href="global.html#loadIdImage">loadIdImage</a></li><li><a href="global.html#loadImage">loadImage</a></li></ul>
+</nav>
+
+<br class="clear">
+
+<footer>
+    Documentation generated by <a href="https://github.com/jsdoc/jsdoc">JSDoc 4.0.0</a> on Tue Dec 27 2022 22:10:39 GMT-0500 (Eastern Standard Time)
+</footer>
+
+<script> prettyPrint(); </script>
+<script src="scripts/linenumber.js"> </script>
+</body>
+</html>
