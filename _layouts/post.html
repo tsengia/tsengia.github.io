@@ -6,7 +6,9 @@ layout: default
   {{ page.title }}
 </h1>
 {% if page.image %}
-  <img src="{{ site.github.url }}/assets/img/{{ page.image }}">
+  {% capture splashimgpath %}/assets/img/{{ page.image }}{% endcapture %} 
+  {% imagesize splashimgpath:opengraph %}
+  <img src="{{ site.github.url }}/assets/img/{{ page.image }}" alt="{{ page.image-alt }}" {% imagesize splashimgpath:props %} />
 {% endif %}
 {% if site.hide_post_date != true %}
   {% include post-date.html %}

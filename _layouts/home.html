@@ -5,11 +5,14 @@ layout: default
 {% for post in paginator.posts %}
   <div class="posts-container">
     <h1>
-      <a href="{{ site.github.url }}{{ post.url }}">{{ post.title }}</a>
+      <a href="{{ site.github.url }}{{ post.url }}" >{{ post.title }}</a>
     </h1>
     {% if post.image %}
+      {% capture splashimgpath %}/assets/img/{{ post.image }}{% endcapture %}
       <div class="thumbnail-container">
-        <a href="{{ site.github.url }}{{ post.url }}"><img src="{{ site.github.url }}/assets/img/{{ post.image }}"></a>
+        <a href="{{ site.github.url }}{{ post.url }}">
+          <img src="{{ site.github.url }}{{ splashimgpath }}" alt="{{ post.image-alt }}" {% imagesize splashimgpath:props %} />
+        </a>
       </div>
     {% endif %}
     <p>
