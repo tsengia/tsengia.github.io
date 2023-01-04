@@ -5,6 +5,7 @@ author: "Tyler Sengia"
 categories: web, javascript, canvas, game
 tags: [web, javascript, canvas, game]
 image: 2dimensions-splash.png
+image-alt: Screenshot of the 2Dimensions game, which shows a yellow player sprite digging a hole into the dirt blocks.
 ---
 
 Block based sandbox games are fantastic. Minecraft and Terraria dominate the market for it, but it's always fun to try to create your own games. Many other open source "voxel" based games and frameworks exist, such as [Voxel JS](https://www.voxeljs.com/) and [MineTest](https://www.minetest.net/).
