@@ -10,21 +10,23 @@ tags: [about]
 
 I'm a software engineer that enjoys writing code for humans.  
 
-I've been programming since a very young age, and in 2022 I graduated from Penn State with a degree in Computer Engineering.  
-
 You will find that my computer interests vary widely.
+
+This website hosts some of my thoughts, experiments, and examples of how to use some common software tools and paradimes.
 
 ## Software Engineering Profile
 ### Languages
 C/C++, Python 3, Java, Bash, SQL  
 
 ### Libraries I've used
-Web: ReactJS, Vue2, Axios, Google Blockly    
+Web: ReactJS, Vue2, Axios, Google Blockly  
+
 Python: matplotlib, flask, sql-alchemy, marshmallow  
+
 C++: OpenCV, Google Protocol Buffers, cJSON, ZMQ   
 
 ### Tools
-Linux, CMake, Zephyr OS, AWS, Docker, GitLab, Uptime Kuma  
+Linux, CMake, Zephyr OS, AWS, Docker, GitLab, [Uptime Kuma](https://github.com/louislam/uptime-kuma)  
 
 ### Editors
 I am a personal fan of Vim, but I don't mind VS Code or Nano.

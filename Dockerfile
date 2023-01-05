@@ -11,10 +11,11 @@ WORKDIR /opt/website
 # Install jekyll and associated plugins
 COPY Gemfile .
 COPY lagrange.gemspec .
+COPY Gemfile.lock .
 RUN bundle install
 
 # Open up the web port
 EXPOSE 4000
 
 # Start Jekyll
-ENTRYPOINT jekyll serve -H 0.0.0.0
+ENTRYPOINT jekyll serve -w -I -H 0.0.0.0
