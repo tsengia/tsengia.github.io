@@ -17,4 +17,4 @@ RUN bundle install
 EXPOSE 4000
 
 # Start Jekyll
-ENTRYPOINT jekyll serve -H 0.0.0.0
+ENTRYPOINT jekyll serve -w -I -H 0.0.0.0
