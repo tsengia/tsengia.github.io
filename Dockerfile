@@ -17,5 +17,6 @@ RUN bundle install
 # Open up the web port
 EXPOSE 4000
 
-# Start Jekyll
+# Start Jekyll in production mode
+RUN export JEKYLL_ENV=production
 ENTRYPOINT jekyll serve -w -I -H 0.0.0.0
