@@ -26,7 +26,7 @@ Python: matplotlib, flask, sql-alchemy, marshmallow
 C++: OpenCV, Google Protocol Buffers, cJSON, ZMQ   
 
 ### Tools
-Linux, CMake, Zephyr OS, AWS, Docker, GitLab, Uptime Kuma  
+Linux, CMake, Zephyr OS, AWS, Docker, GitLab, [Uptime Kuma](https://github.com/louislam/uptime-kuma)  
 
 ### Editors
 I am a personal fan of Vim, but I don't mind VS Code or Nano.

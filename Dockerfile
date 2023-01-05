@@ -11,6 +11,7 @@ WORKDIR /opt/website
 # Install jekyll and associated plugins
 COPY Gemfile .
 COPY lagrange.gemspec .
+COPY Gemfile.lock .
 RUN bundle install
 
 # Open up the web port
