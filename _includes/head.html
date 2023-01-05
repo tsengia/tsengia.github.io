@@ -6,13 +6,12 @@
       {{ page.title }} | {{ site.title }}
     {% endif %}
   </title>
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta charset="utf-8">
-  <link rel="stylesheet" href="{{ site.github.url }}/assets/css/main.css">
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta charset="utf-8" />
+  <link rel="stylesheet" href="{{ site.github.url }}/assets/css/main.css" />
   <!-- Use Atom -->
   {% feed_meta %}
 
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
   <script type="text/javascript" async
     src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/MathJax.js?config=TeX-MML-AM_CHTML">
     MathJax.Hub.Config({
@@ -42,6 +41,10 @@
     }
 
     {% include syntax.css %}
+  </style>
+  <style type="text/css" >
+    {% include font-awesome.min.css %}
+  </style>
   </style>
   <!-- Google Analytics -->
   {% include google-analytics.html %}
