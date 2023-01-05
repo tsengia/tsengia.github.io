@@ -25,3 +25,10 @@ plugins:             [jekyll-paginate, jekyll-sitemap, jekyll-feed, jekyll-seo-t
 title:		           "Tyler Sengia's Blog"
 description:	       'Software engineering blog, tutorials, and examples.'
 author:              'Tyler Sengia'
+
+defaults:
+  -
+    scope:
+      path:            "assets/*"
+    values:
+      sitemap:         false
