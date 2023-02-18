@@ -13,8 +13,7 @@ I quickly picked up and enjoyed web development with JavaScript and HTML5, espec
 Eventually, I figured out how to use PHP and MySQL to create some websites, which I've preserved on this website too.  
 
 ## Keypad Widget
-My father is an Instructional Tech Specialist, which means he helps teachers use technology in the classroom, but in a more involved method than IT.  
-He once asked me to code up a little web widget for students to use for the popular "breakout room" activity.  
+My father is an Instructional Tech Specialist, which means he helps teachers use technology in the classroom. He once asked me to code up a little web widget for students to use for the popular "breakout room" activity.  
 
 So using HTML and JavaScript I made a webpage that shows a keypad.
 If you type in the right combo, it flashes "Success!".
