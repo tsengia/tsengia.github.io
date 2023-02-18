@@ -16,7 +16,7 @@ Our team won first place overall, as well as the first place prize for the Nitta
 <div class="note" >
   Link to souce code: <a href="https://github.com/tsengia/HackPSU-Sauron" >tsengia/HackPSU-Sauron in GitHub</a><br />
   Link to demo video 1: <a href="https://youtu.be/jCYQIU0-NDI" >Sauron Demo Video 1 on YouTube </a><br />
-  Link to demo video 2: <a href="" > Sauron Demo Video 2 on YouTube </a>
+  Link to demo video 2: <a href="https://youtu.be/qyVEQ1Qsfvo" > Sauron Demo Video 2 on YouTube </a>
 </div>
 
 ## Overview of Sauron
@@ -94,5 +94,6 @@ But I also broke up tasks according to individual components and distributed the
 
 <div style="text-align: center;" >
 <img src="assets/img/sauron/hackpsu_team_photo.png" alt="Photo of my team after the hackathon" /><br />
-<small>My team and I after the hackathon.</small>
+<small>My team and I after the hackathon.</small><br />
+<small>From left to right: Tyler, Ralph, Normen, Jared, Michael</small><br />
 </div>
