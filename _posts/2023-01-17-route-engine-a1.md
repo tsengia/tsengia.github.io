@@ -1,0 +1,16 @@
+---
+layout: post
+title: "RouteEngineA1: Homerolled IDE for HTML5 Canvas development"
+author: "Tyler Sengia"
+categories: web, javascript, canvas, ide
+tags: [web, javascript, canvas, ide]
+image: routea1-engine-ide-splash.png
+image-alt: Screenshot of the RouteEngineA1 IDE.
+---
+
+While learning JavaScript and HTML5 for game development, I created my own web-based IDE for rapidly testing and debugging the games I would create.  
+I callled my IDE the RouteEngineA1 studio.  
+
+<div class="note" >
+  <a href="assets/static/route-engine-a1/studio.html" >Try out the RouteEngineA1 studio here!</a>
+</div>
