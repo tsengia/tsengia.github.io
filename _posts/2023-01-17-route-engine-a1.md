@@ -9,7 +9,7 @@ image-alt: Screenshot of the RouteEngineA1 IDE.
 ---
 
 While learning JavaScript and HTML5 for game development, I created my own web-based IDE for rapidly testing and debugging the games I would create.  
-I callled my IDE the RouteEngineA1 studio.  
+I called my IDE the RouteEngineA1 studio.  
 
 The IDE has code highlighting thanks to a JavaScript library called [Code Mirror](https://codemirror.net/).
 
