@@ -43,6 +43,7 @@ Writing the website taught me about PHP, how IP addresses and HTTP works.
 <div class="note" >
 You can see 8BitBio in it's preserved state here: <a href="assets/8bitbio/index.html" > 8bitbio/index.html </a>
 </div>
+<br />
 <div style="text-align: center;" >
 <img src="assets/img/8bitbio-splash.png" alt="Screenshot of the 8BitBio homepage." />  
 </div>
@@ -56,7 +57,7 @@ Some of the links on the website are broken and lost to time forever.
 <div class="note" >
 You can see the Proanimation's Weebly site in it's preserved state here: <a href="assets/weebly/home.html" > weebly/home.html </a>
 </div>
-
+<br />
 <div style="text-align: center;" >
 <img src="assets/img/proanimation-splash.png" alt="Screenshot of the Proanimation's Site homepage." />  
 </div>
