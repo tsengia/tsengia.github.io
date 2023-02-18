@@ -12,7 +12,7 @@ I'm a software engineer that enjoys writing code for humans.
 
 You will find that my computer interests vary widely.
 
-This website hosts some of my thoughts, experiments, and examples of how to use some common software tools and paradimes.
+This website hosts some of my old projects, thoughts, experiments, and examples of how to use some common software tools and paradimes.
 
 ## Software Engineering Profile
 ### Languages
