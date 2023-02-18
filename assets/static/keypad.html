@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html><head>
+<meta http-equiv="content-type" content="text/html; charset=UTF-8"></head><body>
+<style type="text/css">
+#lock {
+width: 500px;
+height: 550px;
+background-color: #AAA;
+}
+#output {
+padding-top: 30px;
+color: #0F0;
+font-family: monospace;
+font-size: 80px;
+background-color: #000;
+min-height: 120px;
+min-width: 100%;
+text-align: center;
+}
+#key-grid {
+text-align: center;
+}
+#zero {
+width: 480px;
+text-align: center;
+height: 90px;
+font-size: 30px;
+}
+.row {
+text-align: center;
+height: 90px;
+}
+.row button {
+height: 100%;
+width: 160px;
+padding: 2px;
+font-size: 30px;
+}
+.wrong {
+color: #F00;
+}
+</style>
+<div id="lock">
+<div id="output">Success!</div><br>
+<div id="key-grid">
+<div class="row"><button type="button" onclick="doKey(event);">7</button><button type="button" onclick="doKey(event);">8</button><button type="button" onclick="doKey(event);">9</button></div>
+<div class="row"><button type="button" onclick="doKey(event);">4</button><button type="button" onclick="doKey(event);">5</button><button type="button" onclick="doKey(event);">6</button></div>
+<div class="row"><button type="button" onclick="doKey(event);">1</button><button type="button" onclick="doKey(event);">2</button><button type="button" onclick="doKey(event);">3</button></div>
+<div><button type="button" onclick="doKey(event);" id="zero">0</button></div>
+</div>
+</div>
+<script type="text/javascript">
+var currentInput = "";
+var pass = "48362";
+var done = false;
+
+function displayOut(msg) {
+	document.getElementById("output").innerHTML = msg;
+}
+
+function doKey(e) {
+	currentInput += event.target.childNodes[0].data;
+	if(!done) {
+		displayOut(currentInput);
+		if(currentInput.length == pass.length) {
+			if(currentInput == pass) {
+				displayOut("Success!");
+				alert("Success! Call the office now!");
+				done = true;
+			}
+			else {
+				displayOut("<b class='wrong' >INCORRECT</b>");
+				currentInput = "";
+				done = false;
+			}
+		}
+	}
+}
+</script>
+
+</body></html>
