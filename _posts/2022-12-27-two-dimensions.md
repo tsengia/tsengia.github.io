@@ -1,6 +1,6 @@
 ---
 layout: post
-title: "2Dimensions"
+title: "2Dimensions: Block based HTML5 Canvas game"
 author: "Tyler Sengia"
 categories: web, javascript, canvas, game
 tags: [web, javascript, canvas, game]
