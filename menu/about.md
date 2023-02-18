@@ -19,14 +19,14 @@ This website hosts some of my thoughts, experiments, and examples of how to use 
 C/C++, Python 3, Java, Bash, SQL  
 
 ### Libraries I've used
-Web: ReactJS, Vue2, Axios, Google Blockly  
+Web: ReactJS, Vue2, Axios, Google Blockly, HTML5 Canvas, MIDI.JS  
 
 Python: matplotlib, flask, sql-alchemy, marshmallow  
 
 C++: OpenCV, Google Protocol Buffers, cJSON, ZMQ   
 
 ### Tools
-Linux, CMake, Zephyr OS, AWS, Docker, GitLab, [Uptime Kuma](https://github.com/louislam/uptime-kuma)  
+Linux, CMake, Zephyr OS, AWS, Docker, GitLab
 
 ### Editors
-I am a personal fan of Vim, but I don't mind VS Code or Nano.
+I am a personal fan of Vim, and I'm also a fan of VS Code.  
