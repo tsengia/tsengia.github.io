@@ -19,15 +19,15 @@ The final circuit did work, and taught me important lessons about simulating des
 
 ## Schematic
 The 4 bit full adder was made entirely of CMOS40XX series integrated circuits, using only AND, OR, and XOR gates.  
-![img/4bit-adder/4-bit-adder-schematic.png](Schematic of the 4 bit full adder.)
+![assets/img/4bit-adder/4-bit-adder-schematic.png](Schematic of the 4 bit full adder.)
 
 ## Prototyping
 Prototyping of the circuitry was done on a breadboard with a mess of jumper wires as shown below.  
-![img/4bit-adder/adder-prototype.jpg](Photo of the 4 bit adder prototyped on a breadboard, a mess of yellow jumper wires are used.)  
+![assets/img/4bit-adder/adder-prototype.jpg](Photo of the 4 bit adder prototyped on a breadboard, a mess of yellow jumper wires are used.)  
 
 ## Finished Product
 The 4 bit inputs could be set using the 4-bit DIP switches on the left.  
 
 The sum of the 4 bit inputs was displayed as 5 red LEDs on the right.  
 
-![img/4bit-adder/adder-full.jpg](Photo of the finished 4 bit adder soldered onto a perforated PCB.)  
+![assets/img/4bit-adder/adder-full.jpg](Photo of the finished 4 bit adder soldered onto a perforated PCB.)  
