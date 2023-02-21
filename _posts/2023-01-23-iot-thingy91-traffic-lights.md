@@ -1,18 +1,46 @@
 ---
 layout: post
-title: "2022 Hack PSU 1st place: Sauron"
+title: "ESP32: Control LED Lights over BLE"
 author: "Tyler Sengia"
-categories: iot, LTE, BLE, programming, web, c
-tags: [IoT, LTE, BLE, bluetooth, Thingy:91, programming, embedded]
+categories: iot, esp32, BLE, programming, embedded
+tags: [IoT, BLE, bluetooth, esp32, programming, embedded]
 image: thingy-91-traffic-light-splash.png
 image-alt: Diagram of LED traffic lights controlled over LTE and BLE.
 ---
 
-During my final semester at Penn State, I worked on a senior capstone project that used Nordic Thingy:91's, ESP32's, ReactJS, and an IoT protocol called oneM2M to control traffic lights over a cellular LTE connection. It was my first time working with Zephyr OS and oneM2M, and the experience was educational
+ESP32 based microcontrollers are the bread and butter for IoT applications, as well as low power communication protocols such as Bluetooth Low Energy. 
+In this post, I'll show you how to program your own ESP32 to control a set of LEDs over a BLE connection from your smart phone.
 
 <div class="note" >
-  Link to souce code: <a href="https://github.com/tsengia/iot-thingy91-traffic-lights" >tsengia/iot-thingy91-traffic-lights in GitHub</a><br />
+  Link to souce code: <a href="https://github.com/tsengia/iot-thingy91-traffic-lights/tree/main/esp32" >tsengia/iot-thingy91-traffic-lights/esp32 on GitHub</a><br />
 </div>
 
-## Project Overview
-TODO: Insert diagram photo here
+## Hardware and Schematics
+I'm using this [`ESP-WROOM-32` ESP-32S Development Board from Amazon](https://a.co/d/16fcZjt), but these instructions and code will probably work for almost any ESP32 based device.
+Just be sure to adjust the pinouts when making your circuits and programming the device.
+
+TODO: Create wiring schematic
+<div style="text-align: center; ">
+  <img src="assets/img/iot-thingy91/TODO.png " alt="Schematic showing how to wire up your ESP32 on a breadboard." />
+</div>
+
+## Setup Arduino IDE
+To program the ESP32, you will need to download the Arduino board packages for the ESP32.  
+To do this, open up your Arduino IDE and go to "File -> Preferences".  
+In the settings tab, you will see a field named "Additional Boards Manager URLs", add this URL to the field:
+https://dl.espressif.com/dl/package_esp32_index.json.
+If you already have other URLs in that box, separate them by adding a comma between them.
+Once you have added this URL, press "OK" in the dialog box to apply the changes.
+
+<div style="text-align: center; ">
+  <img src="assets/img/iot-thingy91/arduino_ide_setup_instruction_urls.png" alt="Screenshot of the Arduino IDE Preferences window with the boards URL circled in red." /><br />
+  <small>Enter your board URL to the field circled in Red and press "OK"</small><br />
+</div>
+
+## Program Device
+    Credits for NUS Code
+    Nordic UART Service
+    Note about insecure
+
+## Try it Out
+    Link to Android app for testing
