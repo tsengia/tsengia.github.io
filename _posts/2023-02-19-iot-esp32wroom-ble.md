@@ -19,11 +19,6 @@ In this post, I'll show you how to program your own ESP32 to control a set of LE
 I'm using this [`ESP-WROOM-32` ESP-32S Development Board from Amazon](https://a.co/d/16fcZjt), but these instructions and code will probably work for almost any ESP32 based device.
 Just be sure to adjust the pinouts when making your circuits and programming the device.
 
-TODO: Create wiring schematic
-<div style="text-align: center; ">
-  <img src="assets/img/iot-thingy91/TODO.png " alt="Schematic showing how to wire up your ESP32 on a breadboard." />
-</div>
-
 The following pinouts are used in the above schematic:  
 
 | *Light #*  | *Color*| *ESP32 GPIO Pin #* | *ESP32 Physical Pin #     |
@@ -38,6 +33,8 @@ The following pinouts are used in the above schematic:
 | 2          | GND    | N/A                | 14, 38, or 32 |
 
 These pin asssignments can be changed by modifying the `r1Pin`, `y1Pin`, `g1Pin`, `r2pin`, `y2pin`, and `g2pin` variables located at the top of the `btControl.ino` file. 
+
+Connect the GPIO pins from the ESP-WROOM-32 to the anode of the LEDs, and the cathode of the LEDs to a 1kOhm resistor and then to ground.
 
 The pinout of the ESP-WROOM-32 microcontroller is shown below.
 <div style="text-align: center; ">
