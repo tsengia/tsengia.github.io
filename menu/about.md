@@ -16,17 +16,18 @@ This website hosts some of my old projects, thoughts, experiments, and examples 
 
 ## Software Engineering Profile
 ### Languages
-C/C++, Python 3, Java, Bash, SQL  
+_Listed in order of preference/ability:_
+Python 3, C/C++, Bash, JavaScript, Java, SQL   
 
 ### Libraries I've used
 Web: ReactJS, Vue2, Axios, Google Blockly, HTML5 Canvas, MIDI.JS  
 
-Python: matplotlib, flask, sql-alchemy, marshmallow  
+Python: matplotlib, flask, sql-alchemy, marshmallow, FastAPI  
 
-C++: OpenCV, Google Protocol Buffers, cJSON, ZMQ   
+C/C++: OpenCV, Google Protocol Buffers, cJSON, ZMQ   
 
 ### Tools
-Linux, CMake, Zephyr OS, AWS, Docker, GitLab
+Linux, CMake, Zephyr OS, Docker, GitLab, AWS
 
 ### Editors
-I am a personal fan of Vim, and I'm also a fan of VS Code.  
+I am a personal fan of Vim, but I'm also a fan of VS Code.  
