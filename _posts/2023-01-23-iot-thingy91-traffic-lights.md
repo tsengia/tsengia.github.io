@@ -8,7 +8,7 @@ image: thingy-91-traffic-light-splash.png
 image-alt: Diagram of LED traffic lights controlled over LTE and BLE.
 ---
 
-ESP32 based microcontrollers are the bread and butter for IoT applications, as well as low power communication protocols such as Bluetooth Low Energy. 
+ESP32 based microcontrollers are great for IoT applications, and allow you to use low power communication protocols such as Bluetooth Low Energy. 
 In this post, I'll show you how to program your own ESP32 to control a set of LEDs over a BLE connection from your smart phone.
 
 <div class="note" >
@@ -24,8 +24,28 @@ TODO: Create wiring schematic
   <img src="assets/img/iot-thingy91/TODO.png " alt="Schematic showing how to wire up your ESP32 on a breadboard." />
 </div>
 
+The following pinouts are used in the above schematic:  
+
+| *Light #* | *Color* | *ESP32 GPIO Pin #* | *ESP32 Physical Pin # |
+|-----------:|:-------|:-------------:|:-------------------------:|
+| 1 | Red    | GPIO23 | 37 |
+| 1 | Yellow | GPIO22 | 36 |
+| 1 | Green  | GPIO21 | 33 |
+| 2 | Red    | GPIO19 | 31 |
+| 2 | Yellow | GPIO18 | 30 |
+| 2 | Green  | GPIO5  | 29 |
+| 1 | GND    | N/A    | 14, 38, or 32 |
+| 2 | GND    | N/A    | 14, 38, or 32 |
+
+These pin asssignments can be changed by modifying the `r1Pin`, `y1Pin`, `g1Pin`, `r2pin`, `y2pin`, and `g2pin` variables located at the top of the `btControl.ino` file. 
+
+The pinout of the ESP-WROOM-32 microcontroller is shown below.
+<div style="text-align: center; ">
+  <img src="assets/img/iot-thingy91/esp32_pinout.jpg " alt="Pinout diagram of theESP-WROOM-32 microcontroller." />
+</div>
+
 ## Setup Arduino IDE
-To program the ESP32, you will need to download the Arduino board packages for the ESP32.  
+To program the ESP32, you will need to download the Arduino board packages for the ESP-WROOM-32.  
 To do this, open up your Arduino IDE and go to "File -> Preferences".  
 In the settings tab, you will see a field named "Additional Boards Manager URLs", add this URL to the field:
 https://dl.espressif.com/dl/package_esp32_index.json.
@@ -38,9 +58,20 @@ Once you have added this URL, press "OK" in the dialog box to apply the changes.
 </div>
 
 ## Program Device
-    Credits for NUS Code
-    Nordic UART Service
-    Note about insecure
+Once you have the correct boards installed onto your Arduino IDE, you can then open up the source code to program your device with.  
+
+To program your device with this software, select the "Node32s" board type in "Tools -> Board -> ESP32 Arduino -> Node32s".
+Select the correct COM/tty port in "Tools -> Port".
+
+Press the upload button to compile and upload the program to the ESP32.  
+
+While uploading the program, you will have to press and hold the "Boot Button" on the ESP-WROOM-32.
+This button is located to the right of the micro USB connector, as circled in red in the image below.
+
+<div style="text-align: center; ">
+  <img src="assets/img/iot-thingy91/esp32_boot_button.png" alt="Boot button of the ESP-WROOM-32 circled in red, located to the right of the microUSB connector." /><br />
+  <small>You will need to press and hold this button when starting the upload of your program.</small><br />
+</div>
 
 ## Try it Out
     Link to Android app for testing
