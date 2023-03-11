@@ -1,6 +1,6 @@
 ---
 layout: post
-title: "AWS: Thought while learning AWS AppSync"
+title: "AWS: Thoughts while learning AWS AppSync"
 author: "Tyler Sengia"
 categories: web, aws, serverless, graphql
 tags: [web, aws, serverless, graphql]
