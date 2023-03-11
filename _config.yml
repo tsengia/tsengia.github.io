@@ -23,7 +23,7 @@ plugins:             [jekyll-paginate, jekyll-sitemap, jekyll-feed, jekyll-seo-t
 
 # Customise atom feed settings (this is where Jekyll-Feed gets configuration information)
 title:		           "Tyler Sengia's Blog"
-description:	       'AI/ML, DevOps, IoT, tutorials, and examples.'
+description:	       'Web, DevOps, IoT, tutorials, and examples.'
 author:              'Tyler Sengia'
 
 url: https://www.tsengia.net

@@ -38,7 +38,7 @@ One VM instance hosted the Grafana Dashboard, and the other hosted the Flask Web
 Could we have used Kubernetes or some sort of serverless architecture?  
 Sure, but we only had about 12 hours to build all of this, so I stuck with what was quick and understandable.
 
-We got a fantastic domain name `hack-sauron.mooo.com` through [Afraid DNS](https://freedns.afraid.org/), which offers free DNS subdomains. It's a fantastic service and part of why I love the internet.
+We got a domain name `hack-sauron.mooo.com` through [Afraid DNS](https://freedns.afraid.org/), which offers free DNS subdomains. It's a fantastic service and part of why I love the internet.
 
 ## Grafana Dashboard
 Our Dashboard was truly the selling point of our entry.  
@@ -72,7 +72,7 @@ We envisioned adding an "anomaly detector" to Sauron to detect car crashes and o
 Then, Grafana would work its polling magic our randomly generated event reports would be display on the Dashboard.  
 
 ## Manual Report Submission
-As mentioned earlier, Sauron provides users the ability to upload event reports from their own mobile devices. Because Sauron is hosted in the cloud, mobile users could use with web browser to open up the form show below to submit event reports.
+As mentioned earlier, Sauron provides users the ability to upload event reports from their own mobile devices. Because Sauron is hosted in the cloud, mobile users could use their web browser to open up the form show below to submit event reports.
 
 <div style="text-align: center;" >
 <img src="assets/img/sauron/user-report-submission.png" alt="Screenshow of the simple HTML form that mobile users could use to upload event reports. Fields include Type, Latitude, Longitude, Description, and Image." />  
