@@ -8,7 +8,7 @@ image: piano-practice-splash.png
 image-alt: Screenshot of the Piano Practice web-app, treble and bass cleffs are visible.
 ---
 
-During my sophomore year of college, I was stuck at home since it was peak COVID pandemic. During that time I made a fun little web app that uses Vue and MIDI.JS to let you play a virtual piano from your web browser.
+While I was stuck at home during peak COVID lockdown, I made a fun little web app that uses Vue and MIDI.JS to let you play a virtual piano from your web browser.
 
 <div class="note" >
   <a href="https://master.d1e5qjqqw33xnw.amplifyapp.com/" >Try out Piano Practice here!</a>
@@ -34,8 +34,7 @@ Piano Practice is a webapp utilizing the following libraries:
 - [MIDI.JS](https://github.com/mudcube/MIDI.js/) for decoding and playing SoundFonts
 - [abc.js](https://github.com/paulrosen/abcjs) for rendering music notes
 
-When the users presses the "Load Soundfont" button, an HTTP GET request is sent using Axios to retrieve the grand piano Soundfont.  
-This Soundfont is loaded into MIDI JS using the `MIDI.loadPlugin`. Once it is loaded, user key presses trigger calls to `MIDI.noteOn()` to play the note, and key releases trigger calls to `MIDI.noteOff()`. MIDI JS uses the browsers Web Audio API to produce the sounds.
+When the users presses the "Load Soundfont" button, the `MIDI.loadPlugin` function is call to load the grandpiano soundfont. Once it is loaded, user key presses trigger calls to `MIDI.noteOn()` to play the note, and key releases trigger calls to `MIDI.noteOff()`. MIDI JS uses the browser's Web Audio API to produce the sounds.
 
 # The `Note` class
 Within [note.js](https://github.com/tsengia/PianoPractice/blob/master/js/note.js) I define several classes:
