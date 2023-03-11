@@ -1,0 +1,8 @@
+!include <awslib/AWSCommon>
+!include <awslib/ApplicationIntegration/all.puml>
+!include <awslib/Compute/all.puml>
+!include <awslib/NetworkingAndContentDelivery/all.puml>
+
+AppSync(AppSync, "Graph QL endpoint", "")
+
+CloudFrontEdgeLocation(CloudFrontEdgeLocation, "SPA Application Source", "")
