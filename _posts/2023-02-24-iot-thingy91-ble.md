@@ -1,6 +1,6 @@
 ---
 layout: post
-title: "Thingy91: Connecting to an ESP32 over BLE"
+title: "Capstone Part 2: Connecting a Thingy:91 to an ESP32 over BLE"
 author: "Tyler Sengia"
 categories: iot, thingy91, esp32, BLE, programming, embedded
 tags: [IoT, BLE, bluetooth, thingy91, esp32, programming, embedded]
@@ -8,7 +8,7 @@ image: thingy91-ble-splash.png
 image-alt: Diagram of LED traffic lights controlled over LTE and BLE.
 ---
 
-The Thingy:91 is an LTE and BLE capable IoT prototyping device created by Nordic Semiconductor. In this post, I'll show you how to pair your Thingy:91 to an ESP32 over BLE.
+In my second post about my senior capstone project, I'll explain how I connected a Thingy:91 to the ESP32 over Bluetooth Low Energy.
 
 <div class="note" >
   Link to souce code: <a href="https://github.com/tsengia/iot-thingy91-traffic-lights/tree/main/thingy/traffic_light_nrf9160" >tsengia/iot-thingy91-traffic-lights/thingy/traffic_light_nrf9160 on GitHub</a><br />

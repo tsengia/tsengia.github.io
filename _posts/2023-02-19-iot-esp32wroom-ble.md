@@ -1,6 +1,6 @@
 ---
 layout: post
-title: "ESP32: Control LED Lights over BLE"
+title: "Capstone Part 1: Control LED Lights over BLE"
 author: "Tyler Sengia"
 categories: iot, esp32, BLE, programming, embedded
 tags: [IoT, BLE, bluetooth, esp32, programming, embedded]
@@ -8,12 +8,34 @@ image: esp32-ble-splash.png
 image-alt: Diagram of LED traffic lights controlled over LTE and BLE.
 ---
 
-ESP32 based microcontrollers are great for IoT applications, and allow you to use low power communication protocols such as Bluetooth Low Energy. 
-In this post, I'll show you how to program your own ESP32 to control a set of LEDs over a BLE connection from your smart phone.
+This is the first of a multi-post series about my senior capstone project while at Penn State.  
 
 <div class="note" >
-  Link to souce code: <a href="https://github.com/tsengia/iot-thingy91-traffic-lights/tree/main/esp32" >tsengia/iot-thingy91-traffic-lights/esp32 on GitHub</a><br />
+  Link to souce code: <a href="https://github.com/tsengia/iot-thingy91-traffic-lights/tree/main/esp32" >tsengia/iot-thingy91-traffic-lights on GitHub</a><br />
 </div>
+
+# Project Overview
+My senior capstone was sponsored by <a href="https://exactagss.com/">Exacta GSS</a>, which is a consulting company for the <a href="https://www.onem2m.org/">oneM2M</a> IoT protocol.
+
+The end goals of the project were two fold
+1. Control Red, Yellow, and Green "Traffic Light" LEDs using the oneM2M IoT protocol
+2. Create an "Upper Tester" interface for verifying the oneM2M Application Entity (AE) was functioning properly
+
+These goals seem simple at first, but we were given additional requirements that made our implementation very complex.  
+In the end, my team had to complete the following tasks:  
+1. Control LEDs over BLE using an ESP32
+2. Pair the ESP32 with a Thingy:91 over BLE
+3. Deploy a oneM2M "CSE" onto AWS
+4. Create a custom oneM2M "FlexContainer" definition on the CSE
+4. Connect the Thingy:91 to the oneM2M CSE over an LTE connection with HTTP requests
+5. Create a web dashboard for controlling the LEDs
+6. Connect the dashboard to the oneM2M CSE using HTTP requests
+7. Create a Python TKinter GUI that sends UART commands to an attached Thingy:91
+
+If I had control over the requirements, I would have just used a single ESP32 microcontroller connected to WiFi and thrown together a web API and dashboard for controlling the LEDs. 
+This would take a few weeks to create, instead of the many months it took to develop everything.
+
+The second goal was the easiest. It's final implementation was a simple Tkinter GUI that sends commands over a serial port to a Thingy:91 attached via a micro-USB cable.
 
 ## Hardware and Schematics
 I'm using this [`ESP-WROOM-32` ESP-32S Development Board from Amazon](https://a.co/d/16fcZjt), but these instructions and code will probably work for almost any ESP32 based device.
