@@ -9,6 +9,11 @@ tags: [web, aws, serverless, graphql]
 For my capstone project as Penn State, I built a React JS single page app (SPA) that used Axios to communicate using an obscure IoT protocol known as oneM2M.  
 Now I'm migrating that dashboard to AWS to show my work to others.  
 
+<div class="note" >
+  Try out the dashboard here: <a href="https://main.d357xgwrfyl7b5.amplifyapp.com/" >https://main.d357xgwrfyl7b5.amplifyapp.com/</a><br />
+  Source code repository: <a href="https://github.com/tsengia/intersection-dashboard" >tsengia/intersection-dashboard on GitHub</a>
+</div>
+
 # Background
 One part of my capstone project was to create a web dashboard to control some LEDs using the <a href="https://www.onem2m.org/">oneM2M</a> IoT protocol.
 At the center of this oneM2M protocol is a backend server known as the oneM2M CSE. This CSE was essentially a message broker and datastore.  
@@ -317,11 +322,160 @@ export default aws_settings;
 
 The `process.env.REACT_APP_*` variables get replaced by the values read from the `.env` file during the build process, so I do not have to worry about commiting my authentication secrets to my GitHub repository.  
 
-# Step 5: Implementing the ReactJS Client
+# Step 5: Implementing the ReactJS GraphQL Client
 Now that I have removed oneM2M and setup my app to use AWS AppSync, I can now begin writing code to send and receive data from my API.  
 I would like to have used React's `useEffect`, but my existing components are all class based, so I will stick to using the regular lifecycle callbacks.  
 
 The first step is to list all available intersections when the app loads in. For this, I added a `componentDidMount` function to my `Dashboard` class:
 ```js
+componentDidMount() {
+    API.configure(aws_settings);
 
+    API.graphql( {
+        query: intersectionList
+    }).then((result) => {
+        console.log(result.data.intersectionList);
+        let intersection_name_map = {};
+        for (let i of result.data.intersectionList) {
+            intersection_name_map[i.name] = i;
+        }
+        this.setState({ intersections: intersection_name_map });
+    }).catch((error) => {
+        console.error(error);
+    });
+}
 ```
+
+I also added callback functions within my `Dashboard` class to handle the addition and deletion of Intersections. I now understand why state management frameworks like Mob-X are popular. Chaining/nesting callbacks to child components is very awkward and potentially hard to read. Most of the state logic was handled in the `Dashboard` class, but I did break out updating the light colors to the child `Intersection` components because updating the light values were something that could contained within the Intersection itself and did not require the parent Dashboard to know about it. I am certainly seeing the benefits of Stateless, Functional Components (SFC), but I am going to stick to a class-based components for now.  
+
+# Step 6:  Adding Realtime Subscriptions
+Now that I am able to add, remove, and update Intersections in my dashboard, it is now time to add a realtime subscription mechanism.  
+
+The subscription mechanism that AppSync provides is websocket based. This is great, I'm a fan of websockets. The old, oneM2M version of this dashboard actually used something called HTTP long polling to acheive real-time notifications of events. HTTP long polling is interesting. It's supported [better in older browsers than websockets](https://stackoverflow.com/questions/36290520/longpolling-vs-websockets).
+
+First, I have to add subscriptions into my GraphQL schema using `@aws_subscribe` directives and adding a `Subscription` type.
+
+My GraphQL schema now looks like:
+```graphql
+type Intersection {
+	name: String!
+	light1: String!
+	light2: String!
+	ble_state: String!
+}
+
+type Mutation {
+	# Returns the new Intersection
+	addIntersection(name: String!): Intersection
+	# Returns the updated Intersection
+	updateIntersection(
+		name: String!,
+		light1: String,
+		light2: String,
+		ble_state: String
+	): Intersection
+	# Returns the name of the deleted intersection
+	removeIntersection(name: String!): Intersection
+}
+
+type Query {
+	# Returns a list of Intersections
+	intersectionList: [Intersection]
+	# Returns the specified Intersection
+	intersection(name: String!): Intersection
+}
+
+type Subscription {
+    addedIntersection: Intersection
+    @aws_subscribe(mutations: ["addIntersection"])
+    removedIntersection: Intersection
+    @aws_subscribe(mutations: ["removeIntersection"])
+    updatedIntersection(name: String): Intersection
+    @aws_subscribe(mutations: ["updateIntersection"])
+}
+
+schema {
+	query: Query
+	mutation: Mutation
+    subscription: Subscription
+}
+```
+
+With my schema updated, it is now time to make the ReactJS app connect to the websocket on startup.  
+To do this, I will need to know where the realtime endpoint is located. The GraphQL and websock/realtime endpoints are actually two different URLs, which you can discover with the following command:
+```bash
+aws appsync get-graphql-api --profile ********** --api-id **********
+```
+
+This command returns:
+```json
+{
+    "graphqlApi": {
+        "name": "IntersectionAPI",
+        "apiId": "************************",
+        "authenticationType": "API_KEY",
+        "logConfig": {
+            "fieldLogLevel": "ALL",
+            "cloudWatchLogsRoleArn": "arn:aws:iam::************:role/service-role/appsync-graphqlapi-logs-******",
+            "excludeVerboseContent": false
+        },
+        "arn": "arn:aws:appsync:******:************:apis/************************",
+        "uris": {
+            "REALTIME": "wss://************************.appsync-realtime-api.******.amazonaws.com/graphql",
+            "GRAPHQL": "https://************************.appsync-api.******.amazonaws.com/graphql"
+        },
+        "tags": {},
+        "xrayEnabled": false
+    }
+}
+```
+
+From the above output, you can see that the `REALTIME` URI is slightly different from the `GRAPHQL` endpoint. Because of this, I will need to modify my `.env` file to expose the location of the realtime endpoint to my React app.
+
+New `.env` file:
+```
+REACT_APP_AWS_REGION=******
+REACT_APP_AWS_GRAPHQLENDPOINT=https://******************.appsync-api.******.amazonaws.com/graphql
+REACT_APP_AWS_REALTIMEENDPOINT=wss://************************.appsync-realtime-api.******.amazonaws.com/graphql
+REACT_APP_AWS_AUTHENTICATIONTYPE=API_KEY
+REACT_APP_AWS_APIKEY=***********************
+```
+
+New `src/aws-exports.js` file:
+```js
+const aws_settings = {
+    aws_appsync_graphqlEndpoint: process.env.REACT_APP_AWS_GRAPHQLENDPOINT,
+    aws_appsync_realtimeEndpoint: process.env.REACT_aPP_AWS_REALTIMEENDPOINT,
+    aws_appsync_region: process.env.REACT_APP_AWS_REGION,
+    aws_appsync_authenticationType: process.env.REACT_APP_AWS_AUTHENTICATIONTYPE,
+    aws_appsync_apiKey: process.env.REACT_APP_AWS_APIKEY,
+};
+
+export default aws_settings;
+```
+
+Additionally, since I've updated the Schema on AWS, I need to refresh the schema on my local git repository:
+```bash
+npx amplify codegen
+```
+This command generates an additional TypeScript file at `src/graphql/subscriptions.ts`.  
+
+Now on startup my React app will subscribe to add and remove events on startup.
+
+To subscribe to events, I must make a GraphQL query and save the subscription so that I can cancel it later when the web-app exits (well, if it exits cleanly that is!).
+I placed the new subscription calls within `componentDidMount()` and added the unsubscription calls to `componentWillUnmount()` of the Dashboard component.  
+
+At first, I had split some of the state across the Dashboard component and the Intersection components. This caused a litanny of bugs, and ultimately I had to "lift state up" back
+to the Dashboard component. Once I had state fully in the Dashboard component, the bugs I was seeing went away.  
+
+# Step 7: Build and Deploy
+Now that my React web-app is fully functional, I can connect AWS Amplify to my GitHub repository. Amplify also allows me to add in the environment variables that I left out of my GitHub repository.  
+
+Within a few minutes, my web-app is built, and globally accessible.
+
+# Conclusion
+Wow, AWS is awesome.  
+I just built a globally available, scalable, serverless web-app in three days.  
+Such speed is not possible when coding everything by yourself. Yes, there are some things that AWS does "automagically" for you, such as the Graph QL code generation and using the AWS Amplify JS SDKs. Sometimes "automagical" things can be difficult to use/maintain/configure, but so far that has not been an issue.  
+
+I look forward to continuing to build with AWS and it's "automagical" awesomeness.
