@@ -1,9 +1,11 @@
 ---
 layout: post
-title: "IoT: Migrating the Traffic Light Dashboard to AWS"
+title: "AWS: Migrating the IoT Traffic Light Dashboard to the cloud"
 author: "Tyler Sengia"
 categories: web, aws, serverless, graphql
 tags: [web, aws, serverless, graphql]
+image: iot-dashboard-splash.png
+image-alt: Screenshot of the intersection dashboard.
 ---
 
 For my capstone project as Penn State, I built a React JS single page app (SPA) that used Axios to communicate using an obscure IoT protocol known as oneM2M.  
