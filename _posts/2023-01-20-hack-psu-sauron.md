@@ -16,7 +16,8 @@ Our team won first place overall, as well as the first place prize for the Nitta
 <div class="note" >
   Link to souce code: <a href="https://github.com/tsengia/HackPSU-Sauron" >tsengia/HackPSU-Sauron on GitHub</a><br />
   Link to demo video 1: <a href="https://youtu.be/jCYQIU0-NDI" >Sauron Demo Video 1 on YouTube </a><br />
-  Link to demo video 2: <a href="https://youtu.be/qyVEQ1Qsfvo" > Sauron Demo Video 2 on YouTube </a>
+  Link to demo video 2: <a href="https://youtu.be/qyVEQ1Qsfvo" > Sauron Demo Video 2 on YouTube </a><br />
+  Link to our DevPost submission: <a href="https://devpost.com/software/sauron-ke72by">Sauron on DevPost</a>
 </div>
 
 ## Overview of Sauron
