@@ -1,6 +1,6 @@
 ---
 layout: post
-title: "AWS: Migrating the IoT Traffic Light Dashboard to the cloud"
+title: "AWS: Migrating the IoT Dashboard to the cloud"
 author: "Tyler Sengia"
 categories: web, aws, serverless, graphql
 tags: [web, aws, serverless, graphql]
