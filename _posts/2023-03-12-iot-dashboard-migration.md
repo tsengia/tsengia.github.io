@@ -91,7 +91,7 @@ type Mutation {
   #  Returns the new Intersection
   addIntersection(name: String!): Intersection
   #  Returns the name of the deleted intersection
-  removeIntersection(name: String!): String
+  removeIntersection(name: String!): Intersection
   #  Returns the updated Intersection
   updateIntersection(ble_state: String, light1: String, light2: String, name: String!): Intersection
 }
