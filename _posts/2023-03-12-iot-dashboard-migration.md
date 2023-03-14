@@ -9,8 +9,18 @@ tags: [web, aws, serverless, graphql]
 For my capstone project as Penn State, I built a React JS single page app (SPA) that used Axios to communicate using an obscure IoT protocol known as oneM2M.  
 Now I'm migrating that dashboard to AWS to show my work to others.  
 
+# Demo App Instructions
+Below are links to the application and the source code.
+
+Instructions for use:
+1. Click the <a href="https://main.d357xgwrfyl7b5.amplifyapp.com/" >Demo Link</a> to open up a new window with the dashboard
+2. __Open up a second window__, to have two windows with the dashboard
+3. Press the "+" button to add a new Intersection, give it a name, you will see it pop-up in both windows
+4. Try clicking the different colors to change the light colors
+5. Press the red "X" on the top right of an Intersection to delete it
+
 <div class="note" >
-  Try out the dashboard here: <a href="https://main.d357xgwrfyl7b5.amplifyapp.com/" >https://main.d357xgwrfyl7b5.amplifyapp.com/</a><br />
+  Demo link: <a href="https://main.d357xgwrfyl7b5.amplifyapp.com/" >https://main.d357xgwrfyl7b5.amplifyapp.com/</a><br />
   Source code repository: <a href="https://github.com/tsengia/intersection-dashboard" >tsengia/intersection-dashboard on GitHub</a>
 </div>
 
@@ -386,18 +396,18 @@ type Query {
 }
 
 type Subscription {
-    addedIntersection: Intersection
-    @aws_subscribe(mutations: ["addIntersection"])
-    removedIntersection: Intersection
-    @aws_subscribe(mutations: ["removeIntersection"])
-    updatedIntersection(name: String): Intersection
-    @aws_subscribe(mutations: ["updateIntersection"])
+	addedIntersection: Intersection
+		@aws_subscribe(mutations: ["addIntersection"])
+	removedIntersection: Intersection
+		@aws_subscribe(mutations: ["removeIntersection"])
+	updatedIntersection(name: String): Intersection
+		@aws_subscribe(mutations: ["updateIntersection"])
 }
 
 schema {
 	query: Query
 	mutation: Mutation
-    subscription: Subscription
+	subscription: Subscription
 }
 ```
 
