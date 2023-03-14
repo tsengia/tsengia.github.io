@@ -105,7 +105,7 @@ type Query {
 ```
 
 # Step 3: Create Pipeline Resolvers
-With the GraphQL Schema in place, I can now attach my API to the DynamoDB table as a datasource and being writing the resolvers.
+With the GraphQL Schema in place, I can now attach my API to the DynamoDB table as a datasource and begin writing the resolvers.
 
 While debugging these resolvers, I found it very helpful to enable verbose logging for my AppSync API so that I could see log messages in CloudWatch.
 
@@ -203,10 +203,7 @@ export function response(ctx) {
 }
 ```
 This simply issues a `PutItem` request on the DynamoDB table to add a new `Intersection` object with default values.
-I attached this Function to the `/addIntersection` resolver pipeline.
-
-The gotcha that I encountered with this resolver is that the `PutItem` request will replace an existing object of the same `key` if it already exists.  
-For my API, that is not desirable. I would like to return an error if the `key` already exists. Yes, this adds overhead to my API since I have to check if the `key` exists already, but for my simple dashboard application I am ok with this. It took me a bit to understand the condition expressions, and I had to add in the error propagation to the `response()` function.
+I attached this Function to the `/addIntersection` resolver pipeline. While I was writing this resolver I unexpectedly encountered a bug. The `PutItem` DynamoDB request will replace an existing object of the same `key` if it already exists. For my API, that is not desirable. I would like to return an error if the `key` already exists. Yes, this adds overhead to my API since I have to check if the `key` exists already, but for my simple dashboard application I am ok with this. It took me a bit to understand the condition expressions, and I had to add in the error propagation to the `response()` function.
 
 ## Update Intersection Function
 For the `/updateIntersection` Mutation, I created an AppSync Function named `UPDATE_INTERSECTION`:
@@ -253,7 +250,7 @@ I attached this Function to the `/updateIntersection` resolver pipeline.
 
 This Function took a considerably longer amount of time to write. I was unfamiliar with DynamoDB's [update expressions](https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/Expressions.UpdateExpressions.html#Expressions.UpdateExpressions.SET), and how to pass in values substituted into the expression. I recognize that AppSync essentially forces you to make use of the `expressionValues` field when performing `SET` updates. Perhaps this is to sidestep the risk of injection based attacks? Still, I wonder if DynamoDB is susceptible to injection attacks like SQL is notorious for. A quick Google shows that yes, Dynamo DB is vulnerable to injection attacks if you don't validate/filter/escape user input.
 
-Additionally, I originally left out the `condition` expression. I was unaware that if the object does not exists, the update will create the object with the specified values. This led to some interesting errors for me while testing. I had created an interesection, removed it, and then updated it. When I queried `intersectionList` again, I got back a confusing error response instead of the expected `[]` value. This was because the result was not an empty array, but actually contained an incomplete intersection object. By enforcing the constraint that updates can only update existing intersections, this bug went away.
+Additionally, I originally left out the `condition` expression. I was unaware that if the object does not exists, the update will create the object with the specified values. This led to some interesting errors for me while testing. I had created an interesection, removed it, and then updated it. When I queried `intersectionList` again, I got back a confusing error response instead of the expected `[]` value. This was because the result was not an empty array, but actually contained an incomplete intersection object. By constraining updates to only update existing intersections, this bug went away.
 
 ## Remove Intersection Function
 For the `/removeIntersection` Mutation, I created an AppSync Function named `UPDATE_INTERSECTION`:
@@ -276,7 +273,7 @@ export function response(ctx) {
     return result;
 }
 ```
-This simply issues an `DeleteItem` request on the DynamoDB table to add a new `Intersection` object with default values.
+This simply issues an `DeleteItem` request on the DynamoDB table.
 I attached this Function to the `/removeIntersection` resolver pipeline.
 
 # Step 4: Configuring the ReactJS Client
@@ -310,7 +307,7 @@ npx amplify add codegen --apiId ****************
 ```
 This command generated an `API.ts` file in my `src/` directory as well as `mutations.ts` and `queries.ts` in `src/graphql`. 
 
-In order for my React app to connect to my GraphQL API, I'll need to provide it the API endpoint and authentication information. However, I don't want to commit these authentication secrets into my source code because then it is publically available to anyone looking at my GitHub repository. Instead, I created an Object that reads in the authentication secrets from a `.env` file using []`create-react-app`'s Environment Variables feature](https://create-react-app.dev/docs/adding-custom-environment-variables/#adding-development-environment-variables-in-env).  
+In order for my React app to connect to my GraphQL API, I'll need to provide it the API endpoint and authentication information. However, I don't want to commit these authentication secrets into my source code. Committing secrets to source code allows anyone to see these secrets by just looking at my GitHub repository. Instead, I created an Object that reads in the authentication secrets from a `.env` file using [`create-react-app`'s Environment Variables feature](https://create-react-app.dev/docs/adding-custom-environment-variables/#adding-development-environment-variables-in-env). If you are a more knowledgable reader, you will realize that the API key still gets baked into my build web-app and is accessible to anyone who looks at the JavaScript code of the web-app. If I really wanted to be secure, I could use something like Cognito to force users to authenticate with my API before using it, however that is not the experience I want.
 
 My `.env` file looked like this (information redacted):
 ```
@@ -358,12 +355,12 @@ componentDidMount() {
 }
 ```
 
-I also added callback functions within my `Dashboard` class to handle the addition and deletion of Intersections. I now understand why state management frameworks like Mob-X are popular. Chaining/nesting callbacks to child components is very awkward and potentially hard to read. Most of the state logic was handled in the `Dashboard` class, but I did break out updating the light colors to the child `Intersection` components because updating the light values were something that could contained within the Intersection itself and did not require the parent Dashboard to know about it. I am certainly seeing the benefits of Stateless, Functional Components (SFC), but I am going to stick to a class-based components for now.  
+I also added callback functions within my `Dashboard` class to handle the addition and deletion of Intersections. I now understand why state management frameworks like Mob-X are popular. Chaining/nesting callbacks to child components is very awkward and potentially hard to read. All of the state + API logic was handled in the `Dashboard` class. I am certainly seeing the benefits of Stateless Functional Components (SFC), but I am going to stick to a class-based components for now.  
 
 # Step 6:  Adding Realtime Subscriptions
 Now that I am able to add, remove, and update Intersections in my dashboard, it is now time to add a realtime subscription mechanism.  
 
-The subscription mechanism that AppSync provides is websocket based. This is great, I'm a fan of websockets. The old, oneM2M version of this dashboard actually used something called HTTP long polling to acheive real-time notifications of events. HTTP long polling is interesting. It's supported [better in older browsers than websockets](https://stackoverflow.com/questions/36290520/longpolling-vs-websockets).
+The subscription mechanism that AppSync provides is websocket based. This is great, I'm a fan of websockets. The old, oneM2M version of this dashboard actually used something called HTTP long polling to acheive real-time notifications of events. HTTP long polling is interesting. It's supported [better in older browsers than websockets](https://stackoverflow.com/questions/36290520/longpolling-vs-websockets), and probably better supported in IoT devices as well. Regardless, I still prefer websockets, they acheive their purpose without the additional trickery that would probably give [Roy Fielding](https://roy.gbiv.com/untangled/) a headache.
 
 First, I have to add subscriptions into my GraphQL schema using `@aws_subscribe` directives and adding a `Subscription` type.
 
