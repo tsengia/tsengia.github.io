@@ -8,11 +8,17 @@ image: iot-dashboard-splash.png
 image-alt: Screenshot of the intersection dashboard.
 ---
 
-For my capstone project as Penn State, I built a React JS single page app (SPA) that used Axios to communicate using an obscure IoT protocol known as oneM2M.  
-Now I'm migrating that dashboard to AWS to show my work to others.  
+For my [capstone project at Penn State](https://sites.psu.edu/lfshowcasefa22/2022/12/07/cellular-based-iot-using-onem2m-testing-for-conformance/), I built a React JS single page app (SPA) that used Axios to communicate using an IoT protocol known as oneM2M in realtime.  
+Now I'm refactoring the app to use AWS AppSync to show my work to others.  
 
 # Demo App Instructions
-Below are links to the application and the source code.
+Below are links to the demo application and the source code.
+
+This web-app is a dashboard that allows users to control multiple Traffic Intersections. 
+Each Traffic Intersection contains two traffic lights, which can be set to Red, Yellow, Green or Off. 
+If the user allows traffic (ie. green, yellow, or off) in one direction, the dashboard will automatically set the other direction to red. 
+For example, if a user sets Light 1 in Intersection A to green, Light 2 will automatically be set to red. This is a very light "safety" feature for controlling traffic.  
+Additionally, this web-app used websockets to provide real-time data. For example, if you open this web-app on two different devices, the changes you make on one device will propagate in real time to the other device!  
 
 Instructions for use:
 1. Click the <a href="https://main.d357xgwrfyl7b5.amplifyapp.com/" >Demo Link</a> to open up a new window with the dashboard
@@ -27,14 +33,12 @@ Instructions for use:
 </div>
 
 # Background
-One part of my capstone project was to create a web dashboard to control some LEDs using the <a href="https://www.onem2m.org/">oneM2M</a> IoT protocol.
-At the center of this oneM2M protocol is a backend server known as the oneM2M CSE. This CSE was essentially a message broker and datastore.  
+This article is reusing the front end of a web-app that I created a few months ago for [my capstone project at Penn State](https://sites.psu.edu/lfshowcasefa22/2022/12/07/cellular-based-iot-using-onem2m-testing-for-conformance/). Part of this capstone project involved creating a web dashboard to control some LEDs using the <a href="https://www.onem2m.org/">oneM2M</a> IoT protocol. I also had to program a Thingy:91 to communicate with a backend server known as the oneM2M CSE. But for this article I am replacing oneM2M with AWS AppSync.  
 
-My project used HTTP carrying JSON messages to communicate with the oneM2M CSE. Now that I'm migrating the dashboard to the cloud, I do not need the oneM2M communications anymore.  
+If you're still curious about oneM2M and my work with IoT devices, you can checkout the original capstone project on [Penn State's Learning Factory website](https://sites.psu.edu/lfshowcasefa22/2022/12/07/cellular-based-iot-using-onem2m-testing-for-conformance/).
 
 # Step 1: Creating a DynamoDB Table
-Since I am no longer using the oneM2M, I now have to create a DynamoDB to store the state of the dashboard.  
-The dashboard allows users to control multiple Traffic Intersections. Each Traffic Intersection contains two traffic lights, which can be set to Red, Yellow, or Green.  
+Because I am no longer using oneM2M as my backend, I will need to create a Dynamo database to store the state of the dashboard.  
 
 The DynamoDB table I created has the following settings:
 - Table name: `intersections`
@@ -64,7 +68,7 @@ For the dashboard, each Intersection has four properties:
 - `name` - Name of the intersection, also the partion key for our table
 - `light1` - State of the first traffic light
 - `light2` - State of the second traffic light
-- `ble-state` - Status of the Thingy:91's BLE connection to the ESP32
+- `ble_state` - Status of the Thingy:91's BLE connection to the ESP32
 
 The valid values for `light1` and `light2` are: `red`, `yellow`, `green`, and `off`.
 
@@ -478,7 +482,8 @@ At first, I had split some of the state across the Dashboard component and the I
 to the Dashboard component. Once I had state fully in the Dashboard component, the bugs I was seeing went away.  
 
 # Step 7: Build and Deploy
-Now that my React web-app is fully functional, I can connect AWS Amplify to my GitHub repository. Amplify also allows me to add in the environment variables that I left out of my GitHub repository.  
+Now that my React web-app is fully functional, I can connect AWS Amplify to my GitHub repository. 
+Amplify also allows me to add in the environment variables that I left out of my GitHub repository for security.  
 
 Within a few minutes, my web-app is built, and globally accessible.
 
