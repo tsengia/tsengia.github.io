@@ -18,7 +18,8 @@ This web-app is a dashboard that allows users to control multiple Traffic Inters
 Each Traffic Intersection contains two traffic lights, which can be set to Red, Yellow, Green or Off. 
 If the user allows traffic (ie. green, yellow, or off) in one direction, the dashboard will automatically set the other direction to red. 
 For example, if a user sets Light 1 in Intersection A to green, Light 2 will automatically be set to red. This is a very light "safety" feature for controlling traffic.  
-Additionally, this web-app used websockets to provide real-time data. For example, if you open this web-app on two different devices, the changes you make on one device will propagate in real time to the other device!  
+
+Additionally, this web-app uses websockets to provide real-time data. If you open this web-app on two different devices, the changes you make on one device will propagate to the other device!  
 
 Instructions for use:
 1. Click the <a href="https://main.d357xgwrfyl7b5.amplifyapp.com/" >Demo Link</a> to open up a new window with the dashboard
