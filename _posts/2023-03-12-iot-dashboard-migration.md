@@ -12,8 +12,6 @@ For my [capstone project at Penn State](https://sites.psu.edu/lfshowcasefa22/202
 Now I'm refactoring the app to use AWS AppSync to show my work to others.  
 
 # Demo App Instructions
-Below are links to the demo application and the source code.
-
 This web-app is a dashboard that allows users to control multiple Traffic Intersections. 
 Each Traffic Intersection contains two traffic lights, which can be set to Red, Yellow, Green or Off. 
 If the user allows traffic (ie. green, yellow, or off) in one direction, the dashboard will automatically set the other direction to red. 
@@ -28,13 +26,17 @@ Instructions for use:
 4. Try clicking the different colors to change the light colors
 5. Press the red "X" on the top right of an Intersection to delete it
 
+Below are links to the demo application and the source code.
 <div class="note" >
   Demo link: <a href="https://main.d357xgwrfyl7b5.amplifyapp.com/" >https://main.d357xgwrfyl7b5.amplifyapp.com/</a><br />
   Source code repository: <a href="https://github.com/tsengia/intersection-dashboard" >tsengia/intersection-dashboard on GitHub</a>
 </div>
 
 # Background
-This article is reusing the front end of a web-app that I created a few months ago for [my capstone project at Penn State](https://sites.psu.edu/lfshowcasefa22/2022/12/07/cellular-based-iot-using-onem2m-testing-for-conformance/). Part of this capstone project involved creating a web dashboard to control some LEDs using the <a href="https://www.onem2m.org/">oneM2M</a> IoT protocol. I also had to program a Thingy:91 to communicate with a backend server known as the oneM2M CSE. But for this article I am replacing oneM2M with AWS AppSync.  
+This article is reusing the front end of a web-app that I created a few months ago for [my capstone project at Penn State](https://sites.psu.edu/lfshowcasefa22/2022/12/07/cellular-based-iot-using-onem2m-testing-for-conformance/). Part of this capstone project involved creating a web dashboard to control IoT devices 
+ using <a href="https://www.onem2m.org/">oneM2M</a>. These IoT devices communicated with a backend server known as the oneM2M CSE.  
+ 
+In this article I am replacing oneM2M with AWS AppSync.  
 
 If you're still curious about oneM2M and my work with IoT devices, you can checkout the original capstone project on [Penn State's Learning Factory website](https://sites.psu.edu/lfshowcasefa22/2022/12/07/cellular-based-iot-using-onem2m-testing-for-conformance/).
 
@@ -76,7 +78,7 @@ The valid values for `light1` and `light2` are: `red`, `yellow`, `green`, and `o
 # Step 2: Creating the GraphQL Schema
 Now that I have a DocumentDB table created and an example item to work with, I can create my GraphQL API Schema with AppSync.  
 
-I am skipping using the AWS Schema Wizards. I've tried them out before, but they've confused me more than helped me. Building from the ground up is sometimes easier and more insightful, although I do see the value in a one click and *poof* you have a GraphQL API.
+I will not be using the AWS Schema Wizards. I've tried them out before, but building from the ground up is sometimes easier and more insightful. However, I do see the value in the ability to click and *poof* a GraphQL API is generated for you.
 
 The schema that I am using is below:
 ```graphql
@@ -253,9 +255,9 @@ export function response(ctx) {
 This simply issues an `UpdateItem` request on the DynamoDB table to add a new `Intersection` object with default values.
 I attached this Function to the `/updateIntersection` resolver pipeline.
 
-This Function took a considerably longer amount of time to write. I was unfamiliar with DynamoDB's [update expressions](https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/Expressions.UpdateExpressions.html#Expressions.UpdateExpressions.SET), and how to pass in values substituted into the expression. I recognize that AppSync essentially forces you to make use of the `expressionValues` field when performing `SET` updates. Perhaps this is to sidestep the risk of injection based attacks? Still, I wonder if DynamoDB is susceptible to injection attacks like SQL is notorious for. A quick Google shows that yes, Dynamo DB is vulnerable to injection attacks if you don't validate/filter/escape user input.
+This Function took a considerably longer amount of time to write. I was unfamiliar with DynamoDB's [update expressions](https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/Expressions.UpdateExpressions.html#Expressions.UpdateExpressions.SET), and how to pass in values substituted into the expression. I recognize that AppSync essentially forces you to make use of the `expressionValues` field when performing `SET` updates. Perhaps this is to sidestep the risk of injection based attacks? Still, I wonder if DynamoDB is susceptible to injection attacks like SQL. A quick Google shows that yes, Dynamo DB is vulnerable to injection attacks if you don't handle user input correctly.
 
-Additionally, I originally left out the `condition` expression. I was unaware that if the object does not exists, the update will create the object with the specified values. This led to some interesting errors for me while testing. I had created an interesection, removed it, and then updated it. When I queried `intersectionList` again, I got back a confusing error response instead of the expected `[]` value. This was because the result was not an empty array, but actually contained an incomplete intersection object. By constraining updates to only update existing intersections, this bug went away.
+At first I left out the `condition` expression. I was unaware that if the object does not exist, the update will create the object with the specified values. This led to some interesting errors for me while testing. I had created an intersection, removed it, and then updated it. When I queried `intersectionList` again, I got back a confusing error response instead of the expected `[]` value. This was because the result was not an empty array, but actually contained an incomplete `Intersection` object. By constraining updates to only apply to existing intersections, this bug went away.
 
 ## Remove Intersection Function
 For the `/removeIntersection` Mutation, I created an AppSync Function named `UPDATE_INTERSECTION`:
@@ -360,12 +362,12 @@ componentDidMount() {
 }
 ```
 
-I also added callback functions within my `Dashboard` class to handle the addition and deletion of Intersections. I now understand why state management frameworks like Mob-X are popular. Chaining/nesting callbacks to child components is very awkward and potentially hard to read. All of the state + API logic was handled in the `Dashboard` class. I am certainly seeing the benefits of Stateless Functional Components (SFC), but I am going to stick to a class-based components for now.  
+I also added callback functions within my `Dashboard` class to handle the addition and deletion of Intersections. I now understand why state management frameworks like Mob-X are popular. Chaining/nesting callbacks to child components is very awkward and potentially hard to read. All of the state + API logic was handled in the `Dashboard` class. I am certainly seeing the benefits of Stateless Functional Components (SFC), but I am going to stick to class-based components for now.  
 
 # Step 6:  Adding Realtime Subscriptions
 Now that I am able to add, remove, and update Intersections in my dashboard, it is now time to add a realtime subscription mechanism.  
 
-The subscription mechanism that AppSync provides is websocket based. This is great, I'm a fan of websockets. The old, oneM2M version of this dashboard actually used something called HTTP long polling to acheive real-time notifications of events. HTTP long polling is interesting. It's supported [better in older browsers than websockets](https://stackoverflow.com/questions/36290520/longpolling-vs-websockets), and probably better supported in IoT devices as well. Regardless, I still prefer websockets, they acheive their purpose without the additional trickery that would probably give [Roy Fielding](https://roy.gbiv.com/untangled/) a headache.
+The subscription mechanism that AppSync provides is websocket based. This is great, I'm a fan of websockets. The old, oneM2M version of this dashboard actually used something called HTTP long polling to acheive real-time notifications of events. HTTP long polling is interesting. It's [better supported in older browsers than websockets](https://stackoverflow.com/questions/36290520/longpolling-vs-websockets), and probably better supported in IoT devices as well. Regardless, I still prefer websockets; they acheive their purpose without the additional trickery that would probably give [Roy Fielding](https://roy.gbiv.com/untangled/) a headache.
 
 First, I have to add subscriptions into my GraphQL schema using `@aws_subscribe` directives and adding a `Subscription` type.
 
@@ -480,7 +482,7 @@ To subscribe to events, I must make a GraphQL query and save the subscription so
 I placed the new subscription calls within `componentDidMount()` and added the unsubscription calls to `componentWillUnmount()` of the Dashboard component.  
 
 At first, I had split some of the state across the Dashboard component and the Intersection components. This caused a litanny of bugs, and ultimately I had to "lift state up" back
-to the Dashboard component. Once I had state fully in the Dashboard component, the bugs I was seeing went away.  
+to the Dashboard component. Once I had state fully in the Dashboard component, the bugs went away.  
 
 # Step 7: Build and Deploy
 Now that my React web-app is fully functional, I can connect AWS Amplify to my GitHub repository. 
@@ -490,7 +492,7 @@ Within a few minutes, my web-app is built, and globally accessible.
 
 # Conclusion
 Wow, AWS is awesome.  
-I just built a globally available, scalable, serverless web-app in three days.  
-Such speed is not possible when coding everything by yourself. Yes, there are some things that AWS does "automagically" for you, such as the Graph QL code generation and using the AWS Amplify JS SDKs. Sometimes "automagical" things can be difficult to use/maintain/configure, but so far that has not been an issue.  
 
-I look forward to continuing to build with AWS and it's "automagical" awesomeness.
+I just built a globally available, scalable, serverless web-app in three days.  
+
+I look forward to continuing to build with AWS.
