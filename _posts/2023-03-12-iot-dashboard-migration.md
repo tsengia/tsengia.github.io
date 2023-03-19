@@ -11,6 +11,11 @@ image-alt: Screenshot of the intersection dashboard.
 For my [capstone project at Penn State](https://sites.psu.edu/lfshowcasefa22/2022/12/07/cellular-based-iot-using-onem2m-testing-for-conformance/), I built a React JS single page app (SPA) that used Axios to communicate using an IoT protocol known as oneM2M in realtime.  
 Now I'm refactoring the app to use AWS AppSync to show my work to others.  
 
+<div class="note" >
+  Demo link: <a href="https://main.d357xgwrfyl7b5.amplifyapp.com/" >https://main.d357xgwrfyl7b5.amplifyapp.com/</a><br />
+  Source code repository: <a href="https://github.com/tsengia/intersection-dashboard" >tsengia/intersection-dashboard on GitHub</a>
+</div>
+
 # Demo App Instructions
 This web-app is a dashboard that allows users to control multiple Traffic Intersections. 
 Each Traffic Intersection contains two traffic lights, which can be set to Red, Yellow, Green or Off. 
@@ -25,12 +30,6 @@ Instructions for use:
 3. Press the "+" button to add a new Intersection, give it a name, you will see it pop-up in both windows
 4. Try clicking the different colors to change the light colors
 5. Press the red "X" on the top right of an Intersection to delete it
-
-Below are links to the demo application and the source code.
-<div class="note" >
-  Demo link: <a href="https://main.d357xgwrfyl7b5.amplifyapp.com/" >https://main.d357xgwrfyl7b5.amplifyapp.com/</a><br />
-  Source code repository: <a href="https://github.com/tsengia/intersection-dashboard" >tsengia/intersection-dashboard on GitHub</a>
-</div>
 
 # Background
 This article is reusing the front end of a web-app that I created a few months ago for [my capstone project at Penn State](https://sites.psu.edu/lfshowcasefa22/2022/12/07/cellular-based-iot-using-onem2m-testing-for-conformance/). Part of this capstone project involved creating a web dashboard to control IoT devices 
