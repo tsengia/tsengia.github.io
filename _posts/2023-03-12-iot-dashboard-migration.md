@@ -8,7 +8,7 @@ image: iot-dashboard-splash.png
 image-alt: Screenshot of the intersection dashboard.
 ---
 
-For my [capstone project at Penn State](https://sites.psu.edu/lfshowcasefa22/2022/12/07/cellular-based-iot-using-onem2m-testing-for-conformance/), I built a React JS single page app (SPA) that used Axios to communicate using an IoT protocol known as oneM2M in realtime.  
+For my capstone project at Penn State, I built a React JS single page app (SPA) that used Axios to communicate using an IoT protocol known as oneM2M in realtime.  
 Now I'm refactoring the app to use AWS AppSync to show my work to others.  
 
 # Demo App Instructions
@@ -491,8 +491,4 @@ Amplify also allows me to add in the environment variables that I left out of my
 Within a few minutes, my web-app is built, and globally accessible.
 
 # Conclusion
-Wow, AWS is awesome.  
-
-I just built a globally available, scalable, serverless web-app in three days.  
-
-I look forward to continuing to build with AWS.
+Wow, AWS is awesome. I just replatformed a globally available, scalable, serverless web-app in three days.
