@@ -39,13 +39,4 @@ I am a personal fan of Vim, but I'm also a fan of VS Code.
 
 
 ## What I'm Learning Now
-I recently became an AWS Certified Cloud Practitioner, so I'm taking some time to tinker with all the features AWS has to offer.  
-So far I've been trying out:  
-- IAM
-- Amplify
-- DynamoDB
-- AppSync
-- EC2
-- Lambda
-- CloudWatch
-- CloudTrail
+I recently bought myself a copy of [The Rust Programming Language](https://www.amazon.com/Rust-Programming-Language-2nd/dp/1718503105) and currently teaching myself Rust. Coming from a C/C++ background, Rust seems very powerful with its safety features, type checking, and syntactic sugar.
