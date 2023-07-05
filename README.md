@@ -15,7 +15,7 @@ Once you have Bundler installed, install the needed Gems using:
 bundle install
 ```
 
-Once you have the Gems installed, you can serve the page while performing live-edits:
+Once you have the Gems installed, you can serve the page while performing live-edits on drafts:
 ```bash
-jekyll serve -w -I -H 0.0.0.0
+jekyll serve --drafts -w -I -H 0.0.0.0
 ```

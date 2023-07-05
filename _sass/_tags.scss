@@ -8,16 +8,16 @@
     padding: 2px 3px 2px 3px;
     border-width: 2px;
     border-style: solid;
-    border-radius: 2px;
+    border-radius: 3px;
 }
 
-.tag-web, .tag-react {
+.tag-web, .tag-personal {
     background-color: #99CCFF;
     border-color: #6699CC;
     color: #114477;
 }
 
-.tag-aws, .tag-cloud, .tag-ember {
+.tag-aws, .tag-cloud {
     background-color: #ffCC99;
     border-color: #CC9966;
     color: #774411;
@@ -29,26 +29,26 @@
     color: #771144;
 }
 
-.tag-iot, .tag-hardware {
+.tag-iot, .tag-hardware, .tag-fpga {
     background-color: #99FFCC;
     border-color: #66CC99;
     color: #117744;
 }
 
-.tag-ml {
+.tag-ml, .tag-ai {
     background-color: #FF99FF;
     border-color: #AA00BB;
     color: #660055;
 }
 
-.tag-game, .tag-vue {
+.tag-game, .tag-vue, .tag-ember, .tag-react {
     background-color: #ffEE99;
     border-color: #CC9966;
     color: #774411;
 }
 
-.tag-personal {
-    background-color: #88CCCC;
-    border-color: #6699CC;
-    color: #556699;
+.tag-devops {
+    background-color: #FF9999;
+    border-color: #DD0000;
+    color: #BB0000;
 }
