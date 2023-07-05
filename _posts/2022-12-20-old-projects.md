@@ -3,7 +3,7 @@ layout: post
 title: "Old Web Projects"
 author: "Tyler Sengia"
 categories: web, html, archive
-tags: [html, javascript, css, web, achive, mla8]
+tags: [web, personal]
 ---
 
 I grew up programming on a daily basis.  

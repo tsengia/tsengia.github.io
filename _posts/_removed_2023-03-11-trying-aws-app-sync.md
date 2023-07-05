@@ -1,9 +1,9 @@
 ---
 layout: post
-title: "AWS: Thoughts while learning AWS AppSync"
+title: ""
 author: "Tyler Sengia"
 categories: web, aws, serverless, graphql
-tags: [web, aws, serverless, graphql]
+tags: [web, aws, graphql]
 ---
 
 I recently became an AWS Certified Cloud Practitioner, and I'm taking the time to migrate most of my old projects onto AWS to show as part of my portfolio of work.  

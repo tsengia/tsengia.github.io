@@ -3,7 +3,7 @@ layout: post
 title: "Survival Guide to VS Code Dev Containers"
 author: "Tyler Sengia"
 categories: devops, containers, vscode, programming, software
-tags: [devops, containers, docker, vscode]
+tags: [devops]
 image: routea1-engine-ide-splash.png
 image-alt: Screenshot of the RouteEngineA1 IDE.
 ---

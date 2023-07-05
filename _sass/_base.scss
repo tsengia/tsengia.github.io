@@ -8,6 +8,7 @@ body {
   color: $body-color;
   line-height: 1.75rem;
   background-color: #EEF;
+  margin: 0;
 }
 
 @media (max-width: $elements-responsive-width) {

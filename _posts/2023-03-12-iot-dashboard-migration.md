@@ -1,9 +1,9 @@
 ---
 layout: post
-title: "AWS: Migrating the IoT Dashboard to the cloud"
+title: "Migrating a Dashboard to AWS"
 author: "Tyler Sengia"
 categories: web, aws, serverless, graphql
-tags: [web, aws, serverless, graphql]
+tags: [web, aws, graphql]
 image: iot-dashboard-splash.png
 image-alt: Screenshot of the intersection dashboard.
 ---

@@ -1,21 +1,25 @@
 ---
 layout: page
-title: About Tyler Sengia
+title: 👋 Hi, I'm Tyler Sengia.
 permalink: /about
 tags: [about]
 ---
 
-# About Me
-👋 Hi, I'm Tyler Sengia.  
+__I enjoy the following about software:__
+- Observing and taking advantage of how humans + code interact
+- Showing others how to develop and use new technologies
+- Using and learning Web technologies
+- Automating tedious tasks
 
-I'm a software engineer that enjoys writing code for humans.  
+__I enjoy the following in my personal life:__
+- Spending time with family
+- Weightlifting
+- Fly fishing and hunting
+- Reading + writing blogs
 
-You will find that my computer interests vary widely.
+__Education:__ I graduated from Penn State University with a Bachelor's of Science degree in Computer Engineering in 2022.  
 
-This website hosts some of my old projects, thoughts, experiments, and examples of how to use some common software tools and paradimes.
-
-## Software Engineering Profile
-### Languages
+## Languages
 _Listed in order of preference/ability:_  
 - Python 3
 - C/C++
@@ -23,20 +27,41 @@ _Listed in order of preference/ability:_
 - JavaScript
 - Java
 - SQL
+- Batch
 
-### Libraries I've used
-Web: ReactJS, Vue2, Axios, Google Blockly, HTML5 Canvas, MIDI.JS  
+## Libraries/SDKs/Frameworks
 
-Python: matplotlib, flask, sql-alchemy, marshmallow, FastAPI  
+__C/C++:__ Google Protocol Buffers, Nlohmann JSON, cJSON, ZMQ, OpenCV
 
-C/C++: OpenCV, Google Protocol Buffers, cJSON, ZMQ   
+__Python:__ pytest, FastAPI, Flask, sql-alchemy, marshmallow, matplotlib
 
-### Tools
-Linux, CMake, Zephyr OS, Docker, GitLab, AWS
+__Web:__ Ember JS (Octane), ReactJS, Vue2, Axios, Google Blockly, HTML5 Canvas, MIDI.JS  
 
-### Editors
-I am a personal fan of Vim, but I'm also a fan of VS Code.  
+## Tools
 
+__OS__: Linux, Windows, Zephyr RTOS
+
+__DevOps:__ Docker, AWS, GitLab, Bamboo, BitBucket, Git, Trivvy, Sonar Qube
+
+__Build Tooling:__ CMake, CPack, AutoTools, Make, Ant
+
+I am also fairly handy with Regular Expressions.
+
+## Editors
+When I have the luxury, I use VS Code.  
+When I'm in the trenches, I use `vim`.  
+When demonstrating to others, I use `nano`.  
+When I'm really in the trenches or automating something, I use `sed`, `cat` and `less`.
 
 ## What I'm Learning Now
-I recently bought myself a copy of [The Rust Programming Language](https://www.amazon.com/Rust-Programming-Language-2nd/dp/1718503105) and currently teaching myself Rust. Coming from a C/C++ background, Rust seems very powerful with its safety features, type checking, and syntactic sugar.
+__Lanuages:__ Rust, TypeScript  
+
+I recently bought myself a copy of [The Rust Programming Language](https://www.amazon.com/Rust-Programming-Language-2nd/dp/1718503105) and currently teaching myself Rust. Coming from a C/C++ background, Rust seems very powerful with its safety features, type checking, and helpful compiler error messages. 
+
+I've also been learning more TypeScript while working on an Ember JS application written in TypeScript.  
+
+__Tools:__ AWS  
+I am working towards my AWS Solutions Architect Associate certification, so I am taking the time to learn more about AWS. The capabilities of AWS are astounding, and it would be foolish of me to not continue to learn as much as possible about it.  
+
+__Skills:__ UI/UX  
+I am working on maturing my UI/UX abilities, specifically for web applications.  

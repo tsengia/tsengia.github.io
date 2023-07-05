@@ -1,9 +1,9 @@
 ---
 layout: post
-title: "ESP32: Control LED Lights over BLE"
+title: "Control LED Lights over BLE with ESP32"
 author: "Tyler Sengia"
 categories: iot, esp32, BLE, programming, embedded
-tags: [IoT, BLE, bluetooth, esp32, programming, embedded]
+tags: [iot]
 image: esp32-ble-splash.png
 image-alt: Diagram of LED traffic lights controlled over LTE and BLE.
 ---

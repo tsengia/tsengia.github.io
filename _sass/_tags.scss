@@ -1,0 +1,54 @@
+.post-tags {
+    display: block;
+    font-size: 0.8rem;
+    font-family: sans-serif;
+}
+
+.post-tags span {
+    padding: 2px 3px 2px 3px;
+    border-width: 2px;
+    border-style: solid;
+    border-radius: 2px;
+}
+
+.tag-web, .tag-react {
+    background-color: #99CCFF;
+    border-color: #6699CC;
+    color: #114477;
+}
+
+.tag-aws, .tag-cloud, .tag-ember {
+    background-color: #ffCC99;
+    border-color: #CC9966;
+    color: #774411;
+}
+
+.tag-graphql, .tag-data, .tag-sql {
+    background-color: #ff99CC;
+    border-color: #CC6699;
+    color: #771144;
+}
+
+.tag-iot, .tag-hardware {
+    background-color: #99FFCC;
+    border-color: #66CC99;
+    color: #117744;
+}
+
+.tag-ml {
+    background-color: #FF99FF;
+    border-color: #AA00BB;
+    color: #660055;
+}
+
+.tag-game, .tag-vue {
+    background-color: #ffEE99;
+    border-color: #CC9966;
+    color: #774411;
+}
+
+.tag-personal {
+    background-color: #88CCCC;
+    border-color: #6699CC;
+    color: #556699;
+}

@@ -3,7 +3,7 @@ layout: post
 title: "Hello World!"
 author: "Tyler Sengia"
 categories: journal
-tags: [journal]
+tags: [personal]
 ---
 
 This is my first post on GitHub pages!

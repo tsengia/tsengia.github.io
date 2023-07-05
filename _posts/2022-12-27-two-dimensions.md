@@ -1,9 +1,9 @@
 ---
 layout: post
-title: "2Dimensions: Block based HTML5 Canvas game"
+title: "Block based HTML5 Canvas game"
 author: "Tyler Sengia"
 categories: web, javascript, canvas, game
-tags: [web, javascript, canvas, game]
+tags: [web, game]
 image: 2dimensions-splash.png
 image-alt: Screenshot of the 2Dimensions game, which shows a yellow player sprite digging a hole into the dirt blocks.
 ---

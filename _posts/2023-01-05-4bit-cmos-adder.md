@@ -3,7 +3,7 @@ layout: post
 title: "4 Bit CMOS 40XX Adder"
 author: "Tyler Sengia"
 categories: circuits, electronics, schematics
-tags: [circuits, electronics, adder, schematic]
+tags: [hardware]
 image: 4bit-adder/adder-full.jpg
 image-alt: Photo of the fully assembled 4 bit CMOS adder.
 ---

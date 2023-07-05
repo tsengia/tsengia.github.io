@@ -3,7 +3,7 @@ layout: post
 title: "2022 Hack PSU 1st place: Sauron"
 author: "Tyler Sengia"
 categories: hackathon, psu, cloud, data
-tags: [hackathon, cloud, data, grafana, gcp, web]
+tags: [web, cloud, sql]
 image: hackpsu-sauron-splash.png
 image-alt: Screenshot of the Hack PSU 2022 Sauron entry.
 ---

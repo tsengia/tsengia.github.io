@@ -1,9 +1,9 @@
 ---
 layout: post
-title: "RouteEngineA1: Homerolled IDE for HTML5 Canvas development"
+title: "Homerolled IDE for HTML5 Canvas Games"
 author: "Tyler Sengia"
 categories: web, javascript, canvas, ide
-tags: [web, javascript, canvas, ide]
+tags: [web]
 image: routea1-engine-ide-splash.png
 image-alt: Screenshot of the RouteEngineA1 IDE.
 ---

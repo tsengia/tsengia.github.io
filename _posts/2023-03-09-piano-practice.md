@@ -1,9 +1,9 @@
 ---
 layout: post
-title: "Piano Practice: Web Base Virtual Keyboard in Vue and MIDI.JS"
+title: "Web Based Virtual Keyboard in Vue"
 author: "Tyler Sengia"
 categories: web, javascript, vue
-tags: [web, javascript, vue]
+tags: [web, vue]
 image: piano-practice-splash.png
 image-alt: Screenshot of the Piano Practice web-app, treble and bass cleffs are visible.
 ---
