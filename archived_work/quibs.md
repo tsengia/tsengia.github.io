@@ -1,5 +1,5 @@
 ---
-layout: post
+layout: archived-work
 title: "First Genetic Learning Project"
 author: "Tyler Sengia"
 categories: simulation, code, ai/ml
@@ -10,10 +10,10 @@ image-alt: Screenshot showing red squares labeled with white numbers moving acro
 
 A long time ago, I decided to make my own simulation to see if "virtual organisms" would be able to learn to survive in a simulated habitat. These virtual organisms were named "Quibs." I don't know why I chose that name; probably because it just sounded funny.  
 
-You can run this simulation in your own browser by going to [this page on my website](assets/static/quibs.html). The simulation is entirely programmed in JavaScript and is rendered in real time on an HTML5 Canvas element.  
+You can run this simulation in your own browser by going to [this page on my website](../assets/static/quibs.html). The simulation is entirely programmed in JavaScript and is rendered in real time on an HTML5 Canvas element.  
 
 <div class="note" >
-  Link to demo application: <a href="assets/static/quibs.html" >quibs.html</a>
+  Link to demo application: <a href="../assets/static/quibs.html" >quibs.html</a>
 </div>
 
 # Simulation Environment
@@ -31,7 +31,7 @@ The simulation continues until only 3 Quibs are remaining, which are then "bred"
 The Quib's decision making is powered through a simple feed-forward artificial neural network shown below:  
 
 <div style="text-align: center;" >
-<img src="assets/img/quibs-network.png" alt="Diagram of the quib's feedforward neural network" />  
+<img src="../assets/img/quibs-network.png" alt="Diagram of the quib's feedforward neural network" />  
 </div>
 
 The neural network is comprised of 4 input neurons, 5 hidden neurons, and 4 output neurons. 

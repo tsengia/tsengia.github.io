@@ -1,5 +1,5 @@
 ---
-layout: post
+layout: archived-work
 title: "Web Based Virtual Keyboard in Vue"
 author: "Tyler Sengia"
 categories: web, javascript, vue
