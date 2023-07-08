@@ -90,8 +90,8 @@ Creating a self-signed certificate for the Flask web-app fixed this for us.
 The HackPSU hackathon was enjoyable, and exhausting. I did not get a minute of sleep the entire 12 hours.
 Working with four friends on my team was also enjoyable, and it helped build my skillset for collaboration and delegating tasks.  
 
-For example, I did most of the architecting and initial setup of GCP, SQL database, Grafana, and the HTTPS certificates for Flask.
-But I also broke up tasks according to individual components and distributed them to team members. Other team members created the mobile event reporting form, domain name registration, frame capture from Youtube DL, and writing up our [submission for HackPSU's DevPost](https://devpost.com/software/sauron-ke72by).
+For example, I did the initial setup of GCP, SQL database, Grafana, and the HTTPS certificates for Flask.
+Other team members created the mobile event reporting form, domain name registration, frame capture from Youtube DL, and writing up our [submission for HackPSU's DevPost](https://devpost.com/software/sauron-ke72by).
 
 <div style="text-align: center;" >
 <img src="assets/img/sauron/hackpsu_team_photo.png" alt="Photo of my team after the hackathon" /><br />
